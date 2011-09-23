@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FD3B0D50-46B3-4A83-9A6D-C641569142CF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Ar.Com.Hjg.Pngnet</RootNamespace>
+    <AssemblyName>Pngnet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Chunks\ChunkHelper.cs" />
+    <Compile Include="Chunks\ChunkList.cs" />
+    <Compile Include="Chunks\ChunkLoadBehaviour.cs" />
+    <Compile Include="Chunks\ChunkRaw.cs" />
+    <Compile Include="Chunks\ChunksToWrite.cs" />
+    <Compile Include="Chunks\PngChunkCHRM.cs" />
+    <Compile Include="Chunks\PngChunkSBIT.cs" />
+    <Compile Include="Chunks\PngChunkSRGB.cs" />
+    <Compile Include="FilterWriteStrategy.cs" />
+    <Compile Include="FileHelper.cs" />
+    <Compile Include="PngCsUtils.cs" />
+    <Compile Include="ImageInfo.cs" />
+    <Compile Include="ImageLine.cs" />
+    <Compile Include="ImageLineHelper.cs" />
+    <Compile Include="Chunks\PngChunk.cs" />
+    <Compile Include="Chunks\PngChunkBKGD.cs" />
+    <Compile Include="Chunks\PngChunkGAMA.cs" />
+    <Compile Include="Chunks\PngChunkICCP.cs" />
+    <Compile Include="Chunks\PngChunkIDAT.cs" />
+    <Compile Include="Chunks\PngChunkIEND.cs" />
+    <Compile Include="Chunks\PngChunkIHDR.cs" />
+    <Compile Include="Chunks\PngChunkITXT.cs" />
+    <Compile Include="Chunks\PngChunkOTHER.cs" />
+    <Compile Include="Chunks\PngChunkPHYS.cs" />
+    <Compile Include="Chunks\PngChunkPLTE.cs" />
+    <Compile Include="Chunks\PngChunkTEXT.cs" />
+    <Compile Include="Chunks\PngChunkTextVar.cs" />
+    <Compile Include="Chunks\PngChunkTIME.cs" />
+    <Compile Include="Chunks\PngChunkTRNS.cs" />
+    <Compile Include="Chunks\PngChunkZTXT.cs" />
+    <Compile Include="PngFilterType.cs" />
+    <Compile Include="PngHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PngIDatChunkInputStream.cs" />
+    <Compile Include="PngIDatChunkOutputStream.cs" />
+    <Compile Include="PngjBadCrcException.cs" />
+    <Compile Include="PngjException.cs" />
+    <Compile Include="PngjInputException.cs" />
+    <Compile Include="PngjOutputException.cs" />
+    <Compile Include="PngjUnsupportedException.cs" />
+    <Compile Include="PngReader.cs" />
+    <Compile Include="PngWriter.cs" />
+    <Compile Include="ProgressiveOutputStream.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="sharpzip\Adler32.cs" />
+    <Compile Include="sharpzip\CRC32.cs" />
+    <Compile Include="sharpzip\Deflater.cs" />
+    <Compile Include="sharpzip\DeflaterConstants.cs" />
+    <Compile Include="sharpzip\DeflaterEngine.cs" />
+    <Compile Include="sharpzip\DeflaterHuffman.cs" />
+    <Compile Include="sharpzip\DeflaterOutputStream.cs" />
+    <Compile Include="sharpzip\DeflaterPending.cs" />
+    <Compile Include="sharpzip\FileSystemScanner.cs" />
+    <Compile Include="sharpzip\IChecksum.cs" />
+    <Compile Include="sharpzip\INameTransform.cs" />
+    <Compile Include="sharpzip\Inflater.cs" />
+    <Compile Include="sharpzip\InflaterDynHeader.cs" />
+    <Compile Include="sharpzip\InflaterHuffmanTree.cs" />
+    <Compile Include="sharpzip\InflaterInputStream.cs" />
+    <Compile Include="sharpzip\IScanFilter.cs" />
+    <Compile Include="sharpzip\LzwConstants.cs" />
+    <Compile Include="sharpzip\LzwException.cs" />
+    <Compile Include="sharpzip\LzwInputStream.cs" />
+    <Compile Include="sharpzip\NameFilter.cs" />
+    <Compile Include="sharpzip\OutputWindow.cs" />
+    <Compile Include="sharpzip\PathFilter.cs" />
+    <Compile Include="sharpzip\PendingBuffer.cs" />
+    <Compile Include="sharpzip\StrangeCRC.cs" />
+    <Compile Include="sharpzip\StreamManipulator.cs" />
+    <Compile Include="sharpzip\StreamUtils.cs" />
+    <Compile Include="sharpzip\WindowsNameTransform.cs" />
+    <Compile Include="sharpzip\WindowsPathUtils.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
