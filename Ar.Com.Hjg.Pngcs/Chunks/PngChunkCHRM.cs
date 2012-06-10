@@ -10,7 +10,8 @@
 	
 	/*
 	 */
-	public class PngChunkCHRM : PngChunk {
+	public class PngChunkCHRM : PngChunkSingle {
+        public const String ID = ChunkHelper.cHRM;
 		// 	// http://www.w3.org/TR/PNG/#11cHRM
 
         private double whitex,whitey;
@@ -19,35 +20,41 @@
 	private double bluex,bluey;
 
     public PngChunkCHRM(ImageInfo info)
-        : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.cHRM_TEXT, info)
+        : base(ID, info)
     {
 		}
-	
-		public override ChunkRaw CreateChunk() {
+
+    public override ChunkOrderingConstraint GetOrderingConstraint()
+    {
+        return ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
+    }
+
+    public override ChunkRaw CreateRawChunk()
+    {
             ChunkRaw c = null;
-            c = CreateEmptyChunk(32, true);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(whitex), c.data, 0);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(whitey), c.data, 4);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(redx), c.data, 8);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(redy), c.data, 12);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(greenx), c.data, 16);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(greeny), c.data, 20);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(bluex), c.data, 24);
-            PngHelper.WriteInt4tobytes(PngHelper.DoubleToInt100000(bluey), c.data, 28);
+            c = createEmptyChunk(32, true);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(whitex), c.Data, 0);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(whitey), c.Data, 4);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(redx), c.Data, 8);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(redy), c.Data, 12);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(greenx), c.Data, 16);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(greeny), c.Data, 20);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(bluex), c.Data, 24);
+            PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(bluey), c.Data, 28);
             return c;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
-            if (c.len != 32)
+		public override void ParseFromRaw(ChunkRaw c) {
+            if (c.Length != 32)
                 throw new PngjException("bad chunk " + c);
-            whitex = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 0));
-            whitey = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 4));
-            redx = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 8));
-            redy = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 12));
-            greenx = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 16));
-            greeny = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 20));
-            bluex = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 24));
-            bluey = PngHelper.IntToDouble100000(PngHelper.ReadInt4fromBytes(c.data, 28));
+            whitex = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 0));
+            whitey = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 4));
+            redx = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 8));
+            redy = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 12));
+            greenx = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 16));
+            greeny = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 20));
+            bluex = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 24));
+            bluey = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 28));
         }
 	
 		public override void CloneDataFromRead(PngChunk other) {
@@ -61,6 +68,23 @@
             bluex = otherx.bluex;
             bluey = otherx.bluey;
         }
-	
+        
+        public void SetChromaticities(double whitex, double whitey, double redx, double redy, double greenx, double greeny,
+                double bluex, double bluey)
+        {
+            this.whitex = whitex;
+            this.redx = redx;
+            this.greenx = greenx;
+            this.bluex = bluex;
+            this.whitey = whitey;
+            this.redy = redy;
+            this.greeny = greeny;
+            this.bluey = bluey;
+        }
+
+        public double[] GetChromaticities()
+        {
+            return new double[] { whitex, whitey, redx, redy, greenx, greeny, bluex, bluey };
+        }
 	}
 }

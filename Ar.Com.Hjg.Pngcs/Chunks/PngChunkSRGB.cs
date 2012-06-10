@@ -17,38 +17,55 @@
      /*
       * // http://www.w3.org/TR/PNG/#11sRGB
       */
-     public class PngChunkSRGB : PngChunk {
+     public class PngChunkSRGB : PngChunkSingle
+     {
+         public const String ID = ChunkHelper.sRGB;
 		// http://www.w3.org/TR/PNG/#11PLTE
 
-   	public static readonly int RENDER_INTENT_Perceptual = 0;
-	public static readonly int RENDER_INTENT_Relative_colorimetric = 1;
-	public static readonly int RENDER_INTENT_Saturation = 2;
-	public static readonly int RENDER_INTENT_Absolute_colorimetric	 = 3;
+   	public const int RENDER_INTENT_Perceptual = 0;
+    public const int RENDER_INTENT_Relative_colorimetric = 1;
+    public const int RENDER_INTENT_Saturation = 2;
+    public const int RENDER_INTENT_Absolute_colorimetric = 3;
 
 		public int intent;
 	
-		public PngChunkSRGB(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.sRGB_TEXT, info) {
+		public PngChunkSRGB(ImageInfo info) : base(ID, info) {
 		}
 
-
-        public override void ParseFromChunk(ChunkRaw c)
+        public override ChunkOrderingConstraint GetOrderingConstraint()
         {
-            if (c.len != 1)
-                throw new PngjException("bad chunk length " + c);
-            intent = PngHelper.ReadInt1fromByte(c.data, 0);
+            return ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT;
         }
 
-		public override ChunkRaw CreateChunk() {
+        public override ChunkRaw CreateRawChunk()
+        {
             ChunkRaw c = null;
-            c = CreateEmptyChunk(1, true);
-            c.data[0] = (byte)intent;
+            c = createEmptyChunk(1, true);
+            c.Data[0] = (byte)intent;
             return c;
-		}
+        }
+
+         public override void ParseFromRaw(ChunkRaw c)
+        {
+            if (c.Length != 1)
+                throw new PngjException("bad chunk length " + c);
+            intent = PngHelperInternal.ReadInt1fromByte(c.Data, 0);
+        }
 	
         
          public override void CloneDataFromRead(PngChunk other) {
              PngChunkSRGB otherx = (PngChunkSRGB)other;
              intent = otherx.intent;
 		}
+
+         public int GetIntent()
+         {
+             return intent;
+         }
+
+         public void SetIntent(int intent)
+         {
+             this.intent = intent;
+         }
 	}
 }

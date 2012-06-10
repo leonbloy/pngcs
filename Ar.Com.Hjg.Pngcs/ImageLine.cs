@@ -32,10 +32,10 @@ namespace Ar.Com.Hjg.Pngcs
     ///
     public class ImageLine
     {
-        public readonly ImageInfo imgInfo;
-        public readonly int channels; // copied from imgInfo, more handy
-        public readonly int bitDepth; // copied from imgInfo, more handy
-        public readonly int[] scanline; // see explanation above!!
+        public readonly ImageInfo ImgInfo;
+        internal readonly int channels; // copied from imgInfo, more handy
+        internal readonly int bitDepth; // copied from imgInfo, more handy
+        public readonly int[] Scanline; // see explanation above!!
         /// <summary>
         /// tracks the current row number (from 0 to rows-1)
         /// </summary>
@@ -44,11 +44,11 @@ namespace Ar.Com.Hjg.Pngcs
 
         public ImageLine(ImageInfo imgInfo_0)
         {
-            this.rown = -1;
-            this.imgInfo = imgInfo_0;
-            channels = imgInfo_0.channels;
-            scanline = new int[imgInfo_0.samplesPerRowP];
-            this.bitDepth = imgInfo_0.bitDepth;
+            this.rown = 0;
+            this.ImgInfo = imgInfo_0;
+            channels = imgInfo_0.Channels;
+            Scanline = new int[imgInfo_0.SamplesPerRowP];
+            this.bitDepth = imgInfo_0.BitDepth;
         }
 
 
@@ -69,14 +69,14 @@ namespace Ar.Com.Hjg.Pngcs
 
         public void SetScanLine(int[] b)
         { // makes copy
-            System.Array.Copy((Array)(b), 0, (Array)(scanline), 0, scanline.Length);
+            System.Array.Copy((Array)(b), 0, (Array)(Scanline), 0, Scanline.Length);
         }
 
         public int[] GetScanLineCopy(int[] b)
         { // makes copy - normally not necessary
-            if (b == null || b.Length < scanline.Length)
-                b = new int[scanline.Length];
-            System.Array.Copy((Array)(scanline), 0, (Array)(b), 0, scanline.Length);
+            if (b == null || b.Length < Scanline.Length)
+                b = new int[Scanline.Length];
+            System.Array.Copy((Array)(Scanline), 0, (Array)(b), 0, Scanline.Length);
             return b;
         }
 
@@ -88,7 +88,7 @@ namespace Ar.Com.Hjg.Pngcs
         ///
         public int[] Tf_unpack(int[] buf, bool scale)
         {
-            int len = scanline.Length;
+            int len = Scanline.Length;
             if (bitDepth == 1)
                 len *= 8;
             else if (bitDepth == 2)
@@ -98,7 +98,7 @@ namespace Ar.Com.Hjg.Pngcs
             if (buf == null)
                 buf = new int[len];
             if (bitDepth >= 8)
-                System.Array.Copy((Array)(scanline), 0, (Array)(buf), 0, scanline.Length);
+                System.Array.Copy((Array)(Scanline), 0, (Array)(buf), 0, Scanline.Length);
             else
             {
                 int mask, offset, v;
@@ -108,7 +108,7 @@ namespace Ar.Com.Hjg.Pngcs
                 offset = offset0;
                 for (int i = 0, j = 0; i < len; i++)
                 {
-                    v = (scanline[j] & mask) >> offset;
+                    v = (Scanline[j] & mask) >> offset;
                     if (scale)
                         v <<= offset0;
                     buf[i] = v;
@@ -132,7 +132,7 @@ namespace Ar.Com.Hjg.Pngcs
         ///
         public void Tf_pack(int[] buf, bool scale)
         { // writes scanline
-            int len = scanline.Length;
+            int len = Scanline.Length;
             if (bitDepth == 1)
                 len *= 8;
             else if (bitDepth == 2)
@@ -140,21 +140,21 @@ namespace Ar.Com.Hjg.Pngcs
             else if (bitDepth == 4)
                 len *= 2;
             if (bitDepth >= 8)
-                System.Array.Copy((Array)(buf), 0, (Array)(scanline), 0, scanline.Length);
+                System.Array.Copy((Array)(buf), 0, (Array)(Scanline), 0, Scanline.Length);
             else
             {
                 int offset0 = 8 - bitDepth;
                 int mask0 = GetMaskForPackedFormats() >> offset0;
                 int offset, v;
                 offset = offset0;
-                Array.Clear(scanline, 0, scanline.Length);
+                Array.Clear(Scanline, 0, Scanline.Length);
                 for (int i = 0, j = 0; i < len; i++)
                 {
                     v = buf[i];
                     if (scale)
                         v >>= offset0;
                     v = (v & mask0) << offset;
-                    scanline[j] |= v;
+                    Scanline[j] |= v;
                     offset -= bitDepth;
                     if (offset < 0)
                     { // new byte in scanline
@@ -178,8 +178,8 @@ namespace Ar.Com.Hjg.Pngcs
 
         public override String ToString()
         {
-            return "row=" + rown + " cols=" + imgInfo.cols + " bpc=" + imgInfo.bitDepth
-                    + " size=" + scanline.Length;
+            return "row=" + rown + " cols=" + ImgInfo.Cols + " bpc=" + ImgInfo.BitDepth
+                    + " size=" + Scanline.Length;
         }
 
         public static void showLineInfo(ImageLine line)

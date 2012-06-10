@@ -15,43 +15,139 @@ namespace Ar.Com.Hjg.Pngcs.Chunks
     using System.IO;
     using System.Runtime.CompilerServices;
 
+
+
     // see http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
     public abstract class PngChunk
     {
-        public readonly String id; // 4 letters
-        public readonly bool crit, pub, safe, known, beforeIDAT, beforePLTE;
-        private int lenori; // merely informational, for read chunks
-        // 0:queued ; 1: queued prioritary; 2: dont write yet; 3: already written
-        private int writeStatus;
-        protected internal readonly ImageInfo imgInfo;
+        public readonly String Id; // 4 letters
+        public readonly bool Crit, Pub, Safe;
+        protected internal readonly ImageInfo ImgInfo;
 
-        protected internal PngChunk(String id_0, ImageInfo imgInfo_1)
+
+        private bool priority = false; //For writing. Queued chunks with high priority will be written as soon as possible
+        public bool Priority { get { return priority; } set { priority = value; } }
+
+        private int chunkGroup = -1; // chunk group where it was read or writen
+        public int ChunkGroup { get { return chunkGroup; } set { chunkGroup = value; } }
+
+        private int lenori = -1; // merely informational, for read chunks
+
+
+        public enum ChunkOrderingConstraint
         {
-            this.lenori = -1;
-            this.writeStatus = 0;
-            this.id = id_0;
-            this.imgInfo = imgInfo_1;
-            this.crit = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsCritical(id_0);
-            this.pub = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsPublic(id_0);
-            this.safe = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsSafeToCopy(id_0);
-            this.known = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsKnown(id_0);
-            // beforeIDAT=true: MUST go before IDATA
-            this.beforeIDAT = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.BeforeIDAT(id_0);
-            // beforePLTE=true: MUST go before PLTE (if present)
-            this.beforePLTE = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.BeforePLTE(id_0);
+            NONE,
+            BEFORE_PLTE_AND_IDAT,
+            AFTER_PLTE_BEFORE_IDAT,
+            BEFORE_IDAT, NA
         }
 
-        public abstract ChunkRaw CreateChunk();
+        protected PngChunk(String id_0, ImageInfo imgInfo_1)
+        {
+            this.Id = id_0;
+            this.ImgInfo = imgInfo_1;
+            this.Crit = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsCritical(id_0);
+            this.Pub = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsPublic(id_0);
+            this.Safe = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IsSafeToCopy(id_0);
+        }
 
-        public abstract void ParseFromChunk(ChunkRaw c);
+        private static Dictionary<String, Type> factoryMap = initFactory();
 
-        // override to make deep copy from read data to write
-        public abstract void CloneDataFromRead(PngChunk other);
+        private static Dictionary<String, Type> initFactory()
+        {
+            Dictionary<String, Type> f = new Dictionary<string, System.Type>();
+            f.Add(ChunkHelper.IDAT, typeof(PngChunkIDAT));
+            f.Add(ChunkHelper.IHDR, typeof(PngChunkIHDR));
+            f.Add(ChunkHelper.PLTE, typeof(PngChunkPLTE));
+            f.Add(ChunkHelper.IEND, typeof(PngChunkIEND));
+            f.Add(ChunkHelper.tEXt, typeof(PngChunkTEXT));
+            f.Add(ChunkHelper.iTXt, typeof(PngChunkITXT));
+            f.Add(ChunkHelper.zTXt, typeof(PngChunkZTXT));
+            f.Add(ChunkHelper.bKGD, typeof(PngChunkBKGD));
+            f.Add(ChunkHelper.gAMA, typeof(PngChunkGAMA));
+            f.Add(ChunkHelper.pHYs, typeof(PngChunkPHYS));
+            f.Add(ChunkHelper.iCCP, typeof(PngChunkICCP));
+            f.Add(ChunkHelper.tIME, typeof(PngChunkTIME));
+            f.Add(ChunkHelper.tRNS, typeof(PngChunkTRNS));
+            f.Add(ChunkHelper.cHRM, typeof(PngChunkCHRM));
+            f.Add(ChunkHelper.sBIT, typeof(PngChunkSBIT));
+            f.Add(ChunkHelper.sRGB, typeof(PngChunkSRGB));
+            f.Add(ChunkHelper.hIST, typeof(PngChunkHIST));
+            f.Add(ChunkHelper.sPLT, typeof(PngChunkSPLT));
+            // extended
+            f.Add(PngChunkOFFS.ID, typeof(PngChunkOFFS));
+            f.Add(PngChunkSTER.ID, typeof(PngChunkSTER));
+            return f;
+        }
+
+        public static void FactoryRegister(String chunkId, Type type)
+        {
+            factoryMap.Add(chunkId, type);
+        }
+
+        internal static bool isKnown(String id)
+        {
+            return factoryMap.ContainsKey(id);
+        }
+
+        internal bool mustGoBeforePLTE()
+        {
+            return GetOrderingConstraint() == ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT;
+        }
+
+        internal bool mustGoBeforeIDAT()
+        {
+            ChunkOrderingConstraint oc = GetOrderingConstraint();
+            return oc == ChunkOrderingConstraint.BEFORE_IDAT || oc == ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT || oc == ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
+        }
+
+        internal bool mustGoAfterPLTE()
+        {
+            return GetOrderingConstraint() == ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
+        }
+
+  
+
+        internal static PngChunk Factory(ChunkRaw chunk, ImageInfo info)
+        {
+            PngChunk c = FactoryFromId(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(chunk.IdBytes), info);
+            c.lenori = chunk.Length;
+            c.ParseFromRaw(chunk);
+            return c;
+        }
+
+        /**
+ * Creates one new blank chunk of the corresponding type, according to factoryMap (PngChunkUNKNOWN if not known)
+ */
+        internal static PngChunk FactoryFromId(String cid, ImageInfo info)
+        {
+            PngChunk chunk = null;
+            if (factoryMap == null) initFactory();
+            if (isKnown(cid))
+            {
+                Type t = factoryMap[cid];
+                if (t == null) Console.Error.WriteLine("What?? " + cid);
+                System.Reflection.ConstructorInfo cons = t.GetConstructor(new Type[] { typeof(ImageInfo) });
+                object o = cons.Invoke(new object[] { info });
+                chunk = (PngChunk)o;
+            }
+            if (chunk == null)
+                chunk = new PngChunkUNKNOWN(cid, info);
+
+            return chunk;
+        }
+
+        internal ChunkRaw createEmptyChunk(int len, bool alloc)
+        {
+            ChunkRaw c = new ChunkRaw(len, ChunkHelper.ToBytes(Id), alloc);
+            return c;
+        }
+
 
         /* @SuppressWarnings("unchecked")*/
-        public static T CloneChunk<T>(T chunk, ImageInfo info) where T : PngChunk
+        internal static T CloneChunk<T>(T chunk, ImageInfo info) where T : PngChunk
         {
-            PngChunk cn = FactoryFromId(chunk.id, info);
+            PngChunk cn = FactoryFromId(chunk.Id, info);
             if ((Object)cn.GetType() != (Object)chunk.GetType())
                 throw new PngjException("bad class cloning chunk: " + cn.GetType() + " "
                         + chunk.GetType());
@@ -59,109 +155,33 @@ namespace Ar.Com.Hjg.Pngcs.Chunks
             return (T)cn;
         }
 
-        public static PngChunk Factory(ChunkRaw chunk, ImageInfo info)
+        internal void write(Stream os)
         {
-            PngChunk c = FactoryFromId(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(chunk.idbytes), info);
-            c.lenori = chunk.len;
-            c.ParseFromChunk(chunk);
-            return c;
-        }
-
-        public static PngChunk FactoryFromId(String cid, ImageInfo info)
-        {
-            PngChunk ctype = null;
-            if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IDAT_TEXT))
-                ctype = new PngChunkIDAT(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IHDR_TEXT))
-                ctype = new PngChunkIHDR(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.PLTE_TEXT))
-                ctype = new PngChunkPLTE(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IEND_TEXT))
-                ctype = new PngChunkIEND(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.gAMA_TEXT))
-                ctype = new PngChunkGAMA(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.tEXt_TEXT))
-                ctype = new PngChunkTEXT(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.iTXt_TEXT))
-                ctype = new PngChunkOTHER(cid, info);// new ChunkTypeITXT(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.zTXt_TEXT))
-                ctype = new PngChunkOTHER(cid, info);// new ChunkTypeZTXT(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.pHYs_TEXT))
-                ctype = new PngChunkPHYS(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.bKGD_TEXT))
-                ctype = new PngChunkBKGD(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.iCCP_TEXT))
-                ctype = new PngChunkICCP(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.tIME_TEXT))
-                ctype = new PngChunkTIME(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.tRNS_TEXT))
-                ctype = new PngChunkTRNS(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.cHRM_TEXT))
-                ctype = new PngChunkCHRM(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.sBIT_TEXT))
-                ctype = new PngChunkSBIT(info);
-            else if (cid.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.sRGB_TEXT))
-                ctype = new PngChunkSRGB(info);
-            else
-                ctype = new PngChunkOTHER(cid, info);
-            return ctype;
-        }
-
-        protected internal ChunkRaw CreateEmptyChunk(int len, bool alloc)
-        {
-            ChunkRaw c = new ChunkRaw(len, Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToBytes(id), alloc);
-            return c;
+            ChunkRaw c = CreateRawChunk();
+            if (c == null)
+                throw new PngjException("null chunk ! creation failed for " + this);
+            c.WriteChunk(os);
         }
 
         public override String ToString()
         {
-            return "chunk id= " + id + " (" + lenori + ") c=" + GetType().Name;
+            return "chunk id= " + Id + " (" + lenori + ") c=" + GetType().Name;
         }
 
         /// <summary>
-        /// should be called for ancillary chunks only Our write order is defined as
-        /// (0:IDHR) 1: after IDHR (2:PLTE if present) 3: before IDAT (4:IDAT) 5: after
-        /// IDAT (6:END)
+        /// 
         /// </summary>
-        ///
-        public int WriteOrder()
-        {
-            if (id.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IHDR))
-                return 0;
-            if (id.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.PLTE))
-                return 2;
-            if (id.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IDAT))
-                return 4;
-            if (id.Equals(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IEND))
-                return 6;
-            if (Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.BeforePLTE(id))
-                return 1;
-            if (Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.BeforeIDAT(id))
-                return 3;
-            else
-                return 5;
-        }
+        public abstract ChunkRaw CreateRawChunk();
 
-        public int GetWriteStatus()
-        {
-            return writeStatus;
-        }
+        public abstract void ParseFromRaw(ChunkRaw c);
 
-        public void SetWriteStatus(int writeStatus_0)
-        {
-            this.writeStatus = writeStatus_0;
-        }
+        // override to make deep copy from read data to write
+        public abstract void CloneDataFromRead(PngChunk other);
 
-        public void WriteAndMarkAsWrite(Stream os)
-        {
-            if (GetWriteStatus() >= 2)
-                throw new Exception("bad write status");
-            ChunkRaw c = CreateChunk();
-            if (c != null)
-                c.WriteChunk(os);
-            else
-                System.Console.Error.WriteLine("null chunk ! for " + this);
-            SetWriteStatus(3);
-        }
+        public abstract bool AllowsMultiple(); // this is implemented in PngChunkMultiple/PngChunSingle
+
+        public abstract ChunkOrderingConstraint GetOrderingConstraint();
+
+
     }
 }

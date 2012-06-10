@@ -6,7 +6,8 @@ It provides a simple API for progressive (sequential line-oriented) reading and 
 It's specially suitable for huge images, which one does not want to load fully in memory.
 
 It supports all PNG spec color models and bitdepths: RGB8/RGB16/RGBA8/RGBA16, G8/4/2/1,
-GA8/4/2/1, PAL8/4/2/1,  all filters/compressions settings. It does not support interlaced images. It also has support for Chunks (metadata).
+GA8/4/2/1, PAL8/4/2/1,  all filters/compressions settings. It does not support interlaced images. 
+It also has support for Chunks (metadata).
 
 This is a port of the PngJ library (Java):
 http://code.google.com/p/pngj/
@@ -24,6 +25,9 @@ released under the GPL licence, and so is this PNGCS library.
 
 History: 
 
+10/June/2012: 1.0.91
+  - Major reorganization to put in sync with Java port: updated to PngJ v 0.91, with all Chunks and full PNGTestSuite
+  - Most public methods/properties naming complies with C# conventions now
 
 22/Sept/2011: Implemented functionality is on par with current PngJ, 
 some testing, optimizing and testing pending.

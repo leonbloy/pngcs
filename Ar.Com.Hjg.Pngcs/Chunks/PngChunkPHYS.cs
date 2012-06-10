@@ -13,34 +13,43 @@
 	using System.ComponentModel;
 	using System.IO;
 	using System.Runtime.CompilerServices;
-	
-	public class PngChunkPHYS : PngChunk {
+
+     public class PngChunkPHYS : PngChunkSingle
+     {
+        public const String ID = ChunkHelper.pHYs;
 		// http://www.w3.org/TR/PNG/#11pHYs
 		public long pixelsxUnitX;
 		public long pixelsxUnitY;
 		public int units; // 0: unknown 1:metre
 	
-		public PngChunkPHYS(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.pHYs_TEXT, info) {
+		public PngChunkPHYS(ImageInfo info) : base(ID, info) {
 		}
-	
-		public override ChunkRaw CreateChunk() {
-			ChunkRaw c = CreateEmptyChunk(9, true);
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4tobytes((int) pixelsxUnitX, c.data, 0);
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4tobytes((int) pixelsxUnitY, c.data, 4);
-			c.data[8] = (byte) units;
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.BEFORE_IDAT;
+        }
+
+		public override ChunkRaw CreateRawChunk() {
+			ChunkRaw c = createEmptyChunk(9, true);
+			Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4tobytes((int) pixelsxUnitX, c.Data, 0);
+			Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4tobytes((int) pixelsxUnitY, c.Data, 4);
+			c.Data[8] = (byte) units;
 			return c;
 		}
+
+      
 	
-		public override void ParseFromChunk(ChunkRaw chunk) {
-			if (chunk.len != 9)
+		public override void ParseFromRaw(ChunkRaw chunk) {
+			if (chunk.Length != 9)
 				throw new PngjException("bad chunk length " + chunk);
-			pixelsxUnitX = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4fromBytes(chunk.data, 0);
+			pixelsxUnitX = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4fromBytes(chunk.Data, 0);
 			if (pixelsxUnitX < 0)
 				pixelsxUnitX += 0x100000000L;
-			pixelsxUnitY = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4fromBytes(chunk.data, 4);
+			pixelsxUnitY = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4fromBytes(chunk.Data, 4);
 			if (pixelsxUnitY < 0)
 				pixelsxUnitY += 0x100000000L;
-			units = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt1fromByte(chunk.data, 8);
+			units = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt1fromByte(chunk.Data, 8);
 		}
 	
 		// returns -1 if not in meters, or not equal
@@ -49,13 +58,31 @@
 				return -1;
 			return ((double) pixelsxUnitX) * 0.0254d;
 		}
-	
+
+        /**
+ * returns -1 if the physicial unit is unknown
+ */
+        public double[] GetAsDpi2()
+        {
+            if (units != 1)
+                return new double[] { -1, -1 };
+            return new double[] { ((double)pixelsxUnitX) * 0.0254, ((double)pixelsxUnitY) * 0.0254 };
+        }
+
+
 		public void SetAsDpi(double dpi) {
 			units = 1;
 			pixelsxUnitX = (long) (dpi / 0.0254d + 0.5d);
 			pixelsxUnitY = pixelsxUnitX;
 		}
-	
+
+        public void SetAsDpi2(double dpix, double dpiy)
+        {
+            units = 1;
+            pixelsxUnitX = (long)(dpix / 0.0254 + 0.5);
+            pixelsxUnitY = (long)(dpiy / 0.0254 + 0.5);
+        }
+
 		public override void CloneDataFromRead(PngChunk other) {
 			PngChunkPHYS otherx = (PngChunkPHYS) other;
 			this.pixelsxUnitX = otherx.pixelsxUnitX;

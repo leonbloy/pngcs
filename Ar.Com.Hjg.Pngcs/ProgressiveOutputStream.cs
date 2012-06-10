@@ -23,6 +23,7 @@
 	
 		public ProgressiveOutputStream(int size_0) {
 			this.size = size_0;
+            if (size < 8) throw new PngjException("bad size for ProgressiveOutputStream: " + size);
 		}
 	
 		public override void Close() {
@@ -36,7 +37,7 @@
 		}
 	
 		public override void Write(byte[] b, int off, int len) {
-			base.Write(b,off,len);
+            base.Write(b, off, len);
 			CheckFlushBuffer(false);
 		}
 	
@@ -45,10 +46,6 @@
 			CheckFlushBuffer(false);
 		}
 	
-		/*public override void Write(int arg0) {
-			base.write(arg0);
-			CheckFlushBuffer(false);
-		}*/
 	
 		/// <summary>
 		/// if it's time to flush data (or if forced==true) calls abstract method

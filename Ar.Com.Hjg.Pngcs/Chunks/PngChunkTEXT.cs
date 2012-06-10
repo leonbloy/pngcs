@@ -15,20 +15,22 @@
 	using System.Runtime.CompilerServices;
 	
 	public class PngChunkTEXT : PngChunkTextVar {
-		public PngChunkTEXT(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.tEXt_TEXT, info) {
+        public const String ID = ChunkHelper.tEXt;
+
+		public PngChunkTEXT(ImageInfo info) : base(ID, info) {
 		}
 	
-		public override ChunkRaw CreateChunk() {
+		public override ChunkRaw CreateRawChunk() {
 			if (val.Length == 0 || key.Length == 0)
 				return null;
-            byte[] b = Ar.Com.Hjg.Pngcs.PngHelper.charset.GetBytes(key + @"\0" + val);
-			ChunkRaw chunk = CreateEmptyChunk(b.Length, false);
-			chunk.data = b;
+            byte[] b = Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetBytes(key + @"\0" + val);
+			ChunkRaw chunk = createEmptyChunk(b.Length, false);
+			chunk.Data = b;
 			return chunk;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
-            String[] k = Ar.Com.Hjg.Pngcs.PngHelper.charset.GetString(c.data).Split(new char[]{'\0'});
+		public override void ParseFromRaw(ChunkRaw c) {
+            String[] k = Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(c.Data).Split(new char[]{'\0'});
             key = k[0];
 			val = k[1];
 		}

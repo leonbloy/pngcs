@@ -15,21 +15,49 @@
 	using System.Runtime.CompilerServices;
 	
 	public class PngChunkZTXT : PngChunkTextVar {
+        public const String ID = ChunkHelper.zTXt;
 		// http://www.w3.org/TR/PNG/#11zTXt
-		public PngChunkZTXT(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.zTXt_TEXT, info) {
+		public PngChunkZTXT(ImageInfo info) : base(ID, info) {
 		}
 	
-		public override ChunkRaw CreateChunk() {
-			// TODO Implement
-			throw new Exception("not implemented");
+		public override ChunkRaw CreateRawChunk() {
+            if (val.Length==0 || key.Length==0)
+                return null;
+                MemoryStream ba = new MemoryStream();
+                ChunkHelper.WriteBytesToStream(ba,ChunkHelper.ToBytes(key));
+                ba.WriteByte(0); // separator
+                ba.WriteByte(0); // compression method: 0
+                byte[] textbytes = ChunkHelper.compressBytes(ChunkHelper.ToBytes(val), true);
+                ChunkHelper.WriteBytesToStream(ba,textbytes);
+                byte[] b = ba.ToArray();
+                ChunkRaw chunk = createEmptyChunk(b.Length, false);
+                chunk.Data = b;
+                return chunk;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
-			throw new Exception("not implemented");
+		public override void ParseFromRaw(ChunkRaw c) {
+            int nullsep = -1;
+            for (int i = 0; i < c.Data.Length; i++)
+            { // look for first zero
+                if (c.Data[i] != 0)
+                    continue;
+                nullsep = i;
+                break;
+            }
+            if (nullsep < 0 || nullsep > c.Data.Length - 2)
+                throw new PngjException("bad zTXt chunk: no separator found");
+            key = ChunkHelper.ToString(c.Data, 0, nullsep);
+            int compmet = (int)c.Data[nullsep + 1];
+            if (compmet != 0)
+                throw new PngjException("bad zTXt chunk: unknown compression method");
+            byte[] uncomp = ChunkHelper.compressBytes(c.Data, nullsep + 2, c.Data.Length - nullsep - 2, false); // uncompress
+            val = ChunkHelper.ToString(uncomp);
 		}
 	
 		public override void CloneDataFromRead(PngChunk other) {
-			throw new Exception("not implemented");
+            PngChunkZTXT otherx = (PngChunkZTXT)other;
+            key = otherx.key;
+            val = otherx.val;
 		}
 	}
 }

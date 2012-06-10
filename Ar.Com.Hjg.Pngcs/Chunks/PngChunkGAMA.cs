@@ -16,24 +16,31 @@
 	
 	/*
 	 */
-	public class PngChunkGAMA : PngChunk {
+	public class PngChunkGAMA : PngChunkSingle {
 		// http://www.w3.org/TR/PNG/#11gAMA
-		private double gamma;
+        public const String ID = ChunkHelper.gAMA;
+        private double gamma;
 	
-		public PngChunkGAMA(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.gAMA_TEXT, info) {
+		public PngChunkGAMA(ImageInfo info) : base(ID, info) {
 		}
-	
-		public override ChunkRaw CreateChunk() {
-			ChunkRaw c = CreateEmptyChunk(4, true);
+
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT;
+        }
+		public override ChunkRaw CreateRawChunk() {
+			ChunkRaw c = createEmptyChunk(4, true);
 			int g = (int) (gamma * 100000 + 0.5d);
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4tobytes(g, c.data, 0);
+			Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4tobytes(g, c.Data, 0);
 			return c;
 		}
-	
-		public override void ParseFromChunk(ChunkRaw chunk) {
-			if (chunk.len != 4)
+
+        public override void ParseFromRaw(ChunkRaw chunk)
+        {
+			if (chunk.Length != 4)
 				throw new PngjException("bad chunk " + chunk);
-			int g = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4fromBytes(chunk.data, 0);
+			int g = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4fromBytes(chunk.Data, 0);
 			gamma = ((double) g) / 100000.0d;
 		}
 	

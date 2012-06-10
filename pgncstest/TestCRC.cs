@@ -10,7 +10,10 @@ namespace pgncstest
 {
     class TestCrcs
     {
-	
+        static void Main(string[] args)
+        {
+            Run();
+        }
     
     public static void Run()
     {

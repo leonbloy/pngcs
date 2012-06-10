@@ -14,8 +14,10 @@
 	using System.IO;
 	using System.Runtime.CompilerServices;
 
-     
-     public class PngChunkSBIT : PngChunk {
+
+     public class PngChunkSBIT : PngChunkSingle
+     {
+         public const String ID = ChunkHelper.sBIT;
 	 /*
       * // http://www.w3.org/TR/PNG/#11sBIT
 	 *  this chunk structure depends on the image type
@@ -26,53 +28,52 @@
 	private int redsb, greensb, bluesb;
 
     public PngChunkSBIT(ImageInfo info)
-        : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.sBIT_TEXT, info)
+        : base(ID, info)
     {
 		}
 
-    private int GetLen()
-    {
-        int len = imgInfo.greyscale ? 1 : 3;
-        if (imgInfo.alpha) len += 1;
-        return len;
-    }
+  	
+	public override ChunkOrderingConstraint GetOrderingConstraint() {
+		return ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT;
+	}
 
-        public override void ParseFromChunk(ChunkRaw c)
+
+        public override void ParseFromRaw(ChunkRaw c)
         {
-            if (c.len != GetLen())
+            if (c.Length != GetLen())
                 throw new PngjException("bad chunk length " + c);
-            if (imgInfo.greyscale)
+            if (ImgInfo.Greyscale)
             {
-                graysb = PngHelper.ReadInt1fromByte(c.data, 0);
-                if (imgInfo.alpha)
-                    alphasb = PngHelper.ReadInt1fromByte(c.data, 1);
+                graysb = PngHelperInternal.ReadInt1fromByte(c.Data, 0);
+                if (ImgInfo.Alpha)
+                    alphasb = PngHelperInternal.ReadInt1fromByte(c.Data, 1);
             }
             else
             {
-                redsb = PngHelper.ReadInt1fromByte(c.data, 0);
-                greensb = PngHelper.ReadInt1fromByte(c.data, 1);
-                bluesb = PngHelper.ReadInt1fromByte(c.data, 2);
-                if (imgInfo.alpha)
-                    alphasb = PngHelper.ReadInt1fromByte(c.data, 3);
+                redsb = PngHelperInternal.ReadInt1fromByte(c.Data, 0);
+                greensb = PngHelperInternal.ReadInt1fromByte(c.Data, 1);
+                bluesb = PngHelperInternal.ReadInt1fromByte(c.Data, 2);
+                if (ImgInfo.Alpha)
+                    alphasb = PngHelperInternal.ReadInt1fromByte(c.Data, 3);
             }
         }
 
-		public override ChunkRaw CreateChunk() {
+		public override ChunkRaw CreateRawChunk() {
             ChunkRaw c = null;
-            c = CreateEmptyChunk(GetLen(), true);
-            if (imgInfo.greyscale)
+            c = createEmptyChunk(GetLen(), true);
+            if (ImgInfo.Greyscale)
             {
-                c.data[0] = (byte)graysb;
-                if (imgInfo.alpha)
-                    c.data[1] = (byte)alphasb;
+                c.Data[0] = (byte)graysb;
+                if (ImgInfo.Alpha)
+                    c.Data[1] = (byte)alphasb;
             }
             else
             {
-                c.data[0] = (byte)redsb;
-                c.data[1] = (byte)greensb;
-                c.data[2] = (byte)bluesb;
-                if (imgInfo.alpha)
-                    c.data[3] = (byte)alphasb;
+                c.Data[0] = (byte)redsb;
+                c.Data[1] = (byte)greensb;
+                c.Data[2] = (byte)bluesb;
+                if (ImgInfo.Alpha)
+                    c.Data[3] = (byte)alphasb;
             }
             return c;
 		}
@@ -86,5 +87,12 @@
              bluesb = otherx.bluesb;
              alphasb = otherx.alphasb;
 		}
+
+         private int GetLen()
+         {
+             int len = ImgInfo.Greyscale ? 1 : 3;
+             if (ImgInfo.Alpha) len += 1;
+             return len;
+         }
 	}
 }

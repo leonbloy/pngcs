@@ -14,13 +14,24 @@
 	using System.IO;
 	using System.Runtime.CompilerServices;
 	
-	public abstract class PngChunkTextVar : PngChunk {
+	public abstract class PngChunkTextVar : PngChunkMultiple {
 		protected internal String key; // key/val: only for tEXt. lazy computed
 		protected internal String val;
 	
 		protected internal PngChunkTextVar(String id, ImageInfo info) : base(id, info) {
 		}
 	
+    public const String KEY_Title = "Title"; // Short (one line) title or caption for image
+	public const String KEY_Author = "Author"; // Name of image's creator
+	public const String KEY_Description = "Description"; // Description of image (possibly long)
+	public const String KEY_Copyright = "Copyright"; // Copyright notice
+	public const String KEY_Creation_Time = "Creation Time"; // Time of original image creation
+	public const String KEY_Software = "Software"; // Software used to create the image
+	public const String KEY_Disclaimer = "Disclaimer"; // Legal disclaimer
+	public const String KEY_Warning = "Warning"; // Warning of nature of content
+	public const String KEY_Source = "Source"; // Device used to create the image
+    public const String KEY_Comment = "Comment"; // Miscellaneous comment
+
 		public class PngTxtInfo {
 			public String title;
 			public String author;
@@ -31,20 +42,13 @@
 			public String warning;
 			public String source;
 			public String comment;
-			/*
-			 * public void writeChunks() { writeChunk("Title", title);
-			 * writeChunk("Author", author); writeChunk("Description", description);
-			 * writeChunk("Creation Time", creation_time); writeChunk("Software",
-			 * software); writeChunk("Disclaimer", disclaimer); writeChunk("Software",
-			 * software); writeChunk("Warning", warning); writeChunk("Source", source);
-			 * writeChunk("Comment", comment); }
-			 */
-			/*
-			 * private void writeChunk(String name, String val) { if (val == null)
-			 * return; PngChunk p = PngChunk.createTextChunk(name, val, crcEngine);
-			 * p.writeChunk(os); }
-			 */
+	
 		}
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.NONE;
+        }
 	
 		public String GetKey() {
 			return key;
@@ -53,5 +57,11 @@
 		public String GetVal() {
 			return val;
 		}
+
+        public void SetKeyVal(String key, String val)
+        {
+            this.key = key;
+            this.val = val;
+        }
 	}
 }

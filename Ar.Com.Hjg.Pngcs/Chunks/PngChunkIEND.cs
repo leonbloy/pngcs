@@ -14,18 +14,24 @@
 	using System.IO;
 	using System.Runtime.CompilerServices;
 	
-	public class PngChunkIEND : PngChunk {
+	public class PngChunkIEND : PngChunkSingle {
+        public const String ID = ChunkHelper.IEND;
 		// http://www.w3.org/TR/PNG/#11IEND
 		// this is a dummy placeholder
-		public PngChunkIEND(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IEND_TEXT, info) {
+		public PngChunkIEND(ImageInfo info) : base(ID, info) {
 		}
-	
-		public override ChunkRaw CreateChunk() {
-			ChunkRaw c = new ChunkRaw(0, Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IEND, false);
+        
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.NA;
+        }
+
+		public override ChunkRaw CreateRawChunk() {
+			ChunkRaw c = new ChunkRaw(0, ChunkHelper.b_IEND, false);
 			return c;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
+		public override void ParseFromRaw(ChunkRaw c) {
 			// this is not used
 		}
 	

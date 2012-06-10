@@ -4,136 +4,233 @@
 // 6/1/11 9:13 a.m.    
 // ${CustomMessageForDisclaimer}                                                                             
 // --------------------------------------------------------------------------------------------------
- namespace Ar.Com.Hjg.Pngcs.Chunks {
-	
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.IO;
-	using System.Runtime.CompilerServices;
-	
-	public class ChunkHelper {
-		public const String IHDR_TEXT = "IHDR";
-		public const String PLTE_TEXT = "PLTE";
-		public const String IDAT_TEXT = "IDAT";
-		public const String IEND_TEXT = "IEND";
-		public const String cHRM_TEXT = "cHRM";// No Before PLTE and IDAT
-		public const String gAMA_TEXT = "gAMA";// No Before PLTE and IDAT
-		public const String iCCP_TEXT = "iCCP";// No Before PLTE and IDAT
-		public const String sBIT_TEXT = "sBIT";// No Before PLTE and IDAT
-		public const String sRGB_TEXT = "sRGB";// No Before PLTE and IDAT
-		public const String bKGD_TEXT = "bKGD";// No After PLTE; before IDAT
-		public const String hIST_TEXT = "hIST";// No After PLTE; before IDAT
-		public const String tRNS_TEXT = "tRNS";// No After PLTE; before IDAT
-		public const String pHYs_TEXT = "pHYs";// No Before IDAT
-		public const String sPLT_TEXT = "sPLT";// Yes Before IDAT
-		public const String tIME_TEXT = "tIME";// No None
-		public const String iTXt_TEXT = "iTXt";// Yes None
-		public const String tEXt_TEXT = "tEXt";// Yes None
-		public const String zTXt_TEXT = "zTXt";// Yes None
-		public static readonly byte[] IHDR = ToBytes(IHDR_TEXT);
-		public static readonly byte[] PLTE = ToBytes(PLTE_TEXT);
-		public static readonly byte[] IDAT = ToBytes(IDAT_TEXT);
-		public static readonly byte[] IEND = ToBytes(IEND_TEXT);
-		public static readonly byte[] cHRM = ToBytes(cHRM_TEXT);
-		public static readonly byte[] gAMA = ToBytes(gAMA_TEXT);
-		public static readonly byte[] iCCP = ToBytes(iCCP_TEXT);
-		public static readonly byte[] sBIT = ToBytes(sBIT_TEXT);
-		public static readonly byte[] sRGB = ToBytes(sRGB_TEXT);
-		public static readonly byte[] bKGD = ToBytes(bKGD_TEXT);
-		public static readonly byte[] hIST = ToBytes(hIST_TEXT);
-		public static readonly byte[] tRNS = ToBytes(tRNS_TEXT);
-		public static readonly byte[] pHYs = ToBytes(pHYs_TEXT);
-		public static readonly byte[] sPLT = ToBytes(sPLT_TEXT);
-		public static readonly byte[] tIME = ToBytes(tIME_TEXT);
-		public static readonly byte[] iTXt = ToBytes(iTXt_TEXT);
-		public static readonly byte[] tEXt = ToBytes(tEXt_TEXT);
-		public static readonly byte[] zTXt = ToBytes(zTXt_TEXT);
-		public static HashSet<String> KNOWN_CHUNKS_CRITICAL = Ar.Com.Hjg.Pngcs.PngHelper.AsSet(IHDR_TEXT, PLTE_TEXT,
-				IDAT_TEXT, IEND_TEXT);
-		// ancillary known chunks, before PLTE and IDAT
-        public static HashSet<String> KNOWN_CHUNKS_BEFORE_PLTE = Ar.Com.Hjg.Pngcs.PngHelper.AsSet(cHRM_TEXT,
-				gAMA_TEXT, iCCP_TEXT, sBIT_TEXT, sRGB_TEXT);
-		// ancillary known chunks, after PLTE , before IDAT
-        public static HashSet<String> KNOWN_CHUNKS_AFTER_PLTE = Ar.Com.Hjg.Pngcs.PngHelper.AsSet(bKGD_TEXT,
-				hIST_TEXT, tRNS_TEXT);
-		// ancillary known chunks, before IDAT (before or after PLTE)
-        public static HashSet<String> KNOWN_CHUNKS_BEFORE_IDAT = Ar.Com.Hjg.Pngcs.PngHelper.AsSet(pHYs_TEXT,
-				sPLT_TEXT);
-		// ancillary known chunks, before or after IDAT
-        public static HashSet<String> KNOWN_CHUNKS_ANYWHERE = Ar.Com.Hjg.Pngcs.PngHelper.AsSet(tIME_TEXT, iTXt_TEXT,
-				tEXt_TEXT, zTXt_TEXT);
-        public static HashSet<String> KNOWN_CHUNKS_BEFORE_IDAT_ALL = Ar.Com.Hjg.Pngcs.PngHelper.UnionSets(
-				KNOWN_CHUNKS_BEFORE_PLTE, KNOWN_CHUNKS_AFTER_PLTE, KNOWN_CHUNKS_BEFORE_IDAT);
-        public static HashSet<String> KNOWN_CHUNKS_ANCILLARY_ALL = Ar.Com.Hjg.Pngcs.PngHelper.UnionSets(
-				KNOWN_CHUNKS_BEFORE_IDAT_ALL, KNOWN_CHUNKS_ANYWHERE);
-	
-		public static bool IsKnown(String id) {
-            return KNOWN_CHUNKS_CRITICAL.Contains(id) || KNOWN_CHUNKS_ANCILLARY_ALL.Contains(id);
-		}
-	
-		public static byte[] ToBytes(String x) {
-            return Ar.Com.Hjg.Pngcs.PngHelper.charset.GetBytes(x);
-		}
-	
-		public static String ToString(byte[] x) {
-            return Ar.Com.Hjg.Pngcs.PngHelper.charset.GetString(x);
-		}
-	
-		public static bool IsCritical(String id) { // critical chunk ?
-			// first letter is uppercase
-			return (Char.IsUpper(id[0]));
-		}
-	
-		public static bool IsPublic(String id) { // public chunk?
-			// second letter is uppercase
-			return (Char.IsUpper(id[1]));
-		}
-	
-		public static bool IsSafeToCopy(String id) { // safe to copy?
-			// fourth letter is lower case
-			return (!Char.IsUpper(id[3]));
-		}
-	
-		public static bool BeforeIDAT(String id) { // only for ancillary
-			return KNOWN_CHUNKS_BEFORE_IDAT_ALL.Contains(id);
-		}
-	
-		public static bool BeforePLTE(String id) { // only for ancillary
-            return KNOWN_CHUNKS_BEFORE_PLTE.Contains(id);
+namespace Ar.Com.Hjg.Pngcs.Chunks
+{
+
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+
+    public class ChunkHelper
+    {
+        public const String IHDR = "IHDR";
+        public const String PLTE = "PLTE";
+        public const String IDAT = "IDAT";
+        public const String IEND = "IEND";
+        public const String cHRM = "cHRM";// No Before PLTE and IDAT
+        public const String gAMA = "gAMA";// No Before PLTE and IDAT
+        public const String iCCP = "iCCP";// No Before PLTE and IDAT
+        public const String sBIT = "sBIT";// No Before PLTE and IDAT
+        public const String sRGB = "sRGB";// No Before PLTE and IDAT
+        public const String bKGD = "bKGD";// No After PLTE; before IDAT
+        public const String hIST = "hIST";// No After PLTE; before IDAT
+        public const String tRNS = "tRNS";// No After PLTE; before IDAT
+        public const String pHYs = "pHYs";// No Before IDAT
+        public const String sPLT = "sPLT";// Yes Before IDAT
+        public const String tIME = "tIME";// No None
+        public const String iTXt = "iTXt";// Yes None
+        public const String tEXt = "tEXt";// Yes None
+        public const String zTXt = "zTXt";// Yes None
+        public static readonly byte[] b_IHDR = ToBytes(IHDR);
+        public static readonly byte[] b_PLTE = ToBytes(PLTE);
+        public static readonly byte[] b_IDAT = ToBytes(IDAT);
+        public static readonly byte[] b_IEND = ToBytes(IEND);
+
+
+        /// <summary>
+        /// "Unknown" just means that our chunk factory (even when it has been augmented by client code) did not recognize 	 * its id
+        /// </summary>
+        public static bool IsUnknown(PngChunk c)
+        {
+            return c is PngChunkUNKNOWN;
         }
-	
-		public static bool AdmitsMultiple(String id) { // only for ancillary
-			if (id.Equals(sPLT_TEXT) || id.Equals(iTXt_TEXT) || id.Equals(tEXt_TEXT)
-					|| id.Equals(zTXt_TEXT))
-				return true;
-			else
-				return false;
-		}
-	
-		public static int PosNullByte(byte[] b) {
-			for (int i = 0; i < b.Length; i++)
-				if (b[i] == 0)
-					return i;
-			return -1;
-		}
-	
-		public static bool ShouldLoad(String id, ChunkLoadBehaviour behav) {
-			if (IsCritical(id))
-				return true;
-			bool kwown = IsKnown(id);
-			switch (behav) {
-			case Ar.Com.Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_ALWAYS:
-				return true;
-			case Ar.Com.Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_IF_SAFE:
-				return kwown || IsSafeToCopy(id);
-			case Ar.Com.Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_KNOWN:
-				return kwown;
-			case Ar.Com.Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_NEVER:
-				return false;
-			}
-			return false; // should not reach here
-		}
-	}
+
+        // this uses latin1
+        public static byte[] ToBytes(String x)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetBytes(x);
+        }
+
+
+        // this uses latin1
+        public static String ToString(byte[] x)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(x);
+        }
+        public static String ToString(byte[] x,int offset , int len)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(x,offset,len);
+        }
+
+        public static byte[] ToBytesUTF8(String x)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetUtf8.GetBytes(x);
+        }
+
+        public static String ToStringUTF8(byte[] x)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetUtf8.GetString(x);
+        }
+        public static String ToStringUTF8(byte[] x, int offset, int len)
+        {
+            return Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetUtf8.GetString(x, offset, len);
+        }
+
+        public static void WriteBytesToStream(Stream s,byte[] b) {
+            s.Write(b, 0, b.Length);
+        }
+
+        public static bool IsCritical(String id)
+        { // critical chunk ?
+            // first letter is uppercase
+            return (Char.IsUpper(id[0]));
+        }
+
+        public static bool IsPublic(String id)
+        { // public chunk?
+            // second letter is uppercase
+            return (Char.IsUpper(id[1]));
+        }
+
+        public static bool IsSafeToCopy(String id)
+        { // safe to copy?
+            // fourth letter is lower case
+            return (!Char.IsUpper(id[3]));
+        }
+
+        public static int PosNullByte(byte[] b)
+        {
+            for (int i = 0; i < b.Length; i++)
+                if (b[i] == 0)
+                    return i;
+            return -1;
+        }
+
+        public static bool ShouldLoad(String id, ChunkLoadBehaviour behav)
+        {
+            if (IsCritical(id))
+                return true;
+            bool kwown = PngChunk.isKnown(id);
+            switch (behav)
+            {
+                case ChunkLoadBehaviour.LOAD_CHUNK_ALWAYS:
+                    return true;
+                case ChunkLoadBehaviour.LOAD_CHUNK_IF_SAFE:
+                    return kwown || IsSafeToCopy(id);
+                case ChunkLoadBehaviour.LOAD_CHUNK_KNOWN:
+                    return kwown;
+                case ChunkLoadBehaviour.LOAD_CHUNK_NEVER:
+                    return false;
+            }
+            return false; // should not reach here
+        }
+
+        internal static byte[] compressBytes(byte[] ori, bool compress)
+        {
+            return compressBytes(ori, 0, ori.Length, compress);
+        }
+        internal static byte[] compressBytes(byte[] ori, int offset, int len, bool compress)
+        {
+            try
+            {
+                MemoryStream inb = new MemoryStream(ori, offset, len);
+                Stream inx = inb;
+                if (compress) inx = new InflaterInputStream(inb);
+                MemoryStream outb = new MemoryStream();
+                Stream outx = outb;
+                if (compress) outx = new DeflaterOutputStream(outb);
+                shovelInToOut(inx, outx);
+                inx.Close();
+                outx.Close();
+                byte[] res = outb.ToArray();
+                return res;
+            }
+            catch (Exception e)
+            {
+                throw new PngjException(e);
+            }
+        }
+
+        private static void shovelInToOut(Stream inx, Stream outx)
+        {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inx.Read(buffer, 0, 1024)) > 0)
+            {
+                outx.Write(buffer, 0, len);
+            }
+        }
+
+        internal static bool maskMatch(int v, int mask)
+        {
+            return (v & mask) != 0;
+        }
+
+
+        public static List<PngChunk> FilterList(List<PngChunk> target, ChunkPredicate predicateKeep)
+        {
+            List<PngChunk> result = new List<PngChunk>();
+            foreach (PngChunk element in target)
+            {
+                if (predicateKeep.Matches(element))
+                {
+                    result.Add(element);
+                }
+            }
+            return result;
+        }
+
+        public static int TrimList(List<PngChunk> target, ChunkPredicate predicateRemove)
+        {
+            int cont = 0;
+            for (int i = target.Count - 1; i >= 0; i--)
+            {
+                if (predicateRemove.Matches(target[i]))
+                {
+                    target.RemoveAt(i);
+                    cont++;
+                }
+            }
+
+            return cont;
+        }
+
+
+        /**
+         * MY adhoc criteria: two chunks are "equivalent" ("practically equal") if they have same id and (perhaps, if
+         * multiple are allowed) if the match also in some "internal key" (eg: key for string values, palette for sPLT, etc)
+         * 
+         * Notice that the use of this is optional, and that the PNG standard allows Text chunks that have same key
+         * 
+         * @return true if "equivalent"
+         */
+        public static bool Equivalent(PngChunk c1, PngChunk c2)
+        {
+            if (c1 == c2)
+                return true;
+            if (c1 == null || c2 == null || !c1.Id.Equals(c2.Id))
+                return false;
+            // same id
+            if (c1.GetType() != c2.GetType())
+                return false; // should not happen
+            if (!c2.AllowsMultiple())
+                return true;
+            if (c1 is PngChunkTextVar)
+            {
+                return ((PngChunkTextVar)c1).GetKey().Equals(((PngChunkTextVar)c2).GetKey());
+            }
+            if (c1 is PngChunkSPLT)
+            {
+                return ((PngChunkSPLT)c1).GetPalName().Equals(((PngChunkSPLT)c2).GetPalName());
+            }
+            // unknown chunks that allow multiple? consider they don't match
+            return false;
+        }
+
+       
+    }
 }

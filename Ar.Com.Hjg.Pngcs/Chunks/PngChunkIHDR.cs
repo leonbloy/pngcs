@@ -14,7 +14,8 @@
 	using System.IO;
 	using System.Runtime.CompilerServices;
 	
-	public class PngChunkIHDR : PngChunk {
+	public class PngChunkIHDR : PngChunkSingle {
+        public const String ID = ChunkHelper.IHDR;
 		public int cols;
 		public int rows;
 		public int bitspc;
@@ -25,36 +26,41 @@
 	
 		// http://www.w3.org/TR/PNG/#11IHDR
 		//
-		public PngChunkIHDR(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IHDR_TEXT, info) {
+		public PngChunkIHDR(ImageInfo info) : base(ID, info) {
 		}
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.NA;
+        }
 	
-		public override ChunkRaw CreateChunk() {
-			ChunkRaw c = new ChunkRaw(13, Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IHDR, true);
+		public override ChunkRaw CreateRawChunk() {
+			ChunkRaw c = new ChunkRaw(13, ChunkHelper.b_IHDR, true);
 			int offset = 0;
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4tobytes(cols, c.data, offset);
+			Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4tobytes(cols, c.Data, offset);
 			offset += 4;
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4tobytes(rows, c.data, offset);
+			Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4tobytes(rows, c.Data, offset);
 			offset += 4;
-			c.data[offset++] = (byte) bitspc;
-			c.data[offset++] = (byte) colormodel;
-			c.data[offset++] = (byte) compmeth;
-			c.data[offset++] = (byte) filmeth;
-			c.data[offset++] = (byte) interlaced;
+			c.Data[offset++] = (byte) bitspc;
+			c.Data[offset++] = (byte) colormodel;
+			c.Data[offset++] = (byte) compmeth;
+			c.Data[offset++] = (byte) filmeth;
+			c.Data[offset++] = (byte) interlaced;
 			return c;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
-			if (c.len != 13)
-				throw new PngjException("Bad IDHR len " + c.len);
+		public override void ParseFromRaw(ChunkRaw c) {
+			if (c.Length != 13)
+				throw new PngjException("Bad IDHR len " + c.Length);
 			MemoryStream st = c.GetAsByteStream();
-			cols = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4(st);
-			rows = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4(st);
+			cols = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4(st);
+			rows = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4(st);
 			// bit depth: number of bits per channel
-			bitspc = Ar.Com.Hjg.Pngcs.PngHelper.ReadByte(st);
-			colormodel = Ar.Com.Hjg.Pngcs.PngHelper.ReadByte(st);
-			compmeth = Ar.Com.Hjg.Pngcs.PngHelper.ReadByte(st);
-			filmeth = Ar.Com.Hjg.Pngcs.PngHelper.ReadByte(st);
-			interlaced = Ar.Com.Hjg.Pngcs.PngHelper.ReadByte(st);
+			bitspc = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadByte(st);
+			colormodel = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadByte(st);
+			compmeth = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadByte(st);
+			filmeth = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadByte(st);
+			interlaced = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadByte(st);
 		}
 	
 		public override void CloneDataFromRead(PngChunk other) {

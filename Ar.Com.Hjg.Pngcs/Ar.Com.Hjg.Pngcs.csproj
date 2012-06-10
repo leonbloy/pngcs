@@ -12,6 +12,7 @@
     <AssemblyName>Pngcs</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,10 +42,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chunks\ChunkHelper.cs" />
-    <Compile Include="Chunks\ChunkList.cs" />
+    <Compile Include="Chunks\ChunksList.cs" />
     <Compile Include="Chunks\ChunkLoadBehaviour.cs" />
     <Compile Include="Chunks\ChunkRaw.cs" />
-    <Compile Include="Chunks\ChunksToWrite.cs" />
+    <Compile Include="Chunks\ChunksListForWrite.cs" />
+    <Compile Include="Chunks\ChunkCopyBehaviour.cs" />
+    <Compile Include="Chunks\ChunkPredicate.cs" />
+    <Compile Include="Chunks\ChunkPredicateId.cs" />
+    <Compile Include="Chunks\ChunkPredicateId2.cs" />
+    <Compile Include="Chunks\ChunkPredicateEquiv.cs" />
+    <Compile Include="Chunks\PngChunkMultiple.cs" />
+    <Compile Include="Chunks\PngChunkSingle.cs" />
+    <Compile Include="Chunks\PngMetadata.cs" />
+    <Compile Include="Chunks\PngChunkSTER.cs" />
+    <Compile Include="Chunks\PngChunkOFFS.cs" />
+    <Compile Include="Chunks\PngChunkSPLT.cs" />
+    <Compile Include="Chunks\PngChunkHIST.cs" />
     <Compile Include="Chunks\PngChunkCHRM.cs" />
     <Compile Include="Chunks\PngChunkSBIT.cs" />
     <Compile Include="Chunks\PngChunkSRGB.cs" />
@@ -62,7 +75,7 @@
     <Compile Include="Chunks\PngChunkIEND.cs" />
     <Compile Include="Chunks\PngChunkIHDR.cs" />
     <Compile Include="Chunks\PngChunkITXT.cs" />
-    <Compile Include="Chunks\PngChunkOTHER.cs" />
+    <Compile Include="Chunks\PngChunkUNKNOWN.cs" />
     <Compile Include="Chunks\PngChunkPHYS.cs" />
     <Compile Include="Chunks\PngChunkPLTE.cs" />
     <Compile Include="Chunks\PngChunkTEXT.cs" />
@@ -70,8 +83,8 @@
     <Compile Include="Chunks\PngChunkTIME.cs" />
     <Compile Include="Chunks\PngChunkTRNS.cs" />
     <Compile Include="Chunks\PngChunkZTXT.cs" />
-    <Compile Include="PngFilterType.cs" />
-    <Compile Include="PngHelper.cs">
+    <Compile Include="FilterType.cs" />
+    <Compile Include="PngHelperInternal.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PngIDatChunkInputStream.cs" />

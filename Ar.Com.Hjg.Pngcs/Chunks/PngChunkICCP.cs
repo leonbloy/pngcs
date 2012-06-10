@@ -16,39 +16,83 @@
 	
 	/*
 	 */
-	public class PngChunkICCP : PngChunk {
+     public class PngChunkICCP : PngChunkSingle
+     {
+        public const String ID = ChunkHelper.iCCP;
 		// http://www.w3.org/TR/PNG/#11iCCP
-		private String profile;
+        private String profileName;
 		// TODO: uncompress
 		private byte[] compressedProfile;
 	
-		public PngChunkICCP(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.iCCP_TEXT, info) {
+		public PngChunkICCP(ImageInfo info) : base(ID, info) {
 		}
-	
-		public override ChunkRaw CreateChunk() {
-			ChunkRaw c = CreateEmptyChunk(profile.Length + compressedProfile.Length + 2, true);
-			System.Array.Copy((Array)(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToBytes(profile)),0,(Array)(c.data),0,profile.Length);
-			c.data[profile.Length] = 0;
-			c.data[profile.Length + 1] = 0;
-			System.Array.Copy((Array)(compressedProfile),0,(Array)(c.data),profile.Length + 2,compressedProfile.Length);
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT;
+        }
+
+
+		public override ChunkRaw CreateRawChunk() {
+            ChunkRaw c = createEmptyChunk(profileName.Length + compressedProfile.Length + 2, true);
+            System.Array.Copy((Array)(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToBytes(profileName)), 0, (Array)(c.Data), 0, profileName.Length);
+            c.Data[profileName.Length] = 0;
+            c.Data[profileName.Length + 1] = 0;
+            System.Array.Copy((Array)(compressedProfile), 0, (Array)(c.Data), profileName.Length + 2, compressedProfile.Length);
 			return c;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw chunk) {
-			int pos0 = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.PosNullByte(chunk.data);
-            profile = Ar.Com.Hjg.Pngcs.PngHelper.charset.GetString(chunk.data, 0, pos0);
-			int comp = (chunk.data[pos0 + 1] & 0xff);
+		public override void ParseFromRaw(ChunkRaw chunk) {
+			int pos0 = Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.PosNullByte(chunk.Data);
+            profileName = Ar.Com.Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(chunk.Data, 0, pos0);
+			int comp = (chunk.Data[pos0 + 1] & 0xff);
 			if (comp != 0)
 				throw new Exception("bad compression for ChunkTypeICCP");
-			int compdatasize = chunk.data.Length - (pos0 + 2);
+			int compdatasize = chunk.Data.Length - (pos0 + 2);
 			compressedProfile = new byte[compdatasize];
-			System.Array.Copy((Array)(chunk.data),pos0 + 2,(Array)(compressedProfile),0,compdatasize);
+			System.Array.Copy((Array)(chunk.Data),pos0 + 2,(Array)(compressedProfile),0,compdatasize);
 		}
 	
 		public override void CloneDataFromRead(PngChunk other) {
 			PngChunkICCP otherx = (PngChunkICCP) other;
-			profile = otherx.profile;
-			compressedProfile = otherx.compressedProfile; // non deep
+            profileName = otherx.profileName;
+			compressedProfile = new byte[otherx.compressedProfile.Length];
+            System.Array.Copy(otherx.compressedProfile, compressedProfile, compressedProfile.Length);
+
 		}
+
+
+        /**
+	 * The profile should be uncompressed bytes
+	 */
+        public void SetProfileNameAndContent(String name, byte[] profile)
+        {
+            profileName = name;
+            compressedProfile = ChunkHelper.compressBytes(profile, true);
+        }
+
+        public void SetProfileNameAndContent(String name, String profile)
+        {
+            SetProfileNameAndContent(name, ChunkHelper.ToBytes(profileName));
+        }
+
+        public String GetProfileName()
+        {
+            return profileName;
+        }
+
+        /**
+         * uncompressed
+         **/
+        public byte[] GetProfile()
+        {
+            return ChunkHelper.compressBytes(compressedProfile, false);
+        }
+
+        public String GetProfileAsString()
+        {
+            return ChunkHelper.ToString(GetProfile());
+        }
+
 	}
 }

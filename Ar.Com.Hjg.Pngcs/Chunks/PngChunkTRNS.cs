@@ -16,7 +16,9 @@
 	
 	/*
 	 */
-	public class PngChunkTRNS : PngChunk {
+     public class PngChunkTRNS : PngChunkSingle
+     {
+         public const String ID = ChunkHelper.tRNS;
 		// http://www.w3.org/TR/PNG/#11tRNS
 		// this chunk structure depends on the image type
 		// only one of these is meaningful
@@ -24,41 +26,44 @@
 		private int red, green, blue;
 		private int[] paletteAlpha;
 	
-		public PngChunkTRNS(ImageInfo info) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.tRNS_TEXT, info) {
+		public PngChunkTRNS(ImageInfo info) : base(ID, info) {
 		}
-	
-		public override ChunkRaw CreateChunk() {
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
+        }
+		public override ChunkRaw CreateRawChunk() {
 			ChunkRaw c = null;
-			if (imgInfo.greyscale) {
-				c = CreateEmptyChunk(2, true);
-				Ar.Com.Hjg.Pngcs.PngHelper.WriteInt2tobytes(gray, c.data, 0);
-			} else if (imgInfo.indexed) {
-				c = CreateEmptyChunk(paletteAlpha.Length, true);
-				for (int n = 0; n < c.len; n++) {
-					c.data[n] = (byte) paletteAlpha[n];
+			if (ImgInfo.Greyscale) {
+				c = createEmptyChunk(2, true);
+				Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt2tobytes(gray, c.Data, 0);
+			} else if (ImgInfo.Indexed) {
+				c = createEmptyChunk(paletteAlpha.Length, true);
+				for (int n = 0; n < c.Length; n++) {
+					c.Data[n] = (byte) paletteAlpha[n];
 				}
 			} else {
-				c = CreateEmptyChunk(6, true);
-				Ar.Com.Hjg.Pngcs.PngHelper.WriteInt2tobytes(red, c.data, 0);
-				Ar.Com.Hjg.Pngcs.PngHelper.WriteInt2tobytes(green, c.data, 0);
-				Ar.Com.Hjg.Pngcs.PngHelper.WriteInt2tobytes(blue, c.data, 0);
+				c = createEmptyChunk(6, true);
+				Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt2tobytes(red, c.Data, 0);
+				Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt2tobytes(green, c.Data, 0);
+				Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt2tobytes(blue, c.Data, 0);
 			}
 			return c;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) {
-			if (imgInfo.greyscale) {
-				gray = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt2fromBytes(c.data, 0);
-			} else if (imgInfo.indexed) {
-				int nentries = c.data.Length;
+		public override void ParseFromRaw(ChunkRaw c) {
+			if (ImgInfo.Greyscale) {
+				gray = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt2fromBytes(c.Data, 0);
+			} else if (ImgInfo.Indexed) {
+				int nentries = c.Data.Length;
 				paletteAlpha = new int[nentries];
 				for (int n = 0; n < nentries; n++) {
-					paletteAlpha[n] = (int) (c.data[n] & 0xff);
+					paletteAlpha[n] = (int) (c.Data[n] & 0xff);
 				}
 			} else {
-				red = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt2fromBytes(c.data, 0);
-				green = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt2fromBytes(c.data, 2);
-				blue = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt2fromBytes(c.data, 4);
+				red = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt2fromBytes(c.Data, 0);
+				green = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt2fromBytes(c.Data, 2);
+				blue = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt2fromBytes(c.Data, 4);
 			}
 		}
 	
@@ -68,7 +73,65 @@
 			red = otherx.red;
 			green = otherx.red;
 			blue = otherx.red;
-			paletteAlpha = otherx.paletteAlpha; // not deep!
+            if (otherx.paletteAlpha != null)
+            {
+                paletteAlpha = new int[otherx.paletteAlpha.Length];
+                System.Array.Copy(otherx.paletteAlpha, 0, paletteAlpha, 0, paletteAlpha.Length);
+            }
 		}
+
+        /**
+    * Set rgb values
+    * 
+    */
+        public void SetRGB(int r, int g, int b)
+        {
+            if (ImgInfo.Greyscale || ImgInfo.Indexed)
+                throw new PngjException("only rgb or rgba images support this");
+            red = r;
+            green = g;
+            blue = b;
+        }
+
+        public int[] GetRGB()
+        {
+            if (ImgInfo.Greyscale || ImgInfo.Indexed)
+                throw new PngjException("only rgb or rgba images support this");
+            return new int[] { red, green, blue };
+        }
+
+        public void SetGray(int g)
+        {
+            if (!ImgInfo.Greyscale)
+                throw new PngjException("only grayscale images support this");
+            gray = g;
+        }
+
+        public int GetGray()
+        {
+            if (!ImgInfo.Greyscale)
+                throw new PngjException("only grayscale images support this");
+            return gray;
+        }
+
+        /**
+         * WARNING: non deep copy
+         */
+        public void SetPalletteAlpha(int[] palAlpha)
+        {
+            if (!ImgInfo.Indexed)
+                throw new PngjException("only indexed images support this");
+            paletteAlpha = palAlpha;
+        }
+
+        /**
+         * WARNING: non deep copy
+         */
+        public int[] GetPalletteAlpha()
+        {
+            if (!ImgInfo.Indexed)
+                throw new PngjException("only indexed images support this");
+            return paletteAlpha;
+        }
 	}
 }

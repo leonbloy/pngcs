@@ -14,18 +14,24 @@
 	using System.IO;
 	using System.Runtime.CompilerServices;
 	
-	public class PngChunkIDAT : PngChunk {
+	public class PngChunkIDAT : PngChunkMultiple {
+        public const String ID = ChunkHelper.IDAT;
 		// http://www.w3.org/TR/PNG/#11IDAT
 		// This is dummy placeholder - we write/read this chunk (actually several)
 		// by special code.
-		public PngChunkIDAT(ImageInfo i) : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.IDAT_TEXT, i) {
+		public PngChunkIDAT(ImageInfo i) : base(ID, i) {
 		}
+
+        public override ChunkOrderingConstraint GetOrderingConstraint()
+        {
+            return ChunkOrderingConstraint.NA;
+        }
 	
-		public override ChunkRaw CreateChunk() {// does nothing
+		public override ChunkRaw CreateRawChunk() {// does nothing
 			return null;
 		}
 	
-		public override void ParseFromChunk(ChunkRaw c) { // does nothing
+		public override void ParseFromRaw(ChunkRaw c) { // does nothing
 		}
 	
 		public override void CloneDataFromRead(PngChunk other) {

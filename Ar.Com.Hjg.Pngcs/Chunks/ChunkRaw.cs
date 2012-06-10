@@ -4,91 +4,100 @@
 // 6/1/11 9:13 a.m.    
 // ${CustomMessageForDisclaimer}                                                                             
 // --------------------------------------------------------------------------------------------------
- namespace Ar.Com.Hjg.Pngcs.Chunks {
-	
-	using Ar.Com.Hjg.Pngcs;
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.IO;
-	using System.Runtime.CompilerServices;
-     using ICSharpCodePngcs.SharpZipLib.Checksums;
-	
-	/// <summary>
-	/// Wraps the raw chunk data Short lived object, to be created while
-	/// serialing/deserializing Do not reuse it for different chunks
-	/// see http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
-	/// </summary>
-	///
-	public class ChunkRaw {
-		public readonly int len;
-		public readonly byte[] idbytes; // 4 bytes
-		public byte[] data; // crc not included
-		private int crcval;
-	
-		// public int offset=-1; // only for read chunks - informational
-		public ChunkRaw(int len_0, byte[] idbytes_1, bool alloc) {
-			this.idbytes = new byte[4];
-			this.data = null;
-			this.crcval = 0;
-			this.len = len_0;
-			System.Array.Copy((Array)(idbytes_1),0,(Array)(this.idbytes),0,4);
-			if (alloc)
-				AllocData();
-		}
-	
-		public void WriteChunk(Stream os) {
-			if (idbytes.Length != 4)
-				throw new PngjOutputException("bad chunkid [" + Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(idbytes) + "]");
-			ComputeCrc();
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4(os, len);
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteBytes(os, idbytes);
-			if (len > 0)
-				Ar.Com.Hjg.Pngcs.PngHelper.WriteBytes(os, data, 0, len);
+namespace Ar.Com.Hjg.Pngcs.Chunks
+{
+
+    using Ar.Com.Hjg.Pngcs;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using ICSharpCodePngcs.SharpZipLib.Checksums;
+
+    /// <summary>
+    /// Wraps the raw chunk data Short lived object, to be created while
+    /// serialing/deserializing Do not reuse it for different chunks
+    /// see http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
+    /// </summary>
+    ///
+    public class ChunkRaw
+    {
+        public readonly int Length;
+        public readonly byte[] IdBytes; // 4 bytes
+        public byte[] Data; // crc not included
+        private int crcval;
+
+        // public int offset=-1; // only for read chunks - informational
+        public ChunkRaw(int len_0, byte[] idbytes_1, bool alloc)
+        {
+            this.IdBytes = new byte[4];
+            this.Data = null;
+            this.crcval = 0;
+            this.Length = len_0;
+            System.Array.Copy((Array)(idbytes_1), 0, (Array)(this.IdBytes), 0, 4);
+            if (alloc)
+                AllocData();
+        }
+
+        public void WriteChunk(Stream os)
+        {
+            if (IdBytes.Length != 4)
+                throw new PngjOutputException("bad chunkid [" + Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(IdBytes) + "]");
+            ComputeCrc();
+            Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4(os, Length);
+            Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteBytes(os, IdBytes);
+            if (Length > 0)
+                Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteBytes(os, Data, 0, Length);
             //Console.WriteLine("writing chunk " + this.ToString() + "crc=" + crcval);
-			Ar.Com.Hjg.Pngcs.PngHelper.WriteInt4(os, crcval);
-		}
-	
-		/// <summary>
-		/// called after setting data, before writing to os
-		/// </summary>
-		///
-		private void ComputeCrc() {
-			Crc32 crcengine = Ar.Com.Hjg.Pngcs.PngHelper.GetCRC();
-			crcengine.Reset();
-			crcengine.Update(idbytes, 0, 4);
-			if (len > 0)
-				crcengine.Update(data, 0, len); //
+            Ar.Com.Hjg.Pngcs.PngHelperInternal.WriteInt4(os, crcval);
+        }
+
+        /// <summary>
+        /// called after setting data, before writing to os
+        /// </summary>
+        ///
+        private void ComputeCrc()
+        {
+            Crc32 crcengine = Ar.Com.Hjg.Pngcs.PngHelperInternal.GetCRC();
+            crcengine.Reset();
+            crcengine.Update(IdBytes, 0, 4);
+            if (Length > 0)
+                crcengine.Update(Data, 0, Length); //
             crcval = (int)crcengine.Value;
-		}
-	
-		public override String ToString() {
-			return "chunkid=" + Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(idbytes) + " len=" + len;
-		}
-	
-		/// <summary>
-		/// position before: just after chunk id. positon after: after crc Data should
-		/// be already allocated. Checks CRC Return number of byte read.
-		/// </summary>
-		///
-		public int ReadChunkData(Stream mask0) {
-			Ar.Com.Hjg.Pngcs.PngHelper.ReadBytes(mask0, data, 0, len);
-			int crcori = Ar.Com.Hjg.Pngcs.PngHelper.ReadInt4(mask0);
-			ComputeCrc();
-			if (crcori != crcval)
-				throw new PngjBadCrcException("crc invalid for chunk " + ToString() + " calc="
-						+ crcval + " read=" + crcori);
-			return len + 4;
-		}
-	
-		public MemoryStream GetAsByteStream() { // only the data
-			return new MemoryStream(data);
-		}
-	
-		private void AllocData() {
-			if (data == null || data.Length < len)
-				data = new byte[len];
-		}
-	}
+        }
+
+        public override String ToString()
+        {
+            return "chunkid=" + Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.ToString(IdBytes) + " len=" + Length;
+        }
+
+        /// <summary>
+        /// position before: just after chunk id. positon after: after crc Data should
+        /// be already allocated. Checks CRC Return number of byte read.
+        /// </summary>
+        ///
+        public int ReadChunkData(Stream mask0)
+        {
+            Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadBytes(mask0, Data, 0, Length);
+            int crcori = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4(mask0);
+            ComputeCrc();
+            if (crcori != crcval)
+                throw new PngjBadCrcException("crc invalid for chunk " + ToString() + " calc="
+                        + crcval + " read=" + crcori);
+            return Length + 4;
+        }
+
+        public MemoryStream GetAsByteStream()
+        { // only the data
+            return new MemoryStream(Data);
+        }
+
+        private void AllocData()
+        {
+            if (Data == null || Data.Length < Length)
+                Data = new byte[Length];
+        }
+    }
 }

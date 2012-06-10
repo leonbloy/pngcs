@@ -18,41 +18,57 @@ namespace Ar.Com.Hjg.Pngcs.Chunks
     /*
      * Palette chunk *this is critical*
      */
-    public class PngChunkPLTE : PngChunk
+    public class PngChunkPLTE : PngChunkSingle
     {
+        public const String ID = ChunkHelper.PLTE;
         // http://www.w3.org/TR/PNG/#11PLTE
-        public int nentries;
-        public int[] entries; // packed xRGB
+        private int nentries = 0;
+        /**
+         * RGB8 packed in one integer
+         */
+        private int[] entries;
 
         public PngChunkPLTE(ImageInfo info)
-            : base(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.PLTE_TEXT, info)
+            : base(ID, info)
         {
             this.nentries = 0;
         }
 
-        public override ChunkRaw CreateChunk()
+        
+	public override ChunkOrderingConstraint GetOrderingConstraint() {
+		return ChunkOrderingConstraint.NA;
+	}
+
+        public override ChunkRaw CreateRawChunk()
         {
             int len = 3 * nentries;
             int[] rgb = new int[3];
-            ChunkRaw c = CreateEmptyChunk(len, true);
+            ChunkRaw c = createEmptyChunk(len, true);
             for (int n = 0, i = 0; n < nentries; n++)
             {
                 GetEntryRgb(n, rgb);
-                c.data[i++] = (byte)rgb[0];
-                c.data[i++] = (byte)rgb[1];
-                c.data[i++] = (byte)rgb[2];
+                c.Data[i++] = (byte)rgb[0];
+                c.Data[i++] = (byte)rgb[1];
+                c.Data[i++] = (byte)rgb[2];
             }
             return c;
         }
 
-        public override void ParseFromChunk(ChunkRaw chunk)
+        public override void ParseFromRaw(ChunkRaw chunk)
         {
-            SetNentries(chunk.len / 3);
+            SetNentries(chunk.Length / 3);
             for (int n = 0, i = 0; n < nentries; n++)
             {
-                SetEntry(n, (int)(chunk.data[i++] & 0xff), (int)(chunk.data[i++] & 0xff),
-                        (int)(chunk.data[i++] & 0xff));
+                SetEntry(n, (int)(chunk.Data[i++] & 0xff), (int)(chunk.Data[i++] & 0xff),
+                        (int)(chunk.Data[i++] & 0xff));
             }
+        }
+
+        public override void CloneDataFromRead(PngChunk other)
+        {
+            PngChunkPLTE otherx = (PngChunkPLTE)other;
+            this.SetNentries(otherx.GetNentries());
+            System.Array.Copy((Array)(otherx.entries), 0, (Array)(entries), 0, nentries);
         }
 
         public void SetNentries(int n)
@@ -105,12 +121,6 @@ namespace Ar.Com.Hjg.Pngcs.Chunks
             else
                 return 8;
         }
-
-        public override void CloneDataFromRead(PngChunk other)
-        {
-            PngChunkPLTE otherx = (PngChunkPLTE)other;
-            this.SetNentries(otherx.GetNentries());
-            System.Array.Copy((Array)(otherx.entries), 0, (Array)(entries), 0, nentries);
-        }
     }
+
 }
