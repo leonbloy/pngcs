@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ar.Com.Hjg.Pngcs", "Ar.Com.Hjg.Pngcs\Ar.Com.Hjg.Pngcs.csproj", "{FD3B0D50-46B3-4A83-9A6D-C641569142CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCRC", "pgncstest\TestCRC.csproj", "{15A86138-A394-4395-9835-AF04D0856C93}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCRC", "TestCRC\TestCRC.csproj", "{15A86138-A394-4395-9835-AF04D0856C93}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FD3B0D50-46B3-4A83-9A6D-C641569142CF} = {FD3B0D50-46B3-4A83-9A6D-C641569142CF}
 	EndProjectSection
