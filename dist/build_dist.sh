@@ -7,6 +7,7 @@
 
 DIRS=`dirname $0`
 
+# no spaces!
 DIRNEW="/C/temp/pngcs_nnn"
 
 if [ -d "$DIRNEW" ]; then
@@ -23,17 +24,22 @@ else
  exit
 fi
 
-cp -r "$DIRS/.." "$DIRNEW/src"
+cd $DIRS
+cp -r ../* $DIRNEW/src/
+cd $DIRNEW
 
-rm -rf "$DIRNEW/src/.git"
-cp "$DIRNEW/src/Ar.Com.Hjg.Pngcs/bin/Release/Pngcs.dll" "$DIRNEW/"
-cp "$DIRNEW/src/COPYING.txt" "$DIRNEW/"
-cp "$DIRNEW/src/readme.txt" "$DIRNEW/"
-find "$DIRNEW" -name bin -type d -exec /bin/rm -rf '{}' \;
-find "$DIRNEW" -name obj -type d -exec /bin/rm -rf '{}' \;
-find "$DIRNEW" -name '*.zip' -exec /bin/rm -f '{}' \;
-find "$DIRNEW" -name '*.sh' -exec /bin/rm -f '{}' \;
-/bin/rm -f "$DIRNEW/src/pngcs.suo" 
+mv src/Hjg.Pngcs/bin/Release/Pngcs.dll .
+cp src/*.txt .
+mv src/*.dll .
+mv src/docs .
+
+find . -name bin -type d -exec /bin/rm -rf '{}' \;
+find . -name obj -type d -exec /bin/rm -rf '{}' \;
+find . -name '*.zip' -exec /bin/rm -f '{}' \;
+find . -name '*.sh' -exec /bin/rm -f '{}' \;
+/bin/rm -f src/pngcs.suo
+
+cd $DIRS
 
 echo "Output in $DIRNEW. Rename it to your version number and zip it" 
 

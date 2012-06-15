@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hjg.Pngcs", "Ar.Com.Hjg.Pngcs\Hjg.Pngcs.csproj", "{FD3B0D50-46B3-4A83-9A6D-C641569142CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hjg.Pngcs", "Hjg.Pngcs\Hjg.Pngcs.csproj", "{FD3B0D50-46B3-4A83-9A6D-C641569142CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCRC", "TestCRC\TestCRC.csproj", "{15A86138-A394-4395-9835-AF04D0856C93}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FD3B0D50-46B3-4A83-9A6D-C641569142CF} = {FD3B0D50-46B3-4A83-9A6D-C641569142CF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PngShowChunks", "PngShowChunks\PngShowChunks.csproj", "{A983383C-1432-441B-9ABF-C47974701174}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleShowChunks", "SampleShowChunks\SampleShowChunks.csproj", "{A983383C-1432-441B-9ABF-C47974701174}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FD3B0D50-46B3-4A83-9A6D-C641569142CF} = {FD3B0D50-46B3-4A83-9A6D-C641569142CF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleMirror", "PngSampleMirror\SampleMirror.csproj", "{E4562FAA-C2B4-4B1F-9F74-0F35D720E76D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleMirror", "SampleMirror\SampleMirror.csproj", "{E4562FAA-C2B4-4B1F-9F74-0F35D720E76D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPngSuite", "TestPngSuite\TestPngSuite.csproj", "{350BF4DD-8CA3-4B6B-90FF-5BE4217C38C6}"
 EndProject

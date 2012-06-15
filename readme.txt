@@ -9,32 +9,28 @@ It supports all PNG spec color models and bitdepths: RGB8/RGB16/RGBA8/RGBA16, G8
 GA8/4/2/1, PAL8/4/2/1,  all filters/compressions settings. It does not support interlaced images. 
 It also has support for Chunks (metadata).
 
-This is a port of the PngJ library (Java):
-http://code.google.com/p/pngj/
+This is a port of the PngJ library (Java): http://code.google.com/p/pngj/
 the API, documentation and samples from PNGJ apply also
 to this PngCs library: http://code.google.com/p/pngj/wiki/Overview
 
+The distribution of this library includes documentation in folder docs/
+
+See also the included sample projects, 
+
 --------------------------------------------------------------
 
-NOTE: PngCs includes some source code from the library SharpZipLib
-http://www.icsharpcode.net/opensource/sharpziplib/
-with minor modifications. That library is originally 
-released under the GPL licence, and so is this PNGCS library.
+NOTE: PngCs depends on SharpZipLib http://www.icsharpcode.net/opensource/sharpziplib/
+The ICSharpCode.SharpZipLib.dll assembly, provided with this library,
+and must be referenced together with Pngcs.dll by client projects.
+Because SharpZipLib is released  under the GPL license with an exception
+that allows to link it with independent modules, PNGCS relies on that
+exception and is released under the Apache license. See LICENSE.txt
 
 -----------------------------------------------------------------------------
 
 History: 
 
-10/June/2012: 1.0.91
-  - Major reorganization to put in sync with Java port: updated to PngJ v 0.91, with all Chunks and full PNGTestSuite
-  - Most public methods/properties naming complies with C# conventions now
-
-22/Sept/2011: Implemented functionality is on par with current PngJ, 
-some testing, optimizing and testing pending.
-
-21/Sept/2011: Added classes from SharpZipLib, basic reading and writing works
-
-Jan/2011: Basic port, aided by http://j2cstranslator.sourceforge.net/ (nice tool!)
+See changes.txt
 
 Hernan J Gonzalez - hgonzalez@gmail.com -  http://stackoverflow.com/users/277304/leonbloy
 

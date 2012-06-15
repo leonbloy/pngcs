@@ -51,7 +51,7 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ar.Com.Hjg.Pngcs\Hjg.Pngcs.csproj">
+    <ProjectReference Include="..\Hjg.Pngcs\Hjg.Pngcs.csproj">
       <Project>{FD3B0D50-46B3-4A83-9A6D-C641569142CF}</Project>
       <Name>Hjg.Pngcs</Name>
     </ProjectReference>

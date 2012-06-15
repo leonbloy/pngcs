@@ -1,0 +1,24 @@
+15/Jun/2012:  1.0.92
+  - LICENCE change: now released under Apache License
+  - Replaced #ZipLib code for standalone assembly : ICSharpCode.SharpZipLib.dll
+  - General polishing, to better fit C# conventions and good practices. 
+  Quite a bit of changes in signatures (cases, specially), break backward compatibility.
+  - Trimmed unnecesary imports (Linq) and replace unnecesary dependendance on .Net 4.0. Now the target is .Net 2.0
+  - Documented all classes/methods (Pngcs.xml)
+  - Reorganized and added some sample projects (SampleCreateOrangeGradient) 
+  - Added Doxygen documentation
+
+10/June/2012: 1.0.91
+  - Major reorganization to put in sync with Java port: updated to PngJ v 0.91, with all Chunks and full PNGTestSuite
+  - Most public methods/properties naming complies with C# conventions now
+
+22/Sept/2011: Implemented functionality is on par with current PngJ, 
+some testing, optimizing and testing pending.
+
+21/Sept/2011: Added classes from SharpZipLib, basic reading and writing works
+
+Jan/2011: Basic port, aided by http://j2cstranslator.sourceforge.net/ (nice tool!)
+
+Hernan J. Gonzalez 
+hgonzalez@gmail.com  
+http://hjg.com.ar/
