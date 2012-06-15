@@ -1,5 +1,4 @@
-namespace Ar.Com.Hjg.Pngcs
-{
+namespace Hjg.Pngcs {
 
     using System;
     using System.Collections;
@@ -7,14 +6,13 @@ namespace Ar.Com.Hjg.Pngcs
     using System.ComponentModel;
     using System.IO;
     using System.Runtime.CompilerServices;
-    using ICSharpCodePngcs.SharpZipLib.Checksums;
+    using ICSharpCode.SharpZipLib.Checksums;
 
     /// <summary>
     /// Reads IDAT chunks
     /// </summary>
     ///
-    internal class PngIDatChunkInputStream : Stream
-    {
+    internal class PngIDatChunkInputStream : Stream {
         private readonly Stream inputStream;
         private readonly Crc32 crcEngine;
         private int lenLastChunk;
@@ -24,13 +22,11 @@ namespace Ar.Com.Hjg.Pngcs
         private long offset; // offset inside inputstream
 
         // just informational
-        public class IdatChunkInfo
-        {
+        public class IdatChunkInfo {
             public readonly int len;
             public readonly int offset;
 
-            public IdatChunkInfo(int len_0, int offset_1)
-            {
+            public IdatChunkInfo(int len_0, int offset_1) {
                 this.len = len_0;
                 this.offset = offset_1;
             }
@@ -53,8 +49,7 @@ namespace Ar.Com.Hjg.Pngcs
         /// chunk
         /// </summary>
         ///
-        public PngIDatChunkInputStream(Stream iStream, int lenFirstChunk, int offset_0)
-        {
+        public PngIDatChunkInputStream(Stream iStream, int lenFirstChunk, int offset_0) {
             this.idLastChunk = new byte[4];
             this.toReadThisChunk = 0;
             this.ended = false;
@@ -65,7 +60,7 @@ namespace Ar.Com.Hjg.Pngcs
             this.lenLastChunk = lenFirstChunk;
             toReadThisChunk = lenFirstChunk;
             // we know it's a IDAT
-            System.Array.Copy((Array)(Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT), 0, (Array)(idLastChunk), 0, 4);
+            System.Array.Copy((Array)(Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT), 0, (Array)(idLastChunk), 0, 4);
             crcEngine.Update(idLastChunk, 0, 4);
             foundChunksInfo.Add(new PngIDatChunkInputStream.IdatChunkInfo(lenLastChunk, offset_0 - 8));
             // PngHelper.logdebug("IDAT Initial fragment: len=" + lenLastChunk);
@@ -77,35 +72,31 @@ namespace Ar.Com.Hjg.Pngcs
         /// does NOT close the associated stream!
         /// </summary>
         ///
-        public override void Close()
-        {
+        public override void Close() {
             base.Close(); // nothing
         }
 
-        private void EndChunkGoForNext()
-        {
+        private void EndChunkGoForNext() {
             // Called after readging the last byte of chunk
             // Checks CRC, and read ID from next CHUNK
             // Those values are left in idLastChunk / lenLastChunk
             // Skips empty IDATS
-            do
-            {
-                int crc = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream); //
+            do {
+                int crc = Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream); //
                 offset += 4;
                 int crccalc = (int)crcEngine.Value;
                 if (lenLastChunk > 0 && crc != crccalc)
                     throw new PngjBadCrcException("error reading idat; offset: " + offset);
                 crcEngine.Reset();
-                lenLastChunk = Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream);
+                lenLastChunk = Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream);
                 if (lenLastChunk < 0)
                     throw new PngjInputException("invalid len for chunk: " + lenLastChunk);
                 toReadThisChunk = lenLastChunk;
-                Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadBytes(inputStream, idLastChunk, 0, 4);
+                Hjg.Pngcs.PngHelperInternal.ReadBytes(inputStream, idLastChunk, 0, 4);
                 offset += 8;
 
-                ended = !PngCsUtils.arraysEqual4(idLastChunk, Ar.Com.Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT);
-                if (!ended)
-                {
+                ended = !PngCsUtils.arraysEqual4(idLastChunk, Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT);
+                if (!ended) {
                     foundChunksInfo.Add(new PngIDatChunkInputStream.IdatChunkInfo(lenLastChunk, (int)(offset - 8)));
                     crcEngine.Update(idLastChunk, 0, 4);
                 }
@@ -120,12 +111,10 @@ namespace Ar.Com.Hjg.Pngcs
         /// reamaing dummy bytes
         /// </summary>
         ///
-        public void ForceChunkEnd()
-        {
-            if (!ended)
-            {
+        public void ForceChunkEnd() {
+            if (!ended) {
                 byte[] dummy = new byte[toReadThisChunk];
-                Ar.Com.Hjg.Pngcs.PngHelperInternal.ReadBytes(inputStream, dummy, 0, toReadThisChunk);
+                Hjg.Pngcs.PngHelperInternal.ReadBytes(inputStream, dummy, 0, toReadThisChunk);
                 crcEngine.Update(dummy, 0, toReadThisChunk);
                 EndChunkGoForNext();
             }
@@ -136,32 +125,27 @@ namespace Ar.Com.Hjg.Pngcs
         /// ended prematurely. That is our error.
         /// </summary>
         ///
-        public override int Read(byte[] b, int off, int len_0)
-        {
+        public override int Read(byte[] b, int off, int len_0) {
             if (ended) return -1;
             if (toReadThisChunk == 0) throw new Exception("this should not happen");
             int n = inputStream.Read(b, off, (len_0 >= toReadThisChunk) ? toReadThisChunk : len_0);
             if (n == -1) n = -2;
-            if (n > 0)
-            {
+            if (n > 0) {
                 crcEngine.Update(b, off, n);
                 this.offset += n;
                 toReadThisChunk -= n;
             }
-            if (n >= 0 && toReadThisChunk == 0)
-            { // end of chunk: prepare for next
+            if (n >= 0 && toReadThisChunk == 0) { // end of chunk: prepare for next
                 EndChunkGoForNext();
             }
             return n;
         }
 
-        public int Read(byte[] b)
-        {
+        public int Read(byte[] b) {
             return this.Read(b, 0, b.Length);
         }
 
-        public override int ReadByte()
-        {
+        public override int ReadByte() {
             // PngHelper.logdebug("read() should go here");
             // inneficient - but this should be used rarely
             byte[] b1 = new byte[1];
@@ -169,24 +153,21 @@ namespace Ar.Com.Hjg.Pngcs
             return (r < 0) ? -1 : (int)b1[0];
         }
 
-        public int GetLenLastChunk()
-        {
+        public int GetLenLastChunk() {
             return lenLastChunk;
         }
 
-        public byte[] GetIdLastChunk()
-        {
+        public byte[] GetIdLastChunk() {
             return idLastChunk;
         }
 
-        public long GetOffset()
-        {
+        public long GetOffset() {
             return offset;
         }
 
-        public bool IsEnded()
-        {
+        public bool IsEnded() {
             return ended;
         }
+
     }
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TestDeflater2")]
+[assembly: AssemblyTitle("SampleCreateOrangeGradient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TestDeflater2")]
+[assembly: AssemblyProduct("SampleCreateOrangeGradient")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f60b66d7-fc9a-46c9-93c8-16f01fd25a85")]
+[assembly: Guid("91b6b934-d0b5-40bf-9e12-60da70574a05")]
 
 // Version information for an assembly consists of the following four values:
 //

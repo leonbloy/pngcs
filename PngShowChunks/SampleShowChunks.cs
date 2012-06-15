@@ -7,8 +7,8 @@ namespace PngShowChunks
     using System.ComponentModel;
     using System.IO;
     using System.Runtime.CompilerServices;
-    using Ar.Com.Hjg.Pngcs;
-    using Ar.Com.Hjg.Pngcs.Chunks;
+    using Hjg.Pngcs;
+    using Hjg.Pngcs.Chunks;
  
     /**
  * prints all chunks (remember that IDAT is shown as only one pseudo zero-length chunk)
@@ -22,7 +22,7 @@ namespace PngShowChunks
             for (int row = 0; row < pngr.ImgInfo.Rows; row++)
                 pngr.ReadRow(row);
             Console.Out.WriteLine(pngr.ToString());
-            Console.Out.WriteLine(pngr.ChunksList.ToStringFull());
+            Console.Out.WriteLine(pngr.GetChunksList().ToStringFull());
         }
 
        

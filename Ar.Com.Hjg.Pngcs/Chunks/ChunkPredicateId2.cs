@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace Ar.Com.Hjg.Pngcs.Chunks
+namespace Hjg.Pngcs.Chunks
 {
-    // match if have same id and, if Text (or SPLT) if have the asame key
-    public class ChunkPredicateId2 : ChunkPredicate
+    /// <summary>
+    /// match if have same id and, if Text (or SPLT) if have the asame key
+    /// </summary>
+    /// <remarks>
+    /// This is the same as ChunkPredicateEquivalent, the only difference is that does not requires
+    /// a chunk at construction time
+    /// </remarks>
+    internal class ChunkPredicateId2 : ChunkPredicate
     {
 
         private readonly string id;
@@ -22,7 +27,7 @@ namespace Ar.Com.Hjg.Pngcs.Chunks
                 return false;
             if (c is PngChunkTextVar && !((PngChunkTextVar)c).GetKey().Equals(innerid))
                 return false;
-            if (c is PngChunkSPLT && !((PngChunkSPLT)c).GetPalName().Equals(innerid))
+            if (c is PngChunkSPLT && !((PngChunkSPLT)c).PalName.Equals(innerid))
                 return false;
 
             return true;

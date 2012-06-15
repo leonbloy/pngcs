@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Ar.Com.Hjg.Pngcs")]
+[assembly: AssemblyTitle("Hjg.Pngcs")]
 [assembly: AssemblyDescription("PNGCS: A library for read-write PNG images")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("http://hjg.com.ar/")]
-[assembly: AssemblyProduct("Ar.Com.Hjg.Pngcs")]
+[assembly: AssemblyProduct("Hjg.Pngcs")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

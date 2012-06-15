@@ -1,36 +1,33 @@
- namespace Ar.Com.Hjg.Pngcs.Chunks {
-	
-	using Ar.Com.Hjg.Pngcs;
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.IO;
-	using System.Runtime.CompilerServices;
-	
-	/*
-	 */
-	public class PngChunkCHRM : PngChunkSingle {
+namespace Hjg.Pngcs.Chunks {
+
+    using Hjg.Pngcs;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    /// cHRM chunk, see http://www.w3.org/TR/PNG/#11cHRM
+    /// </summary>
+    public class PngChunkCHRM : PngChunkSingle {
         public const String ID = ChunkHelper.cHRM;
-		// 	// http://www.w3.org/TR/PNG/#11cHRM
 
-        private double whitex,whitey;
-	private double redx,redy;
-	private double greenx,greeny;
-	private double bluex,bluey;
+        private double whitex, whitey;
+        private double redx, redy;
+        private double greenx, greeny;
+        private double bluex, bluey;
 
-    public PngChunkCHRM(ImageInfo info)
-        : base(ID, info)
-    {
-		}
+        public PngChunkCHRM(ImageInfo info)
+            : base(ID, info) {
+        }
 
-    public override ChunkOrderingConstraint GetOrderingConstraint()
-    {
-        return ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
-    }
+        public override ChunkOrderingConstraint GetOrderingConstraint() {
+            return ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT;
+        }
 
-    public override ChunkRaw CreateRawChunk()
-    {
+        public override ChunkRaw CreateRawChunk() {
             ChunkRaw c = null;
             c = createEmptyChunk(32, true);
             PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(whitex), c.Data, 0);
@@ -42,9 +39,9 @@
             PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(bluex), c.Data, 24);
             PngHelperInternal.WriteInt4tobytes(PngHelperInternal.DoubleToInt100000(bluey), c.Data, 28);
             return c;
-		}
-	
-		public override void ParseFromRaw(ChunkRaw c) {
+        }
+
+        public override void ParseFromRaw(ChunkRaw c) {
             if (c.Length != 32)
                 throw new PngjException("bad chunk " + c);
             whitex = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 0));
@@ -56,8 +53,8 @@
             bluex = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 24));
             bluey = PngHelperInternal.IntToDouble100000(PngHelperInternal.ReadInt4fromBytes(c.Data, 28));
         }
-	
-		public override void CloneDataFromRead(PngChunk other) {
+
+        public override void CloneDataFromRead(PngChunk other) {
             PngChunkCHRM otherx = (PngChunkCHRM)other;
             whitex = otherx.whitex;
             whitey = otherx.whitex;
@@ -68,10 +65,9 @@
             bluex = otherx.bluex;
             bluey = otherx.bluey;
         }
-        
+
         public void SetChromaticities(double whitex, double whitey, double redx, double redy, double greenx, double greeny,
-                double bluex, double bluey)
-        {
+                double bluex, double bluey) {
             this.whitex = whitex;
             this.redx = redx;
             this.greenx = greenx;
@@ -82,9 +78,8 @@
             this.bluey = bluey;
         }
 
-        public double[] GetChromaticities()
-        {
+        public double[] GetChromaticities() {
             return new double[] { whitex, whitey, redx, redy, greenx, greeny, bluex, bluey };
         }
-	}
+    }
 }

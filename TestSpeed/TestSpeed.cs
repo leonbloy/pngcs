@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Ar.Com.Hjg.Pngcs;
+using Hjg.Pngcs;
 
 namespace TestSpeed
 {
@@ -15,7 +14,8 @@ namespace TestSpeed
 		ImageInfo iminfo = new ImageInfo(cols, rows, 8, false);
 		PngWriter png = FileHelper.CreatePngWriter(filename,iminfo,true);
 		png.SetFilterType(filtertype);
-		png.SetCompLevel(compLevel);
+		png.CompLevel= compLevel;
+        png.CompressionStrategy = PngWriter.ECompressionStrategy.Filtered;
 		ImageLine iline1 = new ImageLine(png.ImgInfo);
 		ImageLine iline2 = new ImageLine(png.ImgInfo);
 		ImageLine iline = iline1;
@@ -45,21 +45,28 @@ namespace TestSpeed
 		return dt;
 	}
 
-    // con level=6: [5000 x 5000] 8081 8377(VA) 4680 4727 (A) read(x10) 10530
+    // con level=6: 
+        
+//               8050 (VA) 4352 4462 (A) 4758 4665 (C) read(x10) 15147
+    //     IONIC 9189 (VA) 5007 5694 (A) 7816 7660 (C) read(x10) 14851
+    // (size: 207089)
+    
 	public static void run(int cols, int rows)  {
 		String fwrite="C:/temp/hugecs.png";
         String fread = fwrite; // "C:/temp/huge.png";
         Console.WriteLine("Please wait, this can take a minute or more...");
         int dt1 = createHuge(fwrite, cols, rows, FilterType.FILTER_VERYAGGRESSIVE, 6);
         Console.Write(".");
-        int dt2 = createHuge(fwrite, cols, rows, FilterType.FILTER_VERYAGGRESSIVE, 6);
-        Console.Write(".");
         int dt3 = createHuge(fwrite, cols, rows, FilterType.FILTER_AGGRESSIVE, 6);
         Console.Write(".");
         int dt4 = createHuge(fwrite, cols, rows, FilterType.FILTER_AGGRESSIVE, 6);
         Console.Write(".\n");
+        int dt5 = createHuge(fwrite, cols, rows, FilterType.FILTER_CICLIC, 6);
+        Console.Write(".");
+        int dt6 = createHuge(fwrite, cols, rows, FilterType.FILTER_CICLIC, 6);
+        Console.Write(".\n");
         int dtr = read(fread, 10);
-		Console.Write(String.Format("write [{0} x {1}] {2} {3}(VA) {4} {5} (A) read(x10) {6} \n",cols,rows,dt1,dt2,dt3,dt4,dtr));
+        Console.Write(String.Format("write [{0} x {1}] {2} (VA) {3} {4} (A) {5} {6} (C) read(x10) {7} \n", cols, rows, dt1, dt3, dt4, dt5, dt6, dtr));
 	}
 
     }

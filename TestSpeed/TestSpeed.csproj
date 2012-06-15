@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestSpeed</RootNamespace>
     <AssemblyName>TestSpeed</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -36,12 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestSpeed.cs" />
@@ -49,9 +44,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ar.Com.Hjg.Pngcs\Ar.Com.Hjg.Pngcs.csproj">
+    <ProjectReference Include="..\Ar.Com.Hjg.Pngcs\Hjg.Pngcs.csproj">
       <Project>{FD3B0D50-46B3-4A83-9A6D-C641569142CF}</Project>
-      <Name>Ar.Com.Hjg.Pngcs</Name>
+      <Name>Hjg.Pngcs</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

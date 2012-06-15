@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestPngSuite</RootNamespace>
     <AssemblyName>TestPngSuite</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -35,12 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -48,10 +44,13 @@
     <Compile Include="TestPngSuite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ar.Com.Hjg.Pngcs\Ar.Com.Hjg.Pngcs.csproj">
+    <ProjectReference Include="..\Ar.Com.Hjg.Pngcs\Hjg.Pngcs.csproj">
       <Project>{FD3B0D50-46B3-4A83-9A6D-C641569142CF}</Project>
-      <Name>Ar.Com.Hjg.Pngcs</Name>
+      <Name>Hjg.Pngcs</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

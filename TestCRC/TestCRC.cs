@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
-//using Ar.Com.Hjg.Pngcs;
-using ICSharpCodePngcs.SharpZipLib.Checksums;
+
 
 namespace pgncstest
 {
@@ -17,7 +15,7 @@ namespace pgncstest
     
     public static void Run()
     {
-        Crc32 c = new Crc32();
+        ICSharpCode.SharpZipLib.Checksums.Crc32 c = new ICSharpCode.SharpZipLib.Checksums.Crc32();
 		byte[] b = new byte[]{0,0,3,4,256-124};
 		c.Update(b);
         int l1 = (int)c.Value;

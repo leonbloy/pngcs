@@ -1,5 +1,4 @@
-namespace Ar.Com.Hjg.Pngcs
-{
+namespace Hjg.Pngcs {
 
     using System;
     using System.Collections;
@@ -9,23 +8,55 @@ namespace Ar.Com.Hjg.Pngcs
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Internal PNG predictor filter, or strategy to select it.
+    /// Internal PNG predictor filter, or a strategy to select it.
     /// </summary>
-    ///
-    public enum FilterType
-    {
-        FILTER_NONE = 0,
-        FILTER_SUB = 1, FILTER_UP = 2, FILTER_AVERAGE = 3,
-        FILTER_PAETH = 4,
-        FILTER_DEFAULT = -1, // Default strategy: select one of the above filters depending on global image parameters
-        FILTER_AGGRESSIVE = -2,// Aggressive strategy: select one of the above filters trying each of the filters
-
-        FILTER_ALTERNATE = -3,// Uses all fiters, one for lines, cyciclally. Only for tests.
+    public enum FilterType {
         /// <summary>
-        /// Very aggressive strategy: select one of the above filters trying each of the filters (this is done for every row!)
+        /// No filtering 
         /// </summary>
-        FILTER_VERYAGGRESSIVE = -4,
-        FILTER_NULL = -100
+        FILTER_NONE = 0,
+        /// <summary>
+        /// SUB filter: uses same row
+        /// </summary>
+        FILTER_SUB = 1,
+        /// <summary>
+        ///  UP filter: uses previous row
+        /// </summary>
+        FILTER_UP = 2,
+        /// <summary>
+        ///AVERAGE filter: uses neighbors
+        /// </summary>
+        FILTER_AVERAGE = 3,
+        /// <summary>
+        /// PAETH predictor
+        /// </summary>
+        FILTER_PAETH = 4,
+
+        /// <summary>
+        /// Default strategy: select one of the standard filters depending on global image parameters
+        /// </summary>
+        FILTER_DEFAULT = -1, // 
+
+
+        /// <summary>
+        /// Aggressive strategy: select dinamically the filters, trying every 8 rows
+        /// </summary>
+        FILTER_AGGRESSIVE = -2,
+
+        /// <summary>
+        /// Very aggressive and slow strategy: tries all filters for each row
+        /// </summary>
+        FILTER_VERYAGGRESSIVE = -3,
+
+        /// <summary>
+        /// Uses all fiters, one for lines, in ciclic way. Only useful for testing.
+        /// </summary>
+        FILTER_CICLIC = -50,
+
+        /// <summary>
+        /// Not specified, placeholder for unknown or NA filters. 
+        /// </summary>
+        FILTER_UNKNOWN = -100
     }
 
 

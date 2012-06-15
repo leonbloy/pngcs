@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ar.Com.Hjg.Pngcs", "Ar.Com.Hjg.Pngcs\Ar.Com.Hjg.Pngcs.csproj", "{FD3B0D50-46B3-4A83-9A6D-C641569142CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hjg.Pngcs", "Ar.Com.Hjg.Pngcs\Hjg.Pngcs.csproj", "{FD3B0D50-46B3-4A83-9A6D-C641569142CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCRC", "TestCRC\TestCRC.csproj", "{15A86138-A394-4395-9835-AF04D0856C93}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -13,13 +13,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PngShowChunks", "PngShowChu
 		{FD3B0D50-46B3-4A83-9A6D-C641569142CF} = {FD3B0D50-46B3-4A83-9A6D-C641569142CF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PngSampleMirror", "PngSampleMirror\PngSampleMirror.csproj", "{E4562FAA-C2B4-4B1F-9F74-0F35D720E76D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleMirror", "PngSampleMirror\SampleMirror.csproj", "{E4562FAA-C2B4-4B1F-9F74-0F35D720E76D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPngSuite", "TestPngSuite\TestPngSuite.csproj", "{350BF4DD-8CA3-4B6B-90FF-5BE4217C38C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSpeed", "TestSpeed\TestSpeed.csproj", "{6EDCBF13-1302-45BE-88CF-E130D5641486}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDeflater", "TestDeflater\TestDeflater.csproj", "{E12DE892-806F-44F1-A1F0-0DB74DB5ED52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCreateOrangeGradient", "SampleCreateOrangeGradient\SampleCreateOrangeGradient.csproj", "{00691114-77E7-4644-9FEA-F53266ABA3C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,16 @@ Global
 		{E12DE892-806F-44F1-A1F0-0DB74DB5ED52}.Release|Mixed Platforms.Build.0 = Release|x86
 		{E12DE892-806F-44F1-A1F0-0DB74DB5ED52}.Release|x86.ActiveCfg = Release|x86
 		{E12DE892-806F-44F1-A1F0-0DB74DB5ED52}.Release|x86.Build.0 = Release|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Debug|x86.ActiveCfg = Debug|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Debug|x86.Build.0 = Debug|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Release|Any CPU.ActiveCfg = Release|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Release|x86.ActiveCfg = Release|x86
+		{00691114-77E7-4644-9FEA-F53266ABA3C8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
