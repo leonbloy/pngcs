@@ -17,7 +17,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">PngCs
-   &#160;<span id="projectnumber">1.0.92</span>
+   &#160;<span id="projectnumber">1.0.93</span>
    </div>
    <div id="projectbrief">A C# library for read/write PNG images</div>
   </td>
@@ -100,6 +100,9 @@
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_s_b_i_t.html#a908f79e834d23a8d7d439262955d2733">Hjg.Pngcs.Chunks.PngChunkSBIT</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_s_p_l_t.html#a0177e3db4cfcf61e66a8ad2883df20c8">Hjg.Pngcs.Chunks.PngChunkSPLT</a>
 </li>
+<li>ComputeCompressionRatio()
+: <a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html#a19712941e8d273bb63f430d7e2641dd6">Hjg.Pngcs.PngWriter</a>
+</li>
 <li>CopyChunksFirst()
 : <a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html#ade406fedf1cd04e0d058bd440ed8750c">Hjg.Pngcs.PngWriter</a>
 </li>
@@ -125,15 +128,15 @@
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_u_n_k_n_o_w_n.html#a5d237f4f3e9b2f41ced57cf54c3efb82">Hjg.Pngcs.Chunks.PngChunkUNKNOWN</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_z_t_x_t.html#afbfd915f6237a267619d6c2cb13719be">Hjg.Pngcs.Chunks.PngChunkZTXT</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_g_a_m_a.html#a3e4af0fb174db393dd620df96812cf08">Hjg.Pngcs.Chunks.PngChunkGAMA</a>
+, <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_c_h_r_m.html#aa97d91b4d8fbe2fc3a600634b9c9388e">Hjg.Pngcs.Chunks.PngChunkCHRM</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_h_i_s_t.html#aaa4cdf0320aff5b11e4b8209f79ff1cd">Hjg.Pngcs.Chunks.PngChunkHIST</a>
-, <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_d_a_t.html#a1c08f99a49af2a88ff1934d012e3a2c4">Hjg.Pngcs.Chunks.PngChunkIDAT</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_b_k_g_d.html#a6ebe32079aea8cb937b85e80b23cffff">Hjg.Pngcs.Chunks.PngChunkBKGD</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_t_x_t.html#ac7565c7da8406dec47bd4614fddd5845">Hjg.Pngcs.Chunks.PngChunkITXT</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_p_l_t_e.html#ab30a8cc6dbf534cf989edc14314e0ec6">Hjg.Pngcs.Chunks.PngChunkPLTE</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_s_t_e_r.html#a9a6eadd76c102a7675926bf5fcf4c332">Hjg.Pngcs.Chunks.PngChunkSTER</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_t_r_n_s.html#ace6565568feeb30e55fd3142f8b8d732">Hjg.Pngcs.Chunks.PngChunkTRNS</a>
-, <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_c_h_r_m.html#aa97d91b4d8fbe2fc3a600634b9c9388e">Hjg.Pngcs.Chunks.PngChunkCHRM</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_c_c_p.html#a211181449aafebfebf0bc0de146e3c2b">Hjg.Pngcs.Chunks.PngChunkICCP</a>
+, <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_d_a_t.html#a1c08f99a49af2a88ff1934d012e3a2c4">Hjg.Pngcs.Chunks.PngChunkIDAT</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_h_d_r.html#ae0421ec476d0e1b708b48847c0a2dd34">Hjg.Pngcs.Chunks.PngChunkIHDR</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_s_r_g_b.html#a96a7f63454dc28c2c1ce16dff0cd916c">Hjg.Pngcs.Chunks.PngChunkSRGB</a>
 , <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_i_e_n_d.html#a817e0b0a312997c9a202b39131074775">Hjg.Pngcs.Chunks.PngChunkIEND</a>
@@ -143,7 +146,7 @@
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 21:28:18 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 23 2012 11:15:31 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>

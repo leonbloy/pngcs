@@ -17,7 +17,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">PngCs
-   &#160;<span id="projectnumber">1.0.92</span>
+   &#160;<span id="projectnumber">1.0.93</span>
    </div>
    <div id="projectbrief">A C# library for read/write PNG images</div>
   </td>
@@ -76,11 +76,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6c39a401192e5f008c8d65bd718daa80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ancillary chunks available  <a href="#a6c39a401192e5f008c8d65bd718daa80"></a><br/></td></tr>
 <tr class="memitem:a2fcecce5888b67d72c6410f07226bd54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html">ImageLine</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a2fcecce5888b67d72c6410f07226bd54">ReadRow</a> (int nrow)</td></tr>
 <tr class="memdesc:a2fcecce5888b67d72c6410f07226bd54"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the row using <a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html" title="Lightweight wrapper for an image scanline, for read and write ">ImageLine</a> as buffer  <a href="#a2fcecce5888b67d72c6410f07226bd54"></a><br/></td></tr>
+<tr class="memitem:a2650f9b2d7aa88b0639e27dee3e7473d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html">ImageLine</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a2650f9b2d7aa88b0639e27dee3e7473d">GetRow</a> (int nrow)</td></tr>
+<tr class="memdesc:a2650f9b2d7aa88b0639e27dee3e7473d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Like readRow(int nrow) but this accepts non consecutive rows.  <a href="#a2650f9b2d7aa88b0639e27dee3e7473d"></a><br/></td></tr>
 <tr class="memitem:a279df519530946623e41808a96203ea0"><td class="memItemLeft" align="right" valign="top">int[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a279df519530946623e41808a96203ea0">ReadRow</a> (int[] buffer, int nrow)</td></tr>
 <tr class="memdesc:a279df519530946623e41808a96203ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a line and returns it as a int array  <a href="#a279df519530946623e41808a96203ea0"></a><br/></td></tr>
 <tr class="memitem:adbfa23620a7dbd4ee0c7d780c268ec7a"><td class="memItemLeft" align="right" valign="top">override String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#adbfa23620a7dbd4ee0c7d780c268ec7a">ToString</a> ()</td></tr>
 <tr class="memitem:a16e7ae6bba8ca1b5f94aed8e274b4dfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a16e7ae6bba8ca1b5f94aed8e274b4dfa">End</a> ()</td></tr>
-<tr class="memdesc:a16e7ae6bba8ca1b5f94aed8e274b4dfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dummy method  <a href="#a16e7ae6bba8ca1b5f94aed8e274b4dfa"></a><br/></td></tr>
+<tr class="memdesc:a16e7ae6bba8ca1b5f94aed8e274b4dfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normally this does nothing, but it can be used to force a premature closing  <a href="#a16e7ae6bba8ca1b5f94aed8e274b4dfa"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -134,9 +136,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="adcb6aa5288c3b4b9050d59fbe46e3531"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Hjg.Pngcs.PngReader.PngReader </td>
@@ -146,11 +145,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Constructs a <a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html" title="Reads a PNG image, line by line ">PngReader</a> from a Stream, with no filename information </p>
@@ -166,9 +160,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a6725ff65b33a9551339d994658ba7bc1"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Hjg.Pngcs.PngReader.PngReader </td>
@@ -188,15 +179,11 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Constructs a PNGReader objet from a opened Stream </p>
-<p>remarks&gt;The constructor reads the signature and first chunk (IDHR) seealso cref="FileHelper.CreatePngReader(string)"/&gt; </p>
+<p>The constructor reads the signature and first chunk (IDHR)</p>
+<dl class="section see"><dt>See also:</dt><dd>FileHelper.CreatePngReader(string)</dd></dl>
 <dl class="params"><dt>Parameters:</dt><dd>
   <table class="params">
     <tr><td class="paramname">inputStream</td><td></td></tr>
@@ -225,7 +212,7 @@ Properties</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -244,9 +231,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="aacab59f777377cf1db292eed83f86103"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_chunks_list.html">ChunksList</a> Hjg.Pngcs.PngReader.GetChunksList </td>
@@ -255,11 +239,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns the ancillary chunks available </p>
@@ -271,9 +250,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a6c39a401192e5f008c8d65bd718daa80"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_metadata.html">PngMetadata</a> Hjg.Pngcs.PngReader.GetMetadata </td>
@@ -282,11 +258,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns the ancillary chunks available </p>
@@ -298,9 +269,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a2fcecce5888b67d72c6410f07226bd54"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html">ImageLine</a> Hjg.Pngcs.PngReader.ReadRow </td>
@@ -310,11 +278,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>reads the row using <a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html" title="Lightweight wrapper for an image scanline, for read and write ">ImageLine</a> as buffer </p>
@@ -323,12 +286,36 @@ Properties</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a2650f9b2d7aa88b0639e27dee3e7473d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_image_line.html">ImageLine</a> Hjg.Pngcs.PngReader.GetRow </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nrow</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Like readRow(int nrow) but this accepts non consecutive rows. </p>
+<p>If it's the current row, it will just return it. Elsewhere, it will try to read it. This implementation only accepts nrow greater or equal than current row, but an extended class could implement some partial or full cache of lines.</p>
+<p>This should not not be mixed with calls to readRow(int[] buffer, final int nrow) </p>
+<dl class="params"><dt>Parameters:</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nrow</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns:</dt><dd></dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a279df519530946623e41808a96203ea0"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int [] Hjg.Pngcs.PngReader.ReadRow </td>
@@ -348,11 +335,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Reads a line and returns it as a int array </p>
@@ -371,9 +353,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="adbfa23620a7dbd4ee0c7d780c268ec7a"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">override String Hjg.Pngcs.PngReader.ToString </td>
@@ -382,11 +361,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -394,9 +368,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a16e7ae6bba8ca1b5f94aed8e274b4dfa"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngReader.End </td>
@@ -405,15 +376,9 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Dummy method </p>
-<p>This method nothing now, just kept for backward compatibily</p>
+<p>Normally this does nothing, but it can be used to force a premature closing </p>
 
 </div>
 </div>
@@ -434,7 +399,7 @@ Properties</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -684,7 +649,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 21:28:17 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 23 2012 11:15:30 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>

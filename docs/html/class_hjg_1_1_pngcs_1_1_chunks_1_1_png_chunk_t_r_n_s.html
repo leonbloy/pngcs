@@ -17,7 +17,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">PngCs
-   &#160;<span id="projectnumber">1.0.92</span>
+   &#160;<span id="projectnumber">1.0.93</span>
    </div>
    <div id="projectbrief">A C# library for read/write PNG images</div>
   </td>
@@ -79,6 +79,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a07e3c6594d561cd32fbc3f9f980c2568"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_t_r_n_s.html#a07e3c6594d561cd32fbc3f9f980c2568">GetGray</a> ()</td></tr>
 <tr class="memitem:a884a7b853a3307e28c11ef20a88541c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_t_r_n_s.html#a884a7b853a3307e28c11ef20a88541c9">SetPalletteAlpha</a> (int[] palAlpha)</td></tr>
 <tr class="memdesc:a884a7b853a3307e28c11ef20a88541c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">WARNING: non deep copy  <a href="#a884a7b853a3307e28c11ef20a88541c9"></a><br/></td></tr>
+<tr class="memitem:a110346c640e57ad1e71a5b3026310bfe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_t_r_n_s.html#a110346c640e57ad1e71a5b3026310bfe">setIndexEntryAsTransparent</a> (int palAlphaIndex)</td></tr>
+<tr class="memdesc:a110346c640e57ad1e71a5b3026310bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">utiliy method : to use when only one pallete index is set as totally transparent  <a href="#a110346c640e57ad1e71a5b3026310bfe"></a><br/></td></tr>
 <tr class="memitem:a83981a8ebb2c3e1d86c4df70771c854d"><td class="memItemLeft" align="right" valign="top">int[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_t_r_n_s.html#a83981a8ebb2c3e1d86c4df70771c854d">GetPalletteAlpha</a> ()</td></tr>
 <tr class="memdesc:a83981a8ebb2c3e1d86c4df70771c854d"><td class="mdescLeft">&#160;</td><td class="mdescRight">WARNING: non deep copy  <a href="#a83981a8ebb2c3e1d86c4df70771c854d"></a><br/></td></tr>
 <tr class="inherit_header pub_methods_class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_single"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_single')"><img src="closed.png" alt="-"/>&nbsp;Public Member Functions inherited from <a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_chunk_single.html">Hjg.Pngcs.Chunks.PngChunkSingle</a></td></tr>
@@ -100,9 +102,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a2351e62969418a0fcd3ca4b987ef1643"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Hjg.Pngcs.Chunks.PngChunkTRNS.PngChunkTRNS </td>
@@ -112,11 +111,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -138,7 +132,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -166,7 +160,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -194,7 +188,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -222,7 +216,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -242,9 +236,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="ab827c2a83230c3f5e93e6c46a12ace42"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.Chunks.PngChunkTRNS.SetRGB </td>
@@ -270,11 +261,6 @@ Public Attributes</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -282,9 +268,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a076b74f0c6af7f5f367fc89028c15f7b"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int [] Hjg.Pngcs.Chunks.PngChunkTRNS.GetRGB </td>
@@ -293,11 +276,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -305,9 +283,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a9920da5537fb44dbf3f8f8d104e45b25"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.Chunks.PngChunkTRNS.SetGray </td>
@@ -317,11 +292,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -329,9 +299,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a07e3c6594d561cd32fbc3f9f980c2568"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int Hjg.Pngcs.Chunks.PngChunkTRNS.GetGray </td>
@@ -340,11 +307,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -352,9 +314,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a884a7b853a3307e28c11ef20a88541c9"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.Chunks.PngChunkTRNS.SetPalletteAlpha </td>
@@ -364,11 +323,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>WARNING: non deep copy </p>
@@ -381,12 +335,33 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a110346c640e57ad1e71a5b3026310bfe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Hjg.Pngcs.Chunks.PngChunkTRNS.setIndexEntryAsTransparent </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>palAlphaIndex</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>utiliy method : to use when only one pallete index is set as totally transparent </p>
+<dl class="params"><dt>Parameters:</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">palAlphaIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a83981a8ebb2c3e1d86c4df70771c854d"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int [] Hjg.Pngcs.Chunks.PngChunkTRNS.GetPalletteAlpha </td>
@@ -395,11 +370,6 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>WARNING: non deep copy </p>
@@ -423,7 +393,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 21:28:18 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 23 2012 11:15:31 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>

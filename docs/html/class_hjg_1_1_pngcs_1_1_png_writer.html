@@ -17,7 +17,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">PngCs
-   &#160;<span id="projectnumber">1.0.92</span>
+   &#160;<span id="projectnumber">1.0.93</span>
    </div>
    <div id="projectbrief">A C# library for read/write PNG images</div>
   </td>
@@ -93,6 +93,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a355a37581ca0df1bc0c15e6370d22c71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_chunks_list.html">ChunksList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html#a355a37581ca0df1bc0c15e6370d22c71">GetChunksList</a> ()</td></tr>
 <tr class="memitem:a1ab3f34f17f2eaabb71c1ae41f1928eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html#a1ab3f34f17f2eaabb71c1ae41f1928eb">SetFilterType</a> (<a class="el" href="namespace_hjg_1_1_pngcs.html#a9e5832c6a08234c7eb8a94f559f26ae0">FilterType</a> filterType)</td></tr>
 <tr class="memdesc:a1ab3f34f17f2eaabb71c1ae41f1928eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets internal prediction filter type, or strategy to choose it.  <a href="#a1ab3f34f17f2eaabb71c1ae41f1928eb"></a><br/></td></tr>
+<tr class="memitem:a19712941e8d273bb63f430d7e2641dd6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html#a19712941e8d273bb63f430d7e2641dd6">ComputeCompressionRatio</a> ()</td></tr>
+<tr class="memdesc:a19712941e8d273bb63f430d7e2641dd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes compressed size/raw size, approximate  <a href="#a19712941e8d273bb63f430d7e2641dd6"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -159,9 +161,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a6af724041327563161c819eff402453f"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Hjg.Pngcs.PngWriter.PngWriter </td>
@@ -181,11 +180,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Constructs a <a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html" title="Writes a PNG image, line by line. ">PngWriter</a> from a outputStream, with no filename information </p>
@@ -202,9 +196,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a7100e78eab8f256edb5b29d274743e1c"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Hjg.Pngcs.PngWriter.PngWriter </td>
@@ -230,11 +221,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Constructs a <a class="el" href="class_hjg_1_1_pngcs_1_1_png_writer.html" title="Writes a PNG image, line by line. ">PngWriter</a> from a outputStream, with optional filename or description </p>
@@ -285,7 +271,7 @@ Properties</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -306,9 +292,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="ade406fedf1cd04e0d058bd440ed8750c"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.CopyChunksFirst </td>
@@ -328,11 +311,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -340,9 +318,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a49130d2c50feae2f238bb05ac81fabb6"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.CopyChunksLast </td>
@@ -362,11 +337,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -374,9 +344,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a6dca0c5a998cbfca36f7990fafb60ffb"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.End </td>
@@ -385,11 +352,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Finalizes the image creation and closes the file stream. </p>
@@ -400,9 +362,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="ad87e7fbf5cc4e03ed887b9fe416af719"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">String Hjg.Pngcs.PngWriter.GetFilename </td>
@@ -411,11 +370,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Filename or description, from the optional constructor argument. </p>
@@ -426,9 +380,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a7f30c15d654aabe4a2b1ed9463820d85"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.WriteRow </td>
@@ -448,11 +399,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Writes a full image row. </p>
@@ -470,9 +416,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a756aa4ed81a7106d0ed5cae6c949047d"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.WriteRow </td>
@@ -492,11 +435,6 @@ Properties</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>this uses the row number from the imageline! </p>
@@ -506,9 +444,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a1f1cddd84391bfeae99af2f14cb7a608"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.WriteRow </td>
@@ -518,11 +453,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -530,9 +460,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a59837c0259379cf34ada26a6911c0010"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_png_metadata.html">PngMetadata</a> Hjg.Pngcs.PngWriter.GetMetadata </td>
@@ -541,11 +468,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -553,9 +475,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a355a37581ca0df1bc0c15e6370d22c71"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_hjg_1_1_pngcs_1_1_chunks_1_1_chunks_list.html">ChunksList</a> Hjg.Pngcs.PngWriter.GetChunksList </td>
@@ -564,11 +483,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -576,9 +490,6 @@ Properties</h2></td></tr>
 <a class="anchor" id="a1ab3f34f17f2eaabb71c1ae41f1928eb"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Hjg.Pngcs.PngWriter.SetFilterType </td>
@@ -588,11 +499,6 @@ Properties</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Sets internal prediction filter type, or strategy to choose it. </p>
@@ -604,6 +510,25 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a19712941e8d273bb63f430d7e2641dd6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Hjg.Pngcs.PngWriter.ComputeCompressionRatio </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes compressed size/raw size, approximate </p>
+<p>Actually: compressed size = total size of IDAT data , raw size = uncompressed pixel bytes = rows * (bytesPerRow + 1) </p>
+<dl class="section return"><dt>Returns:</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -827,7 +752,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 21:28:17 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 23 2012 11:15:30 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>
