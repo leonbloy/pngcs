@@ -20,7 +20,7 @@ namespace TestPngSuite {
             if (orig.Equals(dest)) throw new PngjException("input and output file cannot coincide");
             PngReader pngr = FileHelper.CreatePngReader(orig);
             PngWriter pngw = FileHelper.CreatePngWriter(dest, pngr.ImgInfo, true);
-            pngw.SetFilterType(FilterType.FILTER_CICLIC); // just to test all filters
+            pngw.SetFilterType(FilterType.FILTER_CYCLIC); // just to test all filters
             int copyPolicy = ChunkCopyBehaviour.COPY_ALL;
             pngw.CopyChunksFirst(pngr, copyPolicy);
             ImageLine lout = new ImageLine(pngw.ImgInfo);

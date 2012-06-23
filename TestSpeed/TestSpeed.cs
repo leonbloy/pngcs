@@ -61,9 +61,9 @@ namespace TestSpeed
         Console.Write(".");
         int dt4 = createHuge(fwrite, cols, rows, FilterType.FILTER_AGGRESSIVE, 6);
         Console.Write(".\n");
-        int dt5 = createHuge(fwrite, cols, rows, FilterType.FILTER_CICLIC, 6);
+        int dt5 = createHuge(fwrite, cols, rows, FilterType.FILTER_CYCLIC, 6);
         Console.Write(".");
-        int dt6 = createHuge(fwrite, cols, rows, FilterType.FILTER_CICLIC, 6);
+        int dt6 = createHuge(fwrite, cols, rows, FilterType.FILTER_CYCLIC, 6);
         Console.Write(".\n");
         int dtr = read(fread, 10);
         Console.Write(String.Format("write [{0} x {1}] {2} (VA) {3} {4} (A) {5} {6} (C) read(x10) {7} \n", cols, rows, dt1, dt3, dt4, dt5, dt6, dtr));

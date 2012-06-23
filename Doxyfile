@@ -1,7 +1,7 @@
 # Doxyfile 1.8.1.1
 
 # This file describes the settings to be used by the documentation system
-# doxygen (www.doxygen.org) for a project 
+# doxygen (www.doxygen.org) for a project
 #
 # All text after a hash (#) is considered a comment and will be ignored
 # The format is:
@@ -32,7 +32,7 @@ PROJECT_NAME           = PngCs
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1.0.92
+PROJECT_NUMBER         = 1.0.93
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description 
 # for a project that appears at the top of each page and should give viewer 
@@ -224,7 +224,7 @@ OPTIMIZE_OUTPUT_FOR_C  = NO
 # Java. For instance, namespaces will be presented as packages, qualified 
 # scopes will look different, etc.
 
-OPTIMIZE_OUTPUT_JAVA   = NO
+OPTIMIZE_OUTPUT_JAVA   = YES
 
 # Set the OPTIMIZE_FOR_FORTRAN tag to YES if your project consists of Fortran 
 # sources only. Doxygen will then generate output that is more tailored for 
@@ -665,7 +665,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = "c:\Users\h\Documents\Visual Studio 2010\Projects\pngcs\Ar.Com.Hjg.Pngcs"
+INPUT                  = Hjg.Pngcs
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

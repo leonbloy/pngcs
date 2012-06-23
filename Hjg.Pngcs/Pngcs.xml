@@ -689,14 +689,14 @@
             <param name="inputStream"></param>
         </member>
         <member name="M:Hjg.Pngcs.PngReader.#ctor(System.IO.Stream,System.String)">
-             <summary>
-             Constructs a PNGReader objet from a opened Stream
-             </summary>
-            <remarks>The constructor reads the signature and first chunk (IDHR)
-            <seealso cref="M:Hjg.Pngcs.FileHelper.CreatePngReader(System.String)"/>
-             </remarks>
-             <param name="inputStream"></param>
-             <param name="filename">Optional, can be the filename or a description.</param>
+            <summary>
+            Constructs a PNGReader objet from a opened Stream
+            </summary>
+            <remarks>The constructor reads the signature and first chunk (IDHR)<seealso cref="M:Hjg.Pngcs.FileHelper.CreatePngReader(System.String)"/>
+            </remarks>
+            
+            <param name="inputStream"></param>
+            <param name="filename">Optional, can be the filename or a description.</param>
         </member>
         <member name="M:Hjg.Pngcs.PngReader.ParseChunkAndAddToList(Hjg.Pngcs.Chunks.ChunkRaw)">
             <summary>
@@ -761,6 +761,19 @@
             <param name="nrow">row number - just as a check</param>
              <returns>the ImageLine that also is available inside this object</returns>
         </member>
+        <member name="M:Hjg.Pngcs.PngReader.GetRow(System.Int32)">
+            <summary>
+            Like readRow(int nrow) but this accepts non consecutive rows.
+            </summary>
+            <remarks>If it's the current row, it will just return it. Elsewhere, it will try to read it.
+            This implementation only accepts  nrow greater or equal than current row, but
+            an extended class could implement some partial or full cache of lines.
+            
+            This should not  not be mixed with calls to readRow(int[] buffer, final int nrow)
+            </remarks>
+            <param name="nrow"></param>
+            <returns></returns>
+        </member>
         <member name="M:Hjg.Pngcs.PngReader.ReadRow(System.Int32[],System.Int32)">
             <summary>
             Reads a line and returns it as a int array 
@@ -775,9 +788,9 @@
         </member>
         <member name="M:Hjg.Pngcs.PngReader.End">
             <summary>
-            Dummy method
+            Normally this does nothing, but it can be used to force a premature closing
             </summary>
-            <remarks>This method nothing now, just kept for backward compatibily</remarks>
+            <remarks></remarks>
         </member>
         <member name="M:Hjg.Pngcs.PngReader.ShowLineInfo(Hjg.Pngcs.ImageLine)">
              <summary>
@@ -947,6 +960,14 @@
             Recommended values: DEFAULT (default) or AGGRESIVE
             </remarks>
             <param name="filterType">One of the five prediction types or strategy to choose it</param>
+        </member>
+        <member name="M:Hjg.Pngcs.PngWriter.ComputeCompressionRatio">
+            <summary>
+            Computes compressed size/raw size, approximate
+            </summary>
+            <remarks>Actually: compressed size = total size of IDAT data , raw size = uncompressed pixel bytes = rows * (bytesPerRow + 1)
+            </remarks>
+            <returns></returns>
         </member>
         <member name="P:Hjg.Pngcs.PngWriter.CompressionStrategy">
             Deflate algortithm compression strategy
@@ -1522,9 +1543,9 @@
             Very aggressive and slow strategy: tries all filters for each row
             </summary>
         </member>
-        <member name="F:Hjg.Pngcs.FilterType.FILTER_CICLIC">
+        <member name="F:Hjg.Pngcs.FilterType.FILTER_CYCLIC">
             <summary>
-            Uses all fiters, one for lines, in ciclic way. Only useful for testing.
+            Uses all fiters, one for lines, in cyclic way. Only useful for testing.
             </summary>
         </member>
         <member name="F:Hjg.Pngcs.FilterType.FILTER_UNKNOWN">
@@ -1839,6 +1860,12 @@
             WARNING: non deep copy
             </summary>
             <param name="palAlpha"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.setIndexEntryAsTransparent(System.Int32)">
+            <summary>
+            utiliy method : to use when only one pallete index is set as totally transparent
+            </summary>
+            <param name="palAlphaIndex"></param>
         </member>
         <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.GetPalletteAlpha">
             <summary>

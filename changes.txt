@@ -1,3 +1,11 @@
+===========  HISTORY PngCs  http://code.google.com/p/pngcs/ ================
+
+23/Jun/2012:  1.0.93
+  - PngReader.GetRow() allows non sequential reading  (useful for skipping lines)
+  - PngReader.End() is no longer deprecated but recommended (related to the previous)
+  - ImageLine.Pack()/ ImageLine.Unpack() was requiring/returning a buffer of length greater than cols*nchannels - fixed
+  - Added PngWriter.ComputeCompressionRatio()
+  
 15/Jun/2012:  1.0.92
   - LICENCE change: now released under Apache License
   - Replaced #ZipLib code for standalone assembly : ICSharpCode.SharpZipLib.dll
