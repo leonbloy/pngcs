@@ -114,14 +114,8 @@ namespace Hjg.Pngcs {
         /// <param name="scale">flag:  scale the values (bit shift) towards 0-255</param>
         /// <returns>Unpacked buffer, one sample per byte</returns>
         public int[] Unpack(int[] buf, bool scale) {
-            int len = Scanline.Length;
-            if (bitDepth == 1)
-                len *= 8;
-            else if (bitDepth == 2)
-                len *= 4;
-            else if (bitDepth == 4)
-                len *= 2;
-            if (buf == null)
+            int len = ImgInfo.SamplesPerRow;
+            if (buf == null || buf.Length < len)
                 buf = new int[len];
             if (bitDepth >= 8)
                 System.Array.Copy((Array)(Scanline), 0, (Array)(buf), 0, Scanline.Length);
@@ -154,13 +148,9 @@ namespace Hjg.Pngcs {
         /// <param name="buf">Preallocated array, can be null</param>
         /// <param name="scale">flag:  scale the values (bit shift) towards 0-255</param>
         public void Pack(int[] buf, bool scale) { // writes scanline
-            int len = Scanline.Length;
-            if (bitDepth == 1)
-                len *= 8;
-            else if (bitDepth == 2)
-                len *= 4;
-            else if (bitDepth == 4)
-                len *= 2;
+            int len = ImgInfo.SamplesPerRow;
+            if (buf == null || buf.Length < len)
+                buf = new int[len];
             if (bitDepth >= 8)
                 System.Array.Copy((Array)(buf), 0, (Array)(Scanline), 0, Scanline.Length);
             else {
@@ -191,7 +181,7 @@ namespace Hjg.Pngcs {
                 return 0xc0;
             if (bitDepth == 4)
                 return 0xf0;
-            throw new Exception("?");
+            throw new Exception("invalid bitDepth " + bitDepth);
         }
 
         public override String ToString() {

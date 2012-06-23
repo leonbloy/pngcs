@@ -110,6 +110,19 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         /// <summary>
+        /// utiliy method : to use when only one pallete index is set as totally transparent
+        /// </summary>
+        /// <param name="palAlphaIndex"></param>
+        public void setIndexEntryAsTransparent(int palAlphaIndex) {
+            if (!ImgInfo.Indexed)
+                throw new PngjException("only indexed images support this");
+            paletteAlpha = new int[] { palAlphaIndex + 1 };
+            for (int i = 0; i < palAlphaIndex; i++)
+                paletteAlpha[i] = 255;
+            paletteAlpha[palAlphaIndex] = 0;
+        }
+
+        /// <summary>
         /// WARNING: non deep copy
         /// </summary>
         /// <returns></returns>

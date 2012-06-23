@@ -14,6 +14,7 @@ namespace Hjg.Pngcs {
     ///
     abstract internal class ProgressiveOutputStream : MemoryStream {
         private readonly int size;
+        private long countFlushed = 0;
 
         public ProgressiveOutputStream(int size_0) {
             this.size = size_0;
@@ -56,6 +57,7 @@ namespace Hjg.Pngcs {
                 if (nb == 0)
                     return;
                 FlushBuffer(buf, nb);
+                countFlushed += nb;
                 int bytesleft = count - nb;
                 count = bytesleft;
                 Position = count;
@@ -64,6 +66,10 @@ namespace Hjg.Pngcs {
             }
         }
 
-        public abstract void FlushBuffer(byte[] b, int n);
+        protected abstract void FlushBuffer(byte[] b, int n);
+
+        public long GetCountFlushed() {
+            return countFlushed;
+        }
     }
 }

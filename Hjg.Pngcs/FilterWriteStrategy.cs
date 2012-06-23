@@ -91,7 +91,7 @@ namespace Hjg.Pngcs {
                     }
                 }
             }
-            if (configuredType == FilterType.FILTER_CICLIC) {
+            if (configuredType == FilterType.FILTER_CYCLIC) {
                 currentType = (FilterType)(((int)currentType + 1) % 5);
             }
             return currentType;

@@ -127,7 +127,7 @@ namespace Hjg.Pngcs {
         /// <param name="filename">Optional, can be the filename or a description.</param>
         public PngWriter(Stream outputStream, ImageInfo imgInfo,
                 String filename) {
-                    this.filename = (filename == null) ? "" : filename;
+            this.filename = (filename == null) ? "" : filename;
             this.outputStream = outputStream;
             this.ImgInfo = imgInfo;
             // defaults settings
@@ -493,6 +493,20 @@ namespace Hjg.Pngcs {
         /// <param name="filterType">One of the five prediction types or strategy to choose it</param>
         public void SetFilterType(FilterType filterType) {
             filterStrat = new FilterWriteStrategy(ImgInfo, filterType);
+        }
+
+        /// <summary>
+        /// Computes compressed size/raw size, approximate
+        /// </summary>
+        /// <remarks>Actually: compressed size = total size of IDAT data , raw size = uncompressed pixel bytes = rows * (bytesPerRow + 1)
+        /// </remarks>
+        /// <returns></returns>
+        public double ComputeCompressionRatio() {
+            if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_6_END)
+                throw new PngjException("must be called after End()");
+            double compressed = (double)datStream.GetCountFlushed();
+            double raw = (ImgInfo.BytesPerRow + 1) * ImgInfo.Rows;
+            return compressed / raw;
         }
 
         private void reportResultsForFilter(int rown, FilterType type, bool tentative) {

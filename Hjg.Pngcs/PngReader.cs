@@ -106,9 +106,9 @@ namespace Hjg.Pngcs {
         /// <summary>
         /// Constructs a PNGReader objet from a opened Stream
         /// </summary>
-        ///<remarks>The constructor reads the signature and first chunk (IDHR)
-        ///<seealso cref="FileHelper.CreatePngReader(string)"/>
+        /// <remarks>The constructor reads the signature and first chunk (IDHR)<seealso cref="FileHelper.CreatePngReader(string)"/>
         /// </remarks>
+        /// 
         /// <param name="inputStream"></param>
         /// <param name="filename">Optional, can be the filename or a description.</param>
         public PngReader(Stream inputStream, String filename) {
@@ -209,6 +209,17 @@ namespace Hjg.Pngcs {
             offset = (int)iIdatCstream.GetOffset();
             idatIstream.Close();
             ReadLastChunks();
+            Close();
+        }
+
+        private void Close() {
+            if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_6_END) { // this could only happen if forced close
+                try {
+                    idatIstream.Close();
+                } catch (Exception e) {
+                }
+                CurrentChunkGroup = ChunksList.CHUNK_GROUP_6_END;
+            }
             if (ShouldCloseStream)
                 inputStream.Close();
         }
@@ -423,6 +434,25 @@ namespace Hjg.Pngcs {
         }
 
         /// <summary>
+        /// Like readRow(int nrow) but this accepts non consecutive rows.
+        /// </summary>
+        /// <remarks>If it's the current row, it will just return it. Elsewhere, it will try to read it.
+	    /// This implementation only accepts  nrow greater or equal than current row, but
+        /// an extended class could implement some partial or full cache of lines.
+        /// 
+        /// This should not  not be mixed with calls to readRow(int[] buffer, final int nrow)
+        /// </remarks>
+        /// <param name="nrow"></param>
+        /// <returns></returns>
+        public ImageLine GetRow(int nrow) {
+            while (rowNum < nrow) ReadRow(rowNum + 1);
+            // now it should be positioned in the desired row
+            if (rowNum != nrow || imgLine.GetRown() != nrow)
+                throw new PngjInputException("Invalid row: " + nrow);
+            return imgLine;
+        }
+
+        /// <summary>
         /// Reads a line and returns it as a int array 
         /// </summary>
         /// <remarks>See also the other
@@ -462,10 +492,12 @@ namespace Hjg.Pngcs {
             return "filename=" + filename + " " + ImgInfo.ToString();
         }
         /// <summary>
-        /// Dummy method
+        /// Normally this does nothing, but it can be used to force a premature closing
         /// </summary>
-        /// <remarks>This method nothing now, just kept for backward compatibily</remarks>
+        /// <remarks></remarks>
         public void End() {
+            if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_6_END)
+                Close();
         }
 
         /// <summary>

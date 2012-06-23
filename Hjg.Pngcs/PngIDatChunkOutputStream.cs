@@ -26,7 +26,7 @@ namespace Hjg.Pngcs {
             this.outputStream = outputStream_0;
         }
 
-        public override void FlushBuffer(byte[] b, int len) {
+        protected override void FlushBuffer(byte[] b, int len) {
             ChunkRaw c = new ChunkRaw(len, Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT, false);
             c.Data = b;
             c.WriteChunk(outputStream);

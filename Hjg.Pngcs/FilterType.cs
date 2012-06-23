@@ -49,9 +49,9 @@ namespace Hjg.Pngcs {
         FILTER_VERYAGGRESSIVE = -3,
 
         /// <summary>
-        /// Uses all fiters, one for lines, in ciclic way. Only useful for testing.
+        /// Uses all fiters, one for lines, in cyclic way. Only useful for testing.
         /// </summary>
-        FILTER_CICLIC = -50,
+        FILTER_CYCLIC = -50,
 
         /// <summary>
         /// Not specified, placeholder for unknown or NA filters. 
