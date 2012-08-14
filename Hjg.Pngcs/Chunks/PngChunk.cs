@@ -45,7 +45,8 @@ namespace Hjg.Pngcs.Chunks {
         /// </summary>
         public int ChunkGroup { get; set; }
 
-        private int lenori = -1; // merely informational, for read chunks
+        public int Length { get; set; } // merely informational, for read chunks
+        public long Offset { get; set; } // merely informational, for read chunks
 
         /// <summary>
         /// Restrictions for chunk ordering, for ancillary chunks
@@ -86,6 +87,8 @@ namespace Hjg.Pngcs.Chunks {
             this.Safe = Hjg.Pngcs.Chunks.ChunkHelper.IsSafeToCopy(id);
             this.Priority = false;
             this.ChunkGroup = -1;
+            this.Length = -1;
+            this.Offset = 0;
         }
 
         private static Dictionary<String, Type> factoryMap = initFactory();
@@ -147,7 +150,7 @@ namespace Hjg.Pngcs.Chunks {
 
         internal static PngChunk Factory(ChunkRaw chunk, ImageInfo info) {
             PngChunk c = FactoryFromId(Hjg.Pngcs.Chunks.ChunkHelper.ToString(chunk.IdBytes), info);
-            c.lenori = chunk.Length;
+            c.Length = chunk.Length;
             c.ParseFromRaw(chunk);
             return c;
         }
@@ -199,7 +202,7 @@ namespace Hjg.Pngcs.Chunks {
         /// </summary>
         /// <returns></returns>
         public override String ToString() {
-            return "chunk id= " + Id + " (" + lenori + ") c=" + GetType().Name;
+            return "chunk id= " + Id + " (len=" + Length + " off=" + Offset +") c=" + GetType().Name;
         }
 
         /// <summary>

@@ -632,9 +632,11 @@
             
             2. Optional: If you call GetMetadata() before reading the rows, the chunks before IDAT are automatically loaded
             
-            3. The rows are read in strict sequence, from 0 to nrows-1
+            3. The rows are read in sequence, from 0 to nrows-1 (you can skip rows by calling GetRow())
             
             4. The reading of the last row triggers the loading of trailing chunks, and ends the reader.
+            
+            5. End() forcibly finishes/aborts the reading and closes the stream
             </remarks>
         </member>
         <member name="F:Hjg.Pngcs.PngReader.ImgInfo">
@@ -698,24 +700,11 @@
             <param name="inputStream"></param>
             <param name="filename">Optional, can be the filename or a description.</param>
         </member>
-        <member name="M:Hjg.Pngcs.PngReader.ParseChunkAndAddToList(Hjg.Pngcs.Chunks.ChunkRaw)">
-            <summary>
-            Given a raw chunk, parses it, add the PngChunk to the list and returns it
-            </summary>
-            <param name="chunk"></param>
-            <returns></returns>
-        </member>
         <member name="M:Hjg.Pngcs.PngReader.ReadLastAndClose">
             <summary>
             Internally called after having read the last line. 
             It reads extra chunks after IDAT, if present.
             </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.PngReader.ReadLastChunks">
-             <summary>
-             Reads (and processes ... up to a point) chunks after last IDAT.
-             </summary>
-            
         </member>
         <member name="M:Hjg.Pngcs.PngReader.ReadFirstChunks">
              <summary>
@@ -724,6 +713,19 @@
              IDAT chunk , -1 if not found
              </summary>
             
+        </member>
+        <member name="M:Hjg.Pngcs.PngReader.ReadLastChunks">
+             <summary>
+             Reads (and processes ... up to a point) chunks after last IDAT.
+             </summary>
+            
+        </member>
+        <member name="M:Hjg.Pngcs.PngReader.ReadChunk(System.Byte[],System.Int32,System.Boolean)">
+            <summary>
+            Reads chunkd from input stream, adds to ChunksList, and returns it.
+            If it's skipped, a PngChunkSkipped object is created
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Hjg.Pngcs.PngReader.logWarn(System.String)">
             <summary>
@@ -808,12 +810,36 @@
             Should close the underlying Input Stream when ends?
             </summary>
         </member>
-        <member name="P:Hjg.Pngcs.PngReader.MaxBytesChunksToLoad">
+        <member name="P:Hjg.Pngcs.PngReader.MaxBytesMetadata">
             <summary>
             Maximum amount of bytes from ancillary chunks to load in memory 
             </summary>
             <remarks>
-             Default: 1MB. If exceeded, extra bytes will be ignored, and a warning printed to stderr.
+             Default: 5MB. If exceeded, chunks will be skipped
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.MaxTotalBytesRead">
+            <summary>
+            Maximum total bytes to read from stream 
+            </summary>
+            <remarks>
+             Default: 200MB. If exceeded, an exception will be thrown
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.SkipChunkMaxSize">
+            <summary>
+            Maximum ancillary chunk size
+            </summary>
+            <remarks>
+             Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked)
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.SkipChunkIds">
+            <summary>
+            Ancillary chunks to skip
+            </summary>
+            <remarks>
+             Default: { "fdAT" }. chunks with these ids will be skipped (nor even CRC checked)
             </remarks>
         </member>
         <member name="P:Hjg.Pngcs.PngReader.CurrentChunkGroup">
@@ -1743,12 +1769,12 @@
         </member>
         <member name="F:Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_NEVER">
             <summary>
-            ignore non-critical chunks
+            all non-critical chunks are skippped
             </summary>
         </member>
         <member name="F:Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_KNOWN">
             <summary>
-            load chunk if 'known'
+            load chunk if 'known' (registered with the factory)
             </summary>
         </member>
         <member name="F:Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_IF_SAFE">
@@ -1759,6 +1785,8 @@
         <member name="F:Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_ALWAYS">
             <summary>
             load chunks always 
+            
+             Notice that other restrictions might apply, see PngReader.SkipChunkMaxSize PngReader.SkipChunkIds
             </summary>
         </member>
         <member name="T:Hjg.Pngcs.PngjUnsupportedException">
@@ -1792,7 +1820,7 @@
              </summary>
             
         </member>
-        <member name="M:Hjg.Pngcs.PngIDatChunkInputStream.#ctor(System.IO.Stream,System.Int32,System.Int32)">
+        <member name="M:Hjg.Pngcs.PngIDatChunkInputStream.#ctor(System.IO.Stream,System.Int32,System.Int64)">
              <summary>
              Constructor must be called just after reading length and id of first IDAT
              chunk

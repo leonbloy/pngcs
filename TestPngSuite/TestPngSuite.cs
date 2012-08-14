@@ -18,31 +18,36 @@ namespace TestPngSuite {
 
         public static void mirror(String orig, String dest) {
             if (orig.Equals(dest)) throw new PngjException("input and output file cannot coincide");
-            PngReader pngr = FileHelper.CreatePngReader(orig);
-            PngWriter pngw = FileHelper.CreatePngWriter(dest, pngr.ImgInfo, true);
-            pngw.SetFilterType(FilterType.FILTER_CYCLIC); // just to test all filters
-            int copyPolicy = ChunkCopyBehaviour.COPY_ALL;
-            pngw.CopyChunksFirst(pngr, copyPolicy);
-            ImageLine lout = new ImageLine(pngw.ImgInfo);
-            int[] line = null;
-            int cols = pngr.ImgInfo.Cols;
-            int channels = pngr.ImgInfo.Channels;
-            int aux;
-            for (int row = 0; row < pngr.ImgInfo.Rows; row++) {
-                ImageLine l1 = pngr.ReadRow(row);
-                line = l1.Unpack(line, false);
-                for (int c1 = 0, c2 = cols - 1; c1 < c2; c1++, c2--) {
-                    for (int i = 0; i < channels; i++) {
-                        aux = line[c1 * channels + i];
-                        line[c1 * channels + i] = line[c2 * channels + i];
-                        line[c2 * channels + i] = aux;
+                PngReader pngr = FileHelper.CreatePngReader(orig);
+                PngWriter pngw=null;
+                try {
+                    pngw = FileHelper.CreatePngWriter(dest, pngr.ImgInfo, true);
+                    pngw.SetFilterType(FilterType.FILTER_CYCLIC); // just to test all filters
+                    int copyPolicy = ChunkCopyBehaviour.COPY_ALL;
+                    pngw.CopyChunksFirst(pngr, copyPolicy);
+                    ImageLine lout = new ImageLine(pngw.ImgInfo);
+                    int[] line = null;
+                    int cols = pngr.ImgInfo.Cols;
+                    int channels = pngr.ImgInfo.Channels;
+                    int aux;
+                    for (int row = 0; row < pngr.ImgInfo.Rows; row++) {
+                        ImageLine l1 = pngr.ReadRow(row);
+                        line = l1.Unpack(line, false);
+                        for (int c1 = 0, c2 = cols - 1; c1 < c2; c1++, c2--) {
+                            for (int i = 0; i < channels; i++) {
+                                aux = line[c1 * channels + i];
+                                line[c1 * channels + i] = line[c2 * channels + i];
+                                line[c2 * channels + i] = aux;
+                            }
+                        }
+                        lout.Pack(line, false);
+                        pngw.WriteRow(lout, row);
                     }
+                    pngw.CopyChunksLast(pngr, copyPolicy);
+                } finally {
+                    if(pngw != null) pngw.End();
+                    pngr.End();
                 }
-                lout.Pack(line, false);
-                pngw.WriteRow(lout, row);
-            }
-            pngw.CopyChunksLast(pngr, copyPolicy);
-            pngw.End();
         }
 
         public static void TestAll(String dirsrc, String dirdest) {
@@ -72,6 +77,10 @@ namespace TestPngSuite {
             }
 
             System.Console.Out.WriteLine("Errors: " + conterr + "/" + cont);
+            System.Console.Out.WriteLine("Lines starting with 'ok error' are expected errors, they are ok.");
+            System.Console.Out.WriteLine("Output dir: " + dirdest);
+
+            System.Console.In.ReadLine();
         }
 
     }

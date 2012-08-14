@@ -38,6 +38,7 @@ find . -name obj -type d -exec /bin/rm -rf '{}' \;
 find . -name '*.zip' -exec /bin/rm -f '{}' \;
 find . -name '*.sh' -exec /bin/rm -f '{}' \;
 /bin/rm -f src/pngcs.suo
+/bin/rm -rf src/dist/
 
 cd $DIRS
 

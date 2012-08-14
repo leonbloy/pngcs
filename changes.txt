@@ -1,5 +1,13 @@
 ===========  HISTORY PngCs  http://code.google.com/p/pngcs/ ================
 
+14/Aug/2012:  1.0.95
+  - Defensive limits and related tuning in PngReader 
+   -- Added: MaxTotalBytesRead (200MB), MaxBytesMetadata (5MB), SkipChunkMaxSize (2MB) SkipChunkIds ( "fdAT" )
+   -- PngChunkSkipped : now skipped chunks are really skipped (never loaded in memory)  All skipped chunks end in ChunksLists as a PngChunkSkipped
+   -- Several related polishing in PngReader (ParseChunkAndAddToList() removed, ReadChunk() added)
+	 -- 'offset' added in chunks (mainly informational)
+	 -- 'offset' in PngReader: now a long (to support greater than 2GB files), updated and checked against MaxTotalBytesRead
+
 23/Jun/2012:  1.0.93
   - PngReader.GetRow() allows non sequential reading  (useful for skipping lines)
   - PngReader.End() is no longer deprecated but recommended (related to the previous)

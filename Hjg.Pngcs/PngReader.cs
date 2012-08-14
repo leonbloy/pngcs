@@ -7,7 +7,7 @@ namespace Hjg.Pngcs {
     using System.Runtime.CompilerServices;
     using System;
     using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-
+ 
     /// <summary>
     /// Reads a PNG image, line by line
     /// </summary>
@@ -18,9 +18,11 @@ namespace Hjg.Pngcs {
     /// 
     /// 2. Optional: If you call GetMetadata() before reading the rows, the chunks before IDAT are automatically loaded
     /// 
-    /// 3. The rows are read in strict sequence, from 0 to nrows-1
+    /// 3. The rows are read in sequence, from 0 to nrows-1 (you can skip rows by calling GetRow())
     /// 
     /// 4. The reading of the last row triggers the loading of trailing chunks, and ends the reader.
+    /// 
+    /// 5. End() forcibly finishes/aborts the reading and closes the stream
     /// </remarks>
     public class PngReader {
         /// <summary>
@@ -47,9 +49,36 @@ namespace Hjg.Pngcs {
         /// Maximum amount of bytes from ancillary chunks to load in memory 
         /// </summary>
         /// <remarks>
-        ///  Default: 1MB. If exceeded, extra bytes will be ignored, and a warning printed to stderr.
+        ///  Default: 5MB. If exceeded, chunks will be skipped
         /// </remarks>
-        public int MaxBytesChunksToLoad { get; set; }
+        public int MaxBytesMetadata { get; set; }
+
+        /// <summary>
+        /// Maximum total bytes to read from stream 
+        /// </summary>
+        /// <remarks>
+        ///  Default: 200MB. If exceeded, an exception will be thrown
+        /// </remarks>
+        public int MaxTotalBytesRead { get; set; }
+
+
+        /// <summary>
+        /// Maximum ancillary chunk size
+        /// </summary>
+        /// <remarks>
+        ///  Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked)
+        /// </remarks>
+        public int SkipChunkMaxSize { get; set; }
+
+        /// <summary>
+        /// Ancillary chunks to skip
+        /// </summary>
+        /// <remarks>
+        ///  Default: { "fdAT" }. chunks with these ids will be skipped (nor even CRC checked)
+        /// </remarks>
+        public String[] SkipChunkIds { get; set; }
+
+        private Dictionary<string, int> skipChunkIdsSet = null; // lazily created
 
         /// <summary>
         /// A high level wrapper of a ChunksList : list of read chunks
@@ -88,7 +117,7 @@ namespace Hjg.Pngcs {
         /// last read row number
         /// </summary>
         protected int rowNum = -1; // 
-        private int offset = 0;  // offset in InputStream = bytes read
+        private long offset = 0;  // offset in InputStream = bytes read
         private int bytesChunksLoaded = 0; // bytes loaded from anciallary chunks
 
         private readonly Stream inputStream;
@@ -116,10 +145,14 @@ namespace Hjg.Pngcs {
             this.inputStream = inputStream;
             this.chunksList = new ChunksList(null);
             this.metadata = new PngMetadata(chunksList);
+            this.offset = 0;
             // set default options
             this.CurrentChunkGroup = -1;
             this.ShouldCloseStream = true;
-            this.MaxBytesChunksToLoad = 1024 * 1024;
+            this.MaxBytesMetadata = 5 * 1024 * 1024;
+            this.MaxTotalBytesRead = 200 * 1024 * 1024; // 200MB
+            this.SkipChunkMaxSize = 2 * 1024 * 1024;
+            this.SkipChunkIds = new string[] { "fdAT" };
             this.ChunkLoadBehaviour = Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_ALWAYS;
             // starts reading: signature
             byte[] pngid = new byte[PngHelperInternal.pngIdBytes.Length];
@@ -139,9 +172,7 @@ namespace Hjg.Pngcs {
                 throw new PngjInputException("IHDR not found as first chunk??? ["
                         + ChunkHelper.ToString(chunkid) + "]");
             offset += 4;
-            ChunkRaw chunk = new ChunkRaw(clen, chunkid, true);
-            offset += chunk.ReadChunkData(inputStream);
-            PngChunkIHDR ihdr = (PngChunkIHDR)ParseChunkAndAddToList(chunk);
+            PngChunkIHDR ihdr = (PngChunkIHDR)ReadChunk(chunkid, clen, false);
             bool alpha = (ihdr.Colormodel & 0x04) != 0;
             bool palette = (ihdr.Colormodel & 0x01) != 0;
             bool grayscale = (ihdr.Colormodel == 0 || ihdr.Colormodel == 4);
@@ -164,24 +195,7 @@ namespace Hjg.Pngcs {
                 throw new PngjInputException("Invalid bit depth " + ihdr.Bitspc);
         }
 
-        /// <summary>
-        /// Given a raw chunk, parses it, add the PngChunk to the list and returns it
-        /// </summary>
-        /// <param name="chunk"></param>
-        /// <returns></returns>
-        private PngChunk ParseChunkAndAddToList(ChunkRaw chunk) {
-            PngChunk chunkType = PngChunk.Factory(chunk, ImgInfo);
-            if (!chunkType.Crit) {
-                bytesChunksLoaded += chunk.Length;
-            }
-            if (bytesChunksLoaded > MaxBytesChunksToLoad) {
-                logWarn("Chunk exceeded available space (" + MaxBytesChunksToLoad + ") chunk: " + chunk
-                 + " See PngReader.MaxBytesChunksToLoad\n");
-            } else {
-                chunksList.AppendReadChunk(chunkType, CurrentChunkGroup);
-            }
-            return chunkType;
-        }
+
 
         private void ConvertRowFromBytes(int[] buffer) {
             // see http://www.libpng.org/pub/png/spec/1.2/PNG-DataRep.html
@@ -206,7 +220,6 @@ namespace Hjg.Pngcs {
         /// It reads extra chunks after IDAT, if present.
         /// </summary>
         private void ReadLastAndClose() {
-            offset = (int)iIdatCstream.GetOffset();
             idatIstream.Close();
             ReadLastChunks();
             Close();
@@ -225,50 +238,7 @@ namespace Hjg.Pngcs {
         }
 
 
-        /// <summary>
-        /// Reads (and processes ... up to a point) chunks after last IDAT.
-        /// </summary>
-        ///
-        private void ReadLastChunks() {
-            CurrentChunkGroup = ChunksList.CHUNK_GROUP_5_AFTERIDAT;
-            // PngHelper.logdebug("idat ended? " + iIdatCstream.isEnded());
-            if (!iIdatCstream.IsEnded())
-                iIdatCstream.ForceChunkEnd();
-            int clen = iIdatCstream.GetLenLastChunk();
-            byte[] chunkid = iIdatCstream.GetIdLastChunk();
-            bool endfound = false;
-            bool first = true;
-            bool ignore = false;
-            while (!endfound) {
-                ignore = false;
-                if (!first) {
-                    clen = PngHelperInternal.ReadInt4(inputStream);
-                    offset += 4;
-                    if (clen < 0)
-                        throw new PngjInputException("bad len " + clen);
-                    PngHelperInternal.ReadBytes(inputStream, chunkid, 0, 4);
-                    offset += 4;
-                }
-                first = false;
-                if (PngCsUtils.arraysEqual4(chunkid, ChunkHelper.b_IDAT)) {
-                    // PngHelper.logdebug("extra IDAT chunk len - ignoring : ");
-                    ignore = true;
-                } else if (PngCsUtils.arraysEqual4(chunkid, ChunkHelper.b_IEND)) {
-                    CurrentChunkGroup = ChunksList.CHUNK_GROUP_6_END;
-                    endfound = true;
-                }
-                ChunkRaw chunk = new ChunkRaw(clen, chunkid, true);
-                String chunkids = ChunkHelper.ToString(chunkid);
-                bool loadchunk = ChunkHelper.ShouldLoad(chunkids, ChunkLoadBehaviour);
-                offset += chunk.ReadChunkData(inputStream);
-                if (loadchunk && !ignore) {
-                    ParseChunkAndAddToList(chunk);
-                }
-            }
-            if (!endfound)
-                throw new PngjInputException("end chunk not found - offset=" + offset);
-            // PngHelper.logdebug("end chunk found ok offset=" + offset);
-        }
+
 
         private void UnfilterRow() {
             int ftn = rowbfilter[0];
@@ -360,18 +330,15 @@ namespace Hjg.Pngcs {
                     found = true;
                     this.CurrentChunkGroup = ChunksList.CHUNK_GROUP_4_IDAT;
                     // add dummy idat chunk to list
-                    ChunkRaw chunk = new ChunkRaw(0, chunkid, false);
-                    ParseChunkAndAddToList(chunk);
+                    chunksList.AppendReadChunk(new PngChunkIDAT(ImgInfo, clen, offset - 8), CurrentChunkGroup);
                     break;
                 } else if (PngCsUtils.arraysEqual4(chunkid, Hjg.Pngcs.Chunks.ChunkHelper.b_IEND)) {
                     throw new PngjInputException("END chunk found before image data (IDAT) at offset=" + offset);
                 }
-                ChunkRaw chunk_0 = new ChunkRaw(clen, chunkid, true);
                 String chunkids = ChunkHelper.ToString(chunkid);
-                bool loadchunk = ChunkHelper.ShouldLoad(chunkids, this.ChunkLoadBehaviour);
-                offset += chunk_0.ReadChunkData(inputStream);
-                if (loadchunk)
-                    ParseChunkAndAddToList(chunk_0);
+                if (chunkids.Equals(ChunkHelper.PLTE))
+                    this.CurrentChunkGroup = ChunksList.CHUNK_GROUP_2_PLTE;
+                ReadChunk(chunkid, clen, false);
                 if (chunkids.Equals(ChunkHelper.PLTE))
                     this.CurrentChunkGroup = ChunksList.CHUNK_GROUP_3_AFTERPLTE;
             }
@@ -381,6 +348,92 @@ namespace Hjg.Pngcs {
             iIdatCstream = new PngIDatChunkInputStream(inputStream, idatLen, offset);
             idatIstream = new InflaterInputStream(iIdatCstream);
         }
+
+        /// <summary>
+        /// Reads (and processes ... up to a point) chunks after last IDAT.
+        /// </summary>
+        ///
+        private void ReadLastChunks() {
+            CurrentChunkGroup = ChunksList.CHUNK_GROUP_5_AFTERIDAT;
+            // PngHelper.logdebug("idat ended? " + iIdatCstream.isEnded());
+            if (!iIdatCstream.IsEnded())
+                iIdatCstream.ForceChunkEnd();
+            int clen = iIdatCstream.GetLenLastChunk();
+            byte[] chunkid = iIdatCstream.GetIdLastChunk();
+            bool endfound = false;
+            bool first = true;
+            bool skip = false;
+            while (!endfound) {
+                skip = false;
+                if (!first) {
+                    clen = PngHelperInternal.ReadInt4(inputStream);
+                    offset += 4;
+                    if (clen < 0)
+                        throw new PngjInputException("bad len " + clen);
+                    PngHelperInternal.ReadBytes(inputStream, chunkid, 0, 4);
+                    offset += 4;
+                }
+                first = false;
+                if (PngCsUtils.arraysEqual4(chunkid, ChunkHelper.b_IDAT)) {
+                    skip = true; // extra dummy (empty?) idat chunk, it can happen, ignore it
+                } else if (PngCsUtils.arraysEqual4(chunkid, ChunkHelper.b_IEND)) {
+                    CurrentChunkGroup = ChunksList.CHUNK_GROUP_6_END;
+                    endfound = true;
+                }
+                ReadChunk(chunkid, clen, skip);
+            }
+            if (!endfound)
+                throw new PngjInputException("end chunk not found - offset=" + offset);
+            // PngHelper.logdebug("end chunk found ok offset=" + offset);
+        }
+
+        /// <summary>
+        /// Reads chunkd from input stream, adds to ChunksList, and returns it.
+        /// If it's skipped, a PngChunkSkipped object is created
+        /// </summary>
+        /// <returns></returns>
+        private PngChunk ReadChunk(byte[] chunkid, int clen, bool skipforced) {
+            if (clen < 0) throw new PngjInputException("invalid chunk lenght: " + clen);
+            // skipChunksByIdSet is created lazyly, if fist IHDR has already been read
+            if (skipChunkIdsSet == null && CurrentChunkGroup > ChunksList.CHUNK_GROUP_0_IDHR) {
+                skipChunkIdsSet = new Dictionary<string, int>();
+                foreach (string id in SkipChunkIds) skipChunkIdsSet.Add(id, 1);
+            }
+
+            String chunkidstr = ChunkHelper.ToString(chunkid);
+            PngChunk pngChunk = null;
+            bool skip = skipforced;
+            if (clen + offset > MaxTotalBytesRead)
+                throw new PngjInputException("Maximum total bytes to read exceeeded: " + MaxTotalBytesRead + " offset:"
+                        + offset + " clen=" + clen);
+            // an ancillary chunks can be skipped because of several reasons:
+            if (CurrentChunkGroup > ChunksList.CHUNK_GROUP_0_IDHR && !ChunkHelper.IsCritical(chunkidstr))
+                skip = skip || clen >= SkipChunkMaxSize || skipChunkIdsSet.ContainsKey(chunkidstr)
+                        || clen > MaxBytesMetadata - bytesChunksLoaded
+                        || !ChunkHelper.ShouldLoad(chunkidstr, ChunkLoadBehaviour);
+
+            if (skip) {
+                PngHelperInternal.SkipBytes(inputStream, clen);
+                PngHelperInternal.ReadInt4(inputStream); // skip - we dont call PngHelperInternal.skipBytes(inputStream, clen + 4) for risk of overflow 
+                pngChunk = new PngChunkSkipped(chunkidstr, ImgInfo, clen);
+            } else {
+                ChunkRaw chunk = new ChunkRaw(clen, chunkid, true);
+                chunk.ReadChunkData(inputStream);
+                pngChunk = PngChunk.Factory(chunk, ImgInfo);
+                if (!pngChunk.Crit) {
+                    bytesChunksLoaded += chunk.Length;
+                }
+
+            }
+            pngChunk.Offset = offset - 8L;
+            chunksList.AppendReadChunk(pngChunk, CurrentChunkGroup);
+            offset += clen + 4L;
+            return pngChunk;
+        }
+
+
+
+
 
         /// <summary>
         /// Logs/prints a warning.
@@ -437,7 +490,7 @@ namespace Hjg.Pngcs {
         /// Like readRow(int nrow) but this accepts non consecutive rows.
         /// </summary>
         /// <remarks>If it's the current row, it will just return it. Elsewhere, it will try to read it.
-	    /// This implementation only accepts  nrow greater or equal than current row, but
+        /// This implementation only accepts  nrow greater or equal than current row, but
         /// an extended class could implement some partial or full cache of lines.
         /// 
         /// This should not  not be mixed with calls to readRow(int[] buffer, final int nrow)
@@ -477,6 +530,11 @@ namespace Hjg.Pngcs {
             rowbprev = tmp;
             // loads in rowbfilter "raw" bytes, with filter
             PngHelperInternal.ReadBytes(idatIstream, rowbfilter, 0, rowbfilter.Length);
+            // updates and checks offset
+            offset = iIdatCstream.GetOffset();
+            if (offset >= MaxTotalBytesRead || offset < 0)
+                throw new PngjInputException("Reading IDAT: Maximum total bytes to read exceeeded: " + MaxTotalBytesRead
+                        + " offset:" + offset);
             rowb[0] = 0;
             UnfilterRow();
             rowb[0] = rowbfilter[0];

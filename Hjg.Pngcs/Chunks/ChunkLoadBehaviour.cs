@@ -12,11 +12,11 @@ namespace Hjg.Pngcs.Chunks {
     /// </summary>
     public enum ChunkLoadBehaviour {
         /// <summary>
-        /// ignore non-critical chunks
+        /// all non-critical chunks are skippped
         /// </summary>
         LOAD_CHUNK_NEVER,
         /// <summary>
-        /// load chunk if 'known'
+        /// load chunk if 'known' (registered with the factory)
         /// </summary>
         LOAD_CHUNK_KNOWN,
         /// <summary>
@@ -25,6 +25,8 @@ namespace Hjg.Pngcs.Chunks {
         LOAD_CHUNK_IF_SAFE,
         /// <summary>
         /// load chunks always 
+        /// 
+        ///  Notice that other restrictions might apply, see PngReader.SkipChunkMaxSize PngReader.SkipChunkIds
         /// </summary>
         LOAD_CHUNK_ALWAYS,
 

@@ -120,8 +120,14 @@ Properties</h2></td></tr>
 <tr class="memdesc:ad9f2f5933490ab6cfb1356099f4a21c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strategy for chunk loading. Default: LOAD_CHUNK_ALWAYS  <a href="#ad9f2f5933490ab6cfb1356099f4a21c2"></a><br/></td></tr>
 <tr class="memitem:a0a38c187040a2aad6e304f54e2883e5d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a0a38c187040a2aad6e304f54e2883e5d">ShouldCloseStream</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a0a38c187040a2aad6e304f54e2883e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should close the underlying Input Stream when ends?  <a href="#a0a38c187040a2aad6e304f54e2883e5d"></a><br/></td></tr>
-<tr class="memitem:aea6013a0b9ea44bd697c9fd8be2a6ee4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#aea6013a0b9ea44bd697c9fd8be2a6ee4">MaxBytesChunksToLoad</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:aea6013a0b9ea44bd697c9fd8be2a6ee4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum amount of bytes from ancillary chunks to load in memory  <a href="#aea6013a0b9ea44bd697c9fd8be2a6ee4"></a><br/></td></tr>
+<tr class="memitem:a1b3b9a7e8a38ca0b98c713297a19bc40"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a1b3b9a7e8a38ca0b98c713297a19bc40">MaxBytesMetadata</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a1b3b9a7e8a38ca0b98c713297a19bc40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum amount of bytes from ancillary chunks to load in memory  <a href="#a1b3b9a7e8a38ca0b98c713297a19bc40"></a><br/></td></tr>
+<tr class="memitem:aa52ecee29302385c5e3c1e3d2671360e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#aa52ecee29302385c5e3c1e3d2671360e">MaxTotalBytesRead</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:aa52ecee29302385c5e3c1e3d2671360e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum total bytes to read from stream  <a href="#aa52ecee29302385c5e3c1e3d2671360e"></a><br/></td></tr>
+<tr class="memitem:a6a2359583f78fc7a37c6062e54f68402"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a6a2359583f78fc7a37c6062e54f68402">SkipChunkMaxSize</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a6a2359583f78fc7a37c6062e54f68402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum ancillary chunk size  <a href="#a6a2359583f78fc7a37c6062e54f68402"></a><br/></td></tr>
+<tr class="memitem:a6d69943cabc5ed6994ebc9d281f7c178"><td class="memItemLeft" align="right" valign="top">String[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a6d69943cabc5ed6994ebc9d281f7c178">SkipChunkIds</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a6d69943cabc5ed6994ebc9d281f7c178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ancillary chunks to skip  <a href="#a6d69943cabc5ed6994ebc9d281f7c178"></a><br/></td></tr>
 <tr class="memitem:a0a3c8deb3622afb0c1f4751000acf287"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a0a3c8deb3622afb0c1f4751000acf287">CurrentChunkGroup</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a0a3c8deb3622afb0c1f4751000acf287"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of chunk group (0-6) last read, or currently reading  <a href="#a0a3c8deb3622afb0c1f4751000acf287"></a><br/></td></tr>
 </table>
@@ -130,8 +136,9 @@ Properties</h2></td></tr>
 <p>The reading sequence is as follows:</p>
 <p>1. At construction time, the header and IHDR chunk are read (basic image info)</p>
 <p>2. Optional: If you call <a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a6c39a401192e5f008c8d65bd718daa80" title="Returns the ancillary chunks available ">GetMetadata()</a> before reading the rows, the chunks before IDAT are automatically loaded</p>
-<p>3. The rows are read in strict sequence, from 0 to nrows-1</p>
-<p>4. The reading of the last row triggers the loading of trailing chunks, and ends the reader. </p>
+<p>3. The rows are read in sequence, from 0 to nrows-1 (you can skip rows by calling <a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a2650f9b2d7aa88b0639e27dee3e7473d" title="Like readRow(int nrow) but this accepts non consecutive rows. ">GetRow()</a>)</p>
+<p>4. The reading of the last row triggers the loading of trailing chunks, and ends the reader.</p>
+<p>5. <a class="el" href="class_hjg_1_1_pngcs_1_1_png_reader.html#a16e7ae6bba8ca1b5f94aed8e274b4dfa" title="Normally this does nothing, but it can be used to force a premature closing ">End()</a> forcibly finishes/aborts the reading and closes the stream </p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="adcb6aa5288c3b4b9050d59fbe46e3531"></a>
 <div class="memitem">
@@ -600,7 +607,7 @@ Properties</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aea6013a0b9ea44bd697c9fd8be2a6ee4"></a>
+<a class="anchor" id="a1b3b9a7e8a38ca0b98c713297a19bc40"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -608,7 +615,7 @@ Properties</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int Hjg.Pngcs.PngReader.MaxBytesChunksToLoad</td>
+          <td class="memname">int Hjg.Pngcs.PngReader.MaxBytesMetadata</td>
         </tr>
       </table>
   </td>
@@ -619,7 +626,76 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maximum amount of bytes from ancillary chunks to load in memory </p>
-<p>Default: 1MB. If exceeded, extra bytes will be ignored, and a warning printed to stderr. </p>
+<p>Default: 5MB. If exceeded, chunks will be skipped </p>
+
+</div>
+</div>
+<a class="anchor" id="aa52ecee29302385c5e3c1e3d2671360e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Hjg.Pngcs.PngReader.MaxTotalBytesRead</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maximum total bytes to read from stream </p>
+<p>Default: 200MB. If exceeded, an exception will be thrown </p>
+
+</div>
+</div>
+<a class="anchor" id="a6a2359583f78fc7a37c6062e54f68402"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Hjg.Pngcs.PngReader.SkipChunkMaxSize</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maximum ancillary chunk size </p>
+<p>Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked) </p>
+
+</div>
+</div>
+<a class="anchor" id="a6d69943cabc5ed6994ebc9d281f7c178"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">String [] Hjg.Pngcs.PngReader.SkipChunkIds</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Ancillary chunks to skip </p>
+<p>Default: { "fdAT" }. chunks with these ids will be skipped (nor even CRC checked) </p>
 
 </div>
 </div>
@@ -649,7 +725,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 23 2012 11:15:30 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 14 2012 20:05:51 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>

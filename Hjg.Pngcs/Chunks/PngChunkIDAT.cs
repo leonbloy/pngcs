@@ -15,8 +15,10 @@ namespace Hjg.Pngcs.Chunks {
     public class PngChunkIDAT : PngChunkMultiple {
         public const String ID = ChunkHelper.IDAT;
 
-        public PngChunkIDAT(ImageInfo i)
+        public PngChunkIDAT(ImageInfo i,int len, long offset)
             : base(ID, i) {
+            this.Length = len;
+            this.Offset = offset;
         }
 
         public override ChunkOrderingConstraint GetOrderingConstraint() {

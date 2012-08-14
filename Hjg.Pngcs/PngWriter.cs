@@ -385,6 +385,8 @@ namespace Hjg.Pngcs {
                             && !(ChunkHelper.IsUnknown(chunk) || text || chunk.Id.Equals(ChunkHelper.hIST) || chunk.Id
                                     .Equals(ChunkHelper.tIME)))
                         copy = true;
+                    if (chunk is PngChunkSkipped)
+                        copy = false;
                 }
                 if (copy) {
                     chunksList.Queue(PngChunk.CloneChunk(chunk, ImgInfo));

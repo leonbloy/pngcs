@@ -56,6 +56,7 @@
     <Compile Include="Chunks\ChunkPredicateEquiv.cs" />
     <Compile Include="Chunks\PngChunkMultiple.cs" />
     <Compile Include="Chunks\PngChunkSingle.cs" />
+    <Compile Include="Chunks\PngChunkSkipped.cs" />
     <Compile Include="Chunks\PngMetadata.cs" />
     <Compile Include="Chunks\PngChunkSTER.cs" />
     <Compile Include="Chunks\PngChunkOFFS.cs" />

@@ -131,6 +131,21 @@ namespace Hjg.Pngcs {
             }
         }
 
+        public static void SkipBytes(Stream ist, int len) {
+            byte[] buf = new byte[8192 * 4];
+            int read, remain = len;
+            try {
+                while (remain > 0) {
+                    read = ist.Read(buf, 0, remain > buf.Length ? buf.Length : remain);
+                    if (read < 0)
+                        throw new PngjInputException("error reading (skipping) : EOF");
+                    remain -= read;
+                }
+            } catch (IOException e) {
+                throw new PngjInputException("error reading (skipping)", e);
+            }
+        }
+
         public static void WriteBytes(Stream os, byte[] b) {
             try {
                 os.Write(b, 0, b.Length);

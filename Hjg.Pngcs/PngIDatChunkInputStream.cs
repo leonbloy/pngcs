@@ -24,9 +24,9 @@ namespace Hjg.Pngcs {
         // just informational
         public class IdatChunkInfo {
             public readonly int len;
-            public readonly int offset;
+            public readonly long offset;
 
-            public IdatChunkInfo(int len_0, int offset_1) {
+            public IdatChunkInfo(int len_0, long offset_1) {
                 this.len = len_0;
                 this.offset = offset_1;
             }
@@ -49,12 +49,12 @@ namespace Hjg.Pngcs {
         /// chunk
         /// </summary>
         ///
-        public PngIDatChunkInputStream(Stream iStream, int lenFirstChunk, int offset_0) {
+        public PngIDatChunkInputStream(Stream iStream, int lenFirstChunk, long offset_0) {
             this.idLastChunk = new byte[4];
             this.toReadThisChunk = 0;
             this.ended = false;
             this.foundChunksInfo = new List<IdatChunkInfo>();
-            this.offset = (long)offset_0;
+            this.offset = offset_0;
             inputStream = iStream;
             crcEngine = new Crc32();
             this.lenLastChunk = lenFirstChunk;
@@ -97,7 +97,7 @@ namespace Hjg.Pngcs {
 
                 ended = !PngCsUtils.arraysEqual4(idLastChunk, Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT);
                 if (!ended) {
-                    foundChunksInfo.Add(new PngIDatChunkInputStream.IdatChunkInfo(lenLastChunk, (int)(offset - 8)));
+                    foundChunksInfo.Add(new PngIDatChunkInputStream.IdatChunkInfo(lenLastChunk, (offset - 8)));
                     crcEngine.Update(idLastChunk, 0, 4);
                 }
                 // PngHelper.logdebug("IDAT ended. next len= " + lenLastChunk + " idat?" +
