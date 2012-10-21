@@ -13,4 +13,5 @@ To commit to git:
 
 To generate distribution:
  
+  - Update the assembly version
   - See and run (from Git Bash) buid_dist.sh
