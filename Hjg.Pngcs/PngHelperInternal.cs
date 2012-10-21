@@ -26,7 +26,7 @@ namespace Hjg.Pngcs {
             return crc32Engine;
         }
 
-        public static readonly byte[] pngIdBytes = { 256 - 119, 80, 78, 71, 13, 10, 26, 10 }; // png magic
+        public static readonly byte[] pngIdSignature = { 256 - 119, 80, 78, 71, 13, 10, 26, 10 }; // png magic
         public static Encoding charsetLatin1 = System.Text.Encoding.GetEncoding("ISO-8859-1"); // charset
         public static Encoding charsetUtf8 = System.Text.Encoding.GetEncoding("UTF-8"); // charset used for some chunks
 

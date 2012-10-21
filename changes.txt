@@ -1,5 +1,12 @@
 ===========  HISTORY PngCs  http://code.google.com/p/pngcs/ ================
 
+21/Oct/2012:  1.0.96
+  - SetMaxXXX() methods now accept zero, meaning unlimited (eg  PngReader.setMaxTotalBytesRead(0) = no limit) 
+  - Added SampleCustomChunk, shows how to register a custom chunk for read and writing
+  - Small fixes and polishing
+    -- PNGChunkTIME bad format for output
+    -- PngWriter.init() not internally called when not passing row number
+
 14/Aug/2012:  1.0.95
   - Defensive limits and related tuning in PngReader 
    -- Added: MaxTotalBytesRead (200MB), MaxBytesMetadata (5MB), SkipChunkMaxSize (2MB) SkipChunkIds ( "fdAT" )

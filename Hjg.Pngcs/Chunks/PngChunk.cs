@@ -176,13 +176,13 @@ namespace Hjg.Pngcs.Chunks {
             return chunk;
         }
 
-        internal ChunkRaw createEmptyChunk(int len, bool alloc) {
+        public ChunkRaw createEmptyChunk(int len, bool alloc) {
             ChunkRaw c = new ChunkRaw(len, ChunkHelper.ToBytes(Id), alloc);
             return c;
         }
 
         /* @SuppressWarnings("unchecked")*/
-        internal static T CloneChunk<T>(T chunk, ImageInfo info) where T : PngChunk {
+        public static T CloneChunk<T>(T chunk, ImageInfo info) where T : PngChunk {
             PngChunk cn = FactoryFromId(chunk.Id, info);
             if ((Object)cn.GetType() != (Object)chunk.GetType())
                 throw new PngjException("bad class cloning chunk: " + cn.GetType() + " "

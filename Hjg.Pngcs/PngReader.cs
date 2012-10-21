@@ -49,7 +49,7 @@ namespace Hjg.Pngcs {
         /// Maximum amount of bytes from ancillary chunks to load in memory 
         /// </summary>
         /// <remarks>
-        ///  Default: 5MB. If exceeded, chunks will be skipped
+        ///  Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped
         /// </remarks>
         public int MaxBytesMetadata { get; set; }
 
@@ -57,7 +57,7 @@ namespace Hjg.Pngcs {
         /// Maximum total bytes to read from stream 
         /// </summary>
         /// <remarks>
-        ///  Default: 200MB. If exceeded, an exception will be thrown
+        ///  Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown
         /// </remarks>
         public int MaxTotalBytesRead { get; set; }
 
@@ -66,7 +66,7 @@ namespace Hjg.Pngcs {
         /// Maximum ancillary chunk size
         /// </summary>
         /// <remarks>
-        ///  Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked)
+        ///  Default: 2MB, 0: unlimited. Chunks exceeding this size will be skipped (nor even CRC checked)
         /// </remarks>
         public int SkipChunkMaxSize { get; set; }
 
@@ -155,10 +155,10 @@ namespace Hjg.Pngcs {
             this.SkipChunkIds = new string[] { "fdAT" };
             this.ChunkLoadBehaviour = Hjg.Pngcs.Chunks.ChunkLoadBehaviour.LOAD_CHUNK_ALWAYS;
             // starts reading: signature
-            byte[] pngid = new byte[PngHelperInternal.pngIdBytes.Length];
+            byte[] pngid = new byte[8];
             PngHelperInternal.ReadBytes(inputStream, pngid, 0, pngid.Length);
             offset += pngid.Length;
-            if (!PngCsUtils.arraysEqual(pngid, PngHelperInternal.pngIdBytes))
+            if (!PngCsUtils.arraysEqual(pngid, PngHelperInternal.pngIdSignature))
                 throw new PngjInputException("Bad PNG signature");
             CurrentChunkGroup = ChunksList.CHUNK_GROUP_0_IDHR;
             // reads first chunk IDHR
@@ -397,19 +397,20 @@ namespace Hjg.Pngcs {
             // skipChunksByIdSet is created lazyly, if fist IHDR has already been read
             if (skipChunkIdsSet == null && CurrentChunkGroup > ChunksList.CHUNK_GROUP_0_IDHR) {
                 skipChunkIdsSet = new Dictionary<string, int>();
-                foreach (string id in SkipChunkIds) skipChunkIdsSet.Add(id, 1);
+                if(SkipChunkIds!=null)
+                    foreach (string id in SkipChunkIds) skipChunkIdsSet.Add(id, 1);
             }
 
             String chunkidstr = ChunkHelper.ToString(chunkid);
             PngChunk pngChunk = null;
             bool skip = skipforced;
-            if (clen + offset > MaxTotalBytesRead)
+            if (MaxTotalBytesRead > 0 && clen + offset > MaxTotalBytesRead)
                 throw new PngjInputException("Maximum total bytes to read exceeeded: " + MaxTotalBytesRead + " offset:"
                         + offset + " clen=" + clen);
             // an ancillary chunks can be skipped because of several reasons:
             if (CurrentChunkGroup > ChunksList.CHUNK_GROUP_0_IDHR && !ChunkHelper.IsCritical(chunkidstr))
-                skip = skip || clen >= SkipChunkMaxSize || skipChunkIdsSet.ContainsKey(chunkidstr)
-                        || clen > MaxBytesMetadata - bytesChunksLoaded
+                skip = skip || (SkipChunkMaxSize > 0 && clen >= SkipChunkMaxSize) || skipChunkIdsSet.ContainsKey(chunkidstr)
+                        || (MaxBytesMetadata > 0 && clen > MaxBytesMetadata - bytesChunksLoaded)
                         || !ChunkHelper.ShouldLoad(chunkidstr, ChunkLoadBehaviour);
 
             if (skip) {
@@ -532,7 +533,7 @@ namespace Hjg.Pngcs {
             PngHelperInternal.ReadBytes(idatIstream, rowbfilter, 0, rowbfilter.Length);
             // updates and checks offset
             offset = iIdatCstream.GetOffset();
-            if (offset >= MaxTotalBytesRead || offset < 0)
+            if ((MaxTotalBytesRead >0 && offset >= MaxTotalBytesRead) || offset < 0)
                 throw new PngjInputException("Reading IDAT: Maximum total bytes to read exceeeded: " + MaxTotalBytesRead
                         + " offset:" + offset);
             rowb[0] = 0;

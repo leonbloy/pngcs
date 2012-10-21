@@ -17,7 +17,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">PngCs
-   &#160;<span id="projectnumber">1.0.93</span>
+   &#160;<span id="projectnumber">1.0.96</span>
    </div>
    <div id="projectbrief">A C# library for read/write PNG images</div>
   </td>
@@ -626,7 +626,7 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maximum amount of bytes from ancillary chunks to load in memory </p>
-<p>Default: 5MB. If exceeded, chunks will be skipped </p>
+<p>Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped </p>
 
 </div>
 </div>
@@ -649,7 +649,7 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maximum total bytes to read from stream </p>
-<p>Default: 200MB. If exceeded, an exception will be thrown </p>
+<p>Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown </p>
 
 </div>
 </div>
@@ -672,7 +672,7 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maximum ancillary chunk size </p>
-<p>Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked) </p>
+<p>Default: 2MB, 0: unlimited. <a class="el" href="namespace_hjg_1_1_pngcs_1_1_chunks.html">Chunks</a> exceeding this size will be skipped (nor even CRC checked) </p>
 
 </div>
 </div>
@@ -725,7 +725,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 14 2012 20:05:51 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 21 2012 18:30:52 for PngCs by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.1
 </small></address>

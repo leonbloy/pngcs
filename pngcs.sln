@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCreateOrangeGradient"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDecreaseRed", "SampleDecreaseRed\SampleDecreaseRed.csproj", "{6D48CA3E-1132-496E-9160-D0A3A3DBB8BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCustomChunk", "SampleCustomChunk\SampleCustomChunk.csproj", "{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,16 @@ Global
 		{6D48CA3E-1132-496E-9160-D0A3A3DBB8BA}.Release|Mixed Platforms.Build.0 = Release|x86
 		{6D48CA3E-1132-496E-9160-D0A3A3DBB8BA}.Release|x86.ActiveCfg = Release|x86
 		{6D48CA3E-1132-496E-9160-D0A3A3DBB8BA}.Release|x86.Build.0 = Release|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Debug|x86.ActiveCfg = Debug|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Debug|x86.Build.0 = Debug|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Release|Any CPU.ActiveCfg = Release|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Release|x86.ActiveCfg = Release|x86
+		{5BA03EE6-AA07-4A70-812D-C2CBA3294BAA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

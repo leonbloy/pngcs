@@ -217,7 +217,7 @@ namespace Hjg.Pngcs {
         ///
         private void WriteSignatureAndIHDR() {
             CurrentChunkGroup = ChunksList.CHUNK_GROUP_0_IDHR;
-            PngHelperInternal.WriteBytes(outputStream, Hjg.Pngcs.PngHelperInternal.pngIdBytes); // signature
+            PngHelperInternal.WriteBytes(outputStream, Hjg.Pngcs.PngHelperInternal.pngIdSignature); // signature
             PngChunkIHDR ihdr = new PngChunkIHDR(ImgInfo);
             // http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
             ihdr.Cols = ImgInfo.Cols;
@@ -445,9 +445,9 @@ namespace Hjg.Pngcs {
         /// <param name="newrow">Array of pixel values</param>
         /// <param name="rown">Number of row, from 0 (top) to rows-1 (bottom)</param>
         public void WriteRow(int[] newrow, int rown) {
-            if (rown == 0) {
+            if (datStream == null)
                 init();
-            }
+
             if (rown < -1 || rown > ImgInfo.Rows)
                 throw new Exception("invalid value for row " + rown);
             rowNum++;
@@ -480,7 +480,7 @@ namespace Hjg.Pngcs {
             return metadata;
         }
 
-        public ChunksList GetChunksList() {
+        public ChunksListForWrite GetChunksList() {
             return chunksList;
         }
 

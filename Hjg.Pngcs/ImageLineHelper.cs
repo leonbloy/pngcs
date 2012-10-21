@@ -146,23 +146,43 @@ namespace Hjg.Pngcs {
         }
 
         public static void SetPixelsRGB8(ImageLine line, int[] rgb) {
-            for (int i = 0; i < line.ImgInfo.Cols; i++) {
-                line.Scanline[i * line.channels] = ((rgb[i] & 0xFF0000) >> 16);
-                line.Scanline[i * line.channels + 1] = ((rgb[i] & 0xFF00) >> 8);
-                line.Scanline[i * line.channels + 2] = ((rgb[i] & 0xFF));
+            for (int i = 0,j=0; i < line.ImgInfo.Cols; i++) {
+                line.Scanline[j++] = ((rgb[i] >> 16) & 0xFF);
+                line.Scanline[j++] = ((rgb[i] >> 8) & 0xFF);
+                line.Scanline[j++] = ((rgb[i] & 0xFF));
             }
         }
 
         public static void SetPixelRGB8(ImageLine line, int col, int rgb) {
-            line.Scanline[col * line.channels] = ((rgb & 0xFF0000) >> 16);
-            line.Scanline[col * line.channels + 1] = ((rgb & 0xFF00) >> 8);
-            line.Scanline[col * line.channels + 2] = ((rgb & 0xFF));
-        }
+           SetPixelRGB8(line, col, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+	    }
 
         public static void SetPixelRGB8(ImageLine line, int col, int r, int g, int b) {
-            line.Scanline[col * line.channels] = r;
-            line.Scanline[col * line.channels + 1] = g;
-            line.Scanline[col * line.channels + 2] = b;
+            col *= line.channels;
+            line.Scanline[col++] = r;
+            line.Scanline[col++] = g;
+            line.Scanline[col++] = b;
+        }
+
+        public static void SetPixelsRGBA8(ImageLine line, int[] rgb) {
+            for (int i = 0, j = 0; i < line.ImgInfo.Cols; i++) {
+                line.Scanline[j++] = ((rgb[i] >> 16) & 0xFF);
+                line.Scanline[j++] = ((rgb[i] >> 8) & 0xFF);
+                line.Scanline[j++] = ((rgb[i] & 0xFF));
+                line.Scanline[j++] = ((rgb[i] >> 24) & 0xFF);
+            }
+        }
+
+        public static void SetPixelRGBA8(ImageLine line, int col, int rgb) {
+            SetPixelRGBA8(line, col, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, (rgb >> 24) & 0xFF);
+        }
+
+        public static void SetPixelRGBA8(ImageLine line, int col, int r, int g, int b,int a) {
+            col *= line.channels;
+            line.Scanline[col++] = r;
+            line.Scanline[col++] = g;
+            line.Scanline[col++] = b;
+            line.Scanline[col++] = a;
         }
 
         public static void SetValD(ImageLine line, int i, double d) {

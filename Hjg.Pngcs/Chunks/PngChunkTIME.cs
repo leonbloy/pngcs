@@ -81,7 +81,7 @@ namespace Hjg.Pngcs.Chunks {
 
         /** format YYYY/MM/DD HH:mm:SS */
         public String GetAsString() {
-            return String.Format("%04/%02d/%02d %02d:%02d:%02d", year, mon, day, hour, min, sec);
+            return String.Format("%04d/%02d/%02d %02d:%02d:%02d", year, mon, day, hour, min, sec);
         }
 
     }

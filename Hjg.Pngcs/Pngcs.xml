@@ -815,7 +815,7 @@
             Maximum amount of bytes from ancillary chunks to load in memory 
             </summary>
             <remarks>
-             Default: 5MB. If exceeded, chunks will be skipped
+             Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped
             </remarks>
         </member>
         <member name="P:Hjg.Pngcs.PngReader.MaxTotalBytesRead">
@@ -823,7 +823,7 @@
             Maximum total bytes to read from stream 
             </summary>
             <remarks>
-             Default: 200MB. If exceeded, an exception will be thrown
+             Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown
             </remarks>
         </member>
         <member name="P:Hjg.Pngcs.PngReader.SkipChunkMaxSize">
@@ -831,7 +831,7 @@
             Maximum ancillary chunk size
             </summary>
             <remarks>
-             Default: 2MB, , chunks exceeding this size will be skipped (nor even CRC checked)
+             Default: 2MB, 0: unlimited. Chunks exceeding this size will be skipped (nor even CRC checked)
             </remarks>
         </member>
         <member name="P:Hjg.Pngcs.PngReader.SkipChunkIds">
