@@ -15,17 +15,24 @@ namespace Hjg.Pngcs {
     /// Reads a PNG image, line by line
     /// </summary>
     /// <remarks>
-    /// The reading sequence is as follows:
+    /// The typical reading sequence is as follows:
     /// 
     /// 1. At construction time, the header and IHDR chunk are read (basic image info)
     /// 
-    /// 2. Optional: If you call GetMetadata() before reading the rows, the chunks before IDAT are automatically loaded
+    /// 2  (Optional) you can set some global options: UnpackedMode CrcCheckDisabled
     /// 
-    /// 3. The rows are read in sequence, from 0 to nrows-1 (you can skip rows by calling GetRow())
+    /// 3. (Optional) If you call GetMetadata() or or GetChunksLisk() before reading the pixels, the chunks before IDAT are automatically loaded and available
     /// 
-    /// 4. The reading of the last row triggers the loading of trailing chunks, and ends the reader.
+    /// 4a. The rows are read, one by one, with the <tt>ReadRowXXX</tt> methods: (ReadRowInt() , ReadRowByte(), etc)
+    /// in order, from 0 to nrows-1 (you can skip or repeat rows, but not go backwards)
     /// 
-    /// 5. End() forcibly finishes/aborts the reading and closes the stream
+    /// 4b. Alternatively, you can read all rows, or a subset, in a single call: see ReadRowsInt(), ReadRowsByte()
+	/// In general this consumes more memory, but for interlaced images this is equally efficient, and more so if reading a small subset of rows.
+	///
+    /// 5. Read of the last row automatically loads the trailing chunks, and ends the reader.
+    /// 
+    /// 6. End() forcibly finishes/aborts the reading and closes the stream
+    ///
     /// </remarks>
     public class PngReader {
         /// <summary>
@@ -438,12 +445,6 @@ namespace Hjg.Pngcs {
             return pngChunk;
         }
 
-
-
-
-
-
-
         /// <summary>
         /// Logs/prints a warning.
         /// </summary>
@@ -452,7 +453,7 @@ namespace Hjg.Pngcs {
         /// This happens rarely - most errors are fatal.
         /// </remarks>
         /// <param name="warn"></param>
-        protected virtual void logWarn(String warn) {
+        internal void logWarn(String warn) {
             Console.Error.WriteLine(warn);
         }
 
