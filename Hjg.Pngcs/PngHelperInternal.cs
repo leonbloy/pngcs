@@ -12,7 +12,7 @@ namespace Hjg.Pngcs {
     /// <summary>
     /// Some utility static methods for internal use.
     /// </summary>
-    internal class PngHelperInternal {
+    public class PngHelperInternal {
 
         [ThreadStatic]
         private static ICSharpCode.SharpZipLib.Checksums.Crc32 crc32Engine = null;
@@ -26,7 +26,8 @@ namespace Hjg.Pngcs {
             return crc32Engine;
         }
 
-        public static readonly byte[] pngIdSignature = { 256 - 119, 80, 78, 71, 13, 10, 26, 10 }; // png magic
+        public static readonly byte[] PNG_ID_SIGNATURE = { 256 - 119, 80, 78, 71, 13, 10, 26, 10 }; // png magic
+
         public static Encoding charsetLatin1 = System.Text.Encoding.GetEncoding("ISO-8859-1"); // charset
         public static Encoding charsetUtf8 = System.Text.Encoding.GetEncoding("UTF-8"); // charset used for some chunks
 
@@ -206,6 +207,15 @@ namespace Hjg.Pngcs {
             if (DEBUG)
                 System.Console.Out.WriteLine(msg);
         }
+
+
+   	public static void InitCrcForTests(PngReader pngr) {
+		pngr.InitCrctest();
+	}
+
+	public static long GetCrctestVal(PngReader pngr) {
+		return pngr.GetCrctestVal();
+	}
 
     }
 }

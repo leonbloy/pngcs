@@ -24,6 +24,8 @@ namespace TestDeflater
             DeflateStrategy strat= DeflateStrategy.Default;
             int t = TestDeflate.test2("C:/temp/pragad.bmp", complevel, strat);
             Console.Out.WriteLine(t + " msecs");
+            Console.In.ReadLine();
+
 	    }
 
 

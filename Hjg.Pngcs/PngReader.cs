@@ -1,3 +1,4 @@
+using Ar.Com.Hjg.Pngcs;
 namespace Hjg.Pngcs {
 
     using Hjg.Pngcs.Chunks;
@@ -7,7 +8,9 @@ namespace Hjg.Pngcs {
     using System.Runtime.CompilerServices;
     using System;
     using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
- 
+    using ICSharpCode.SharpZipLib.Checksums;
+    using Ar.Com.Hjg.Pngcs;
+
     /// <summary>
     /// Reads a PNG image, line by line
     /// </summary>
@@ -28,7 +31,7 @@ namespace Hjg.Pngcs {
         /// <summary>
         /// Basic image info, inmutable
         /// </summary>
-        public readonly ImageInfo ImgInfo;
+        public ImageInfo ImgInfo {get;private set;}
 
         /// <summary>
         /// filename, or description - merely informative, can be empty
@@ -51,7 +54,7 @@ namespace Hjg.Pngcs {
         /// <remarks>
         ///  Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped
         /// </remarks>
-        public int MaxBytesMetadata { get; set; }
+        public long MaxBytesMetadata { get; set; }
 
         /// <summary>
         /// Maximum total bytes to read from stream 
@@ -59,7 +62,7 @@ namespace Hjg.Pngcs {
         /// <remarks>
         ///  Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown
         /// </remarks>
-        public int MaxTotalBytesRead { get; set; }
+        public long MaxTotalBytesRead { get; set; }
 
 
         /// <summary>
@@ -94,7 +97,6 @@ namespace Hjg.Pngcs {
         /// </summary>
         protected ImageLine imgLine;
 
-
         /// <summary>
         /// raw current row, as array of bytes,counting from 1 (index 0 is reserved for filter type)
         /// </summary>
@@ -107,6 +109,16 @@ namespace Hjg.Pngcs {
         /// raw current row, after unfiltered
         /// </summary>
         protected byte[] rowbfilter;
+
+
+        // only set for interlaced PNG
+        public readonly bool interlaced;
+        private readonly PngDeinterlacer deinterlacer;
+
+        private bool crcEnabled = true;
+
+        // this only influences the 1-2-4 bitdepth format
+        private bool unpackedMode = false;
 
         /// <summary>
         /// number of chunk group (0-6) last read, or currently reading
@@ -123,6 +135,8 @@ namespace Hjg.Pngcs {
         private readonly Stream inputStream;
         internal InflaterInputStream idatIstream;
         internal PngIDatChunkInputStream iIdatCstream;
+
+        protected Crc32 crctest; // If set to non null, it gets a CRC of the unfiltered bytes, to check for images equality
 
         /// <summary>
         /// Constructs a PngReader from a Stream, with no filename information
@@ -158,7 +172,7 @@ namespace Hjg.Pngcs {
             byte[] pngid = new byte[8];
             PngHelperInternal.ReadBytes(inputStream, pngid, 0, pngid.Length);
             offset += pngid.Length;
-            if (!PngCsUtils.arraysEqual(pngid, PngHelperInternal.pngIdSignature))
+            if (!PngCsUtils.arraysEqual(pngid, PngHelperInternal.PNG_ID_SIGNATURE))
                 throw new PngjInputException("Bad PNG signature");
             CurrentChunkGroup = ChunksList.CHUNK_GROUP_0_IDHR;
             // reads first chunk IDHR
@@ -178,15 +192,14 @@ namespace Hjg.Pngcs {
             bool grayscale = (ihdr.Colormodel == 0 || ihdr.Colormodel == 4);
             // creates ImgInfo and imgLine, and allocates buffers
             ImgInfo = new ImageInfo(ihdr.Cols, ihdr.Rows, ihdr.Bitspc, alpha, grayscale, palette);
-            imgLine = new ImageLine(ImgInfo);
             rowb = new byte[ImgInfo.BytesPerRow + 1];
             rowbprev = new byte[rowb.Length];
             rowbfilter = new byte[rowb.Length];
+            interlaced = ihdr.Interlaced == 1;
+            deinterlacer = interlaced ? new PngDeinterlacer(ImgInfo) : null;
             // some checks
-            if (ihdr.Interlaced != 0)
-                throw new PngjUnsupportedException("PNG interlaced not supported by this library");
-            if (ihdr.Filmeth != 0 || ihdr.Compmeth != 0)
-                throw new PngjInputException("compmethod o filtermethod unrecognized");
+            if (ihdr.Filmeth != 0 || ihdr.Compmeth != 0 || (ihdr.Interlaced & 0xFFFE) != 0)
+                throw new PngjInputException("compmethod or filtermethod or interlaced unrecognized");
             if (ihdr.Colormodel < 0 || ihdr.Colormodel > 6 || ihdr.Colormodel == 1
                     || ihdr.Colormodel == 5)
                 throw new PngjInputException("Invalid colormodel " + ihdr.Colormodel);
@@ -196,32 +209,22 @@ namespace Hjg.Pngcs {
         }
 
 
-
-        private void ConvertRowFromBytes(int[] buffer) {
-            // see http://www.libpng.org/pub/png/spec/1.2/PNG-DataRep.html
-            int i, j;
-            if (ImgInfo.BitDepth <= 8) {
-                for (i = 0, j = 1; i < ImgInfo.SamplesPerRowP; i++) {
-                    buffer[i] = (rowb[j++]);
-                }
-            } else { // 16 bitspc
-                for (i = 0, j = 1; i < ImgInfo.SamplesPerRowP; i++) {
-                    buffer[i] = (rowb[j++] << 8) + rowb[j++];
-                }
-            }
-        }
-
         private bool FirstChunksNotYetRead() {
             return CurrentChunkGroup < ChunksList.CHUNK_GROUP_1_AFTERIDHR;
         }
+
 
         /// <summary>
         /// Internally called after having read the last line. 
         /// It reads extra chunks after IDAT, if present.
         /// </summary>
         private void ReadLastAndClose() {
-            idatIstream.Close();
-            ReadLastChunks();
+            if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_5_AFTERIDAT) {
+                try {
+                    idatIstream.Close();
+                } catch (Exception ) { }
+                ReadLastChunks();
+            }
             Close();
         }
 
@@ -229,7 +232,7 @@ namespace Hjg.Pngcs {
             if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_6_END) { // this could only happen if forced close
                 try {
                     idatIstream.Close();
-                } catch (Exception e) {
+                } catch (Exception ) {
                 }
                 CurrentChunkGroup = ChunksList.CHUNK_GROUP_6_END;
             }
@@ -238,68 +241,68 @@ namespace Hjg.Pngcs {
         }
 
 
-
-
-        private void UnfilterRow() {
+        private void UnfilterRow(int nbytes) {
             int ftn = rowbfilter[0];
             FilterType ft = (FilterType)ftn;
             switch (ft) {
                 case Hjg.Pngcs.FilterType.FILTER_NONE:
-                    UnfilterRowNone();
+                    UnfilterRowNone(nbytes);
                     break;
                 case Hjg.Pngcs.FilterType.FILTER_SUB:
-                    UnfilterRowSub();
+                    UnfilterRowSub(nbytes);
                     break;
                 case Hjg.Pngcs.FilterType.FILTER_UP:
-                    UnfilterRowUp();
+                    UnfilterRowUp(nbytes);
                     break;
                 case Hjg.Pngcs.FilterType.FILTER_AVERAGE:
-                    UnfilterRowAverage();
+                    UnfilterRowAverage(nbytes);
                     break;
                 case Hjg.Pngcs.FilterType.FILTER_PAETH:
-                    UnfilterRowPaeth();
+                    UnfilterRowPaeth(nbytes);
                     break;
                 default:
                     throw new PngjInputException("Filter type " + ftn + " not implemented");
             }
+            if (crctest != null)
+                crctest.Update(rowb, 1, nbytes);
         }
 
 
-        private void UnfilterRowAverage() {
+        private void UnfilterRowAverage(int nbytes) {
             int i, j, x;
-            for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= ImgInfo.BytesPerRow; i++, j++) {
+            for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= nbytes; i++, j++) {
                 x = (j > 0) ? rowb[j] : 0;
                 rowb[i] = (byte)(rowbfilter[i] + (x + (rowbprev[i] & 0xFF)) / 2);
             }
         }
 
-        private void UnfilterRowNone() {
-            for (int i = 1; i <= ImgInfo.BytesPerRow; i++) {
+        private void UnfilterRowNone(int nbytes) {
+            for (int i = 1; i <= nbytes; i++) {
                 rowb[i] = (byte)(rowbfilter[i]);
             }
         }
 
-        private void UnfilterRowPaeth() {
+        private void UnfilterRowPaeth(int nbytes) {
             int i, j, x, y;
-            for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= ImgInfo.BytesPerRow; i++, j++) {
+            for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= nbytes; i++, j++) {
                 x = (j > 0) ? rowb[j] : 0;
                 y = (j > 0) ? rowbprev[j] : 0;
                 rowb[i] = (byte)(rowbfilter[i] + PngHelperInternal.FilterPaethPredictor(x, rowbprev[i], y));
             }
         }
 
-        private void UnfilterRowSub() {
+        private void UnfilterRowSub(int nbytes) {
             int i, j;
             for (i = 1; i <= ImgInfo.BytesPixel; i++) {
                 rowb[i] = (byte)(rowbfilter[i]);
             }
-            for (j = 1, i = ImgInfo.BytesPixel + 1; i <= ImgInfo.BytesPerRow; i++, j++) {
+            for (j = 1, i = ImgInfo.BytesPixel + 1; i <= nbytes; i++, j++) {
                 rowb[i] = (byte)(rowbfilter[i] + rowb[j]);
             }
         }
 
-        private void UnfilterRowUp() {
-            for (int i = 1; i <= ImgInfo.BytesPerRow; i++) {
+        private void UnfilterRowUp(int nbytes) {
+            for (int i = 1; i <= nbytes; i++) {
                 rowb[i] = (byte)(rowbfilter[i] + rowbprev[i]);
             }
         }
@@ -347,6 +350,8 @@ namespace Hjg.Pngcs {
                 throw new PngjInputException("first idat chunk not found!");
             iIdatCstream = new PngIDatChunkInputStream(inputStream, idatLen, offset);
             idatIstream = new InflaterInputStream(iIdatCstream);
+            if (!crcEnabled)
+                iIdatCstream.DisableCrcCheck();
         }
 
         /// <summary>
@@ -397,12 +402,13 @@ namespace Hjg.Pngcs {
             // skipChunksByIdSet is created lazyly, if fist IHDR has already been read
             if (skipChunkIdsSet == null && CurrentChunkGroup > ChunksList.CHUNK_GROUP_0_IDHR) {
                 skipChunkIdsSet = new Dictionary<string, int>();
-                if(SkipChunkIds!=null)
+                if (SkipChunkIds != null)
                     foreach (string id in SkipChunkIds) skipChunkIdsSet.Add(id, 1);
             }
 
             String chunkidstr = ChunkHelper.ToString(chunkid);
             PngChunk pngChunk = null;
+            bool critical = ChunkHelper.IsCritical(chunkidstr);
             bool skip = skipforced;
             if (MaxTotalBytesRead > 0 && clen + offset > MaxTotalBytesRead)
                 throw new PngjInputException("Maximum total bytes to read exceeeded: " + MaxTotalBytesRead + " offset:"
@@ -419,7 +425,7 @@ namespace Hjg.Pngcs {
                 pngChunk = new PngChunkSkipped(chunkidstr, ImgInfo, clen);
             } else {
                 ChunkRaw chunk = new ChunkRaw(clen, chunkid, true);
-                chunk.ReadChunkData(inputStream);
+                chunk.ReadChunkData(inputStream, crcEnabled || critical);
                 pngChunk = PngChunk.Factory(chunk, ImgInfo);
                 if (!pngChunk.Crit) {
                     bytesChunksLoaded += chunk.Length;
@@ -431,6 +437,8 @@ namespace Hjg.Pngcs {
             offset += clen + 4L;
             return pngChunk;
         }
+
+
 
 
 
@@ -481,69 +489,239 @@ namespace Hjg.Pngcs {
         ///<param name="nrow">row number - just as a check</param>
         /// <returns>the ImageLine that also is available inside this object</returns>
         public ImageLine ReadRow(int nrow) {
-            ReadRow(imgLine.Scanline, nrow);
+            return imgLine == null || imgLine.SampleType != ImageLine.ESampleType.BYTE ? ReadRowInt(nrow) : ReadRowByte(nrow);
+        }
+
+        public ImageLine ReadRowInt(int nrow) {
+            if (imgLine == null)
+                imgLine = new ImageLine(ImgInfo, ImageLine.ESampleType.INT, unpackedMode);
+            if (imgLine.Rown == nrow) // already read
+                return imgLine;
+            ReadRowInt(imgLine.Scanline, nrow);
             imgLine.FilterUsed = (FilterType)rowbfilter[0];
-            imgLine.SetRown(nrow);
+            imgLine.Rown = nrow;
             return imgLine;
         }
 
+        public ImageLine ReadRowByte(int nrow) {
+            if (imgLine == null)
+                imgLine = new ImageLine(ImgInfo, ImageLine.ESampleType.BYTE, unpackedMode);
+            if (imgLine.Rown == nrow) // already read
+                return imgLine;
+            ReadRowByte(imgLine.ScanlineB, nrow);
+            imgLine.FilterUsed = (FilterType)rowbfilter[0];
+            imgLine.Rown = nrow;
+            return imgLine;
+        }
+
+        public int[] ReadRow(int[] buffer, int nrow) {
+            return ReadRowInt(buffer, nrow);
+        }
+
+        public int[] ReadRowInt(int[] buffer, int nrow) {
+            if (buffer == null)
+                buffer = new int[unpackedMode ? ImgInfo.SamplesPerRow : ImgInfo.SamplesPerRowPacked];
+            if (!interlaced) {
+                if (nrow <= rowNum)
+                    throw new PngjInputException("rows must be read in increasing order: " + nrow);
+                int bytesread = 0;
+                while (rowNum < nrow)
+                    bytesread = ReadRowRaw(rowNum + 1); // read rows, perhaps skipping if necessary
+                decodeLastReadRowToInt(buffer, bytesread);
+            } else { // interlaced
+                if (deinterlacer.getImageInt() == null)
+                    deinterlacer.setImageInt(ReadRowsInt().Scanlines); // read all image and store it in deinterlacer
+                Array.Copy(deinterlacer.getImageInt()[nrow], 0, buffer, 0, unpackedMode ? ImgInfo.SamplesPerRow
+                        : ImgInfo.SamplesPerRowPacked);
+            }
+            return buffer;
+        }
+
+        public byte[] ReadRowByte(byte[] buffer, int nrow) {
+            if (buffer == null)
+                buffer = new byte[unpackedMode ? ImgInfo.SamplesPerRow : ImgInfo.SamplesPerRowPacked];
+            if (!interlaced) {
+                if (nrow <= rowNum)
+                    throw new PngjInputException("rows must be read in increasing order: " + nrow);
+                int bytesread = 0;
+                while (rowNum < nrow)
+                    bytesread = ReadRowRaw(rowNum + 1); // read rows, perhaps skipping if necessary
+                decodeLastReadRowToByte(buffer, bytesread);
+            } else { // interlaced
+                if (deinterlacer.getImageByte() == null)
+                    deinterlacer.setImageByte(ReadRowsByte().ScanlinesB); // read all image and store it in deinterlacer
+                Array.Copy(deinterlacer.getImageByte()[nrow], 0, buffer, 0, unpackedMode ? ImgInfo.SamplesPerRow
+                        : ImgInfo.SamplesPerRowPacked);
+            }
+            return buffer;
+        }
+
         /// <summary>
-        /// Like readRow(int nrow) but this accepts non consecutive rows.
-        /// </summary>
-        /// <remarks>If it's the current row, it will just return it. Elsewhere, it will try to read it.
-        /// This implementation only accepts  nrow greater or equal than current row, but
-        /// an extended class could implement some partial or full cache of lines.
         /// 
-        /// This should not  not be mixed with calls to readRow(int[] buffer, final int nrow)
-        /// </remarks>
+        /// </summary>
         /// <param name="nrow"></param>
         /// <returns></returns>
+        [Obsolete("GetRow is deprecated,  use ReadRow/ReadRowInt/ReadRowByte instead.")]
         public ImageLine GetRow(int nrow) {
-            while (rowNum < nrow) ReadRow(rowNum + 1);
-            // now it should be positioned in the desired row
-            if (rowNum != nrow || imgLine.GetRown() != nrow)
-                throw new PngjInputException("Invalid row: " + nrow);
-            return imgLine;
+            return ReadRow(nrow);
         }
 
-        /// <summary>
-        /// Reads a line and returns it as a int array 
-        /// </summary>
-        /// <remarks>See also the other
-        /// overloaded method</remarks>
-        /// <param name="buffer">Buffer can be prealocated (in
-        /// this case it must have enough len!) or can be null</param>
-        /// <param name="nrow">number of row, as check</param>
-        /// <returns>The same buffer if it was allocated, a newly allocated one
-        /// otherwise</returns>
-        public int[] ReadRow(int[] buffer, int nrow) {
-            if (nrow < 0 || nrow >= ImgInfo.Rows)
-                throw new PngjInputException("invalid line");
-            if (nrow != rowNum + 1)
-                throw new PngjInputException("invalid line (expected: " + (rowNum + 1));
+        private void decodeLastReadRowToInt(int[] buffer, int bytesRead) {            // see http://www.libpng.org/pub/png/spec/1.2/PNG-DataRep.html
+            if (ImgInfo.BitDepth <= 8) {
+                for (int i = 0, j = 1; i < bytesRead; i++)
+                    buffer[i] = (rowb[j++]);
+            } else { // 16 bitspc
+                for (int i = 0, j = 1; j < bytesRead; i++)
+                    buffer[i] = (rowb[j++] << 8) + rowb[j++];
+            }
+            if (ImgInfo.Packed && unpackedMode)
+                ImageLine.unpackInplaceInt(ImgInfo, buffer, buffer, false);
+        }
+
+        private void decodeLastReadRowToByte(byte[] buffer, int bytesRead) {            // see http://www.libpng.org/pub/png/spec/1.2/PNG-DataRep.html
+            if (ImgInfo.BitDepth <= 8) {
+                Array.Copy(rowb, 1, buffer, 0, bytesRead);
+            } else { // 16 bitspc
+                for (int i = 0, j = 1; j < bytesRead; i++, j += 2)
+                    buffer[i] = rowb[j]; // 16 bits in 1 byte: this discards the LSB!!!
+            }
+            if (ImgInfo.Packed && unpackedMode)
+                ImageLine.unpackInplaceByte(ImgInfo, buffer, buffer, false);
+        }
+
+
+        public ImageLines ReadRowsInt(int rowOffset, int nRows, int rowStep) {
+            if (nRows < 0)
+                nRows = (ImgInfo.Rows - rowOffset) / rowStep;
+            if (rowStep < 1 || rowOffset < 0 || nRows * rowStep + rowOffset > ImgInfo.Rows)
+                throw new PngjInputException("bad args");
+            ImageLines imlines = new ImageLines(ImgInfo, ImageLine.ESampleType.INT, unpackedMode, rowOffset, nRows, rowStep);
+            if (!interlaced) {
+                for (int j = 0; j < ImgInfo.Rows; j++) {
+                    int bytesread = ReadRowRaw(j); // read and perhaps discards
+                    int mrow = imlines.ImageRowToMatrixRowStrict(j);
+                    if (mrow >= 0)
+                        decodeLastReadRowToInt(imlines.Scanlines[mrow], bytesread);
+                }
+            } else { // and now, for something completely different (interlaced)
+                int[] buf = new int[unpackedMode ? ImgInfo.SamplesPerRow : ImgInfo.SamplesPerRowPacked];
+                for (int p = 1; p <= 7; p++) {
+                    deinterlacer.setPass(p);
+                    for (int i = 0; i < deinterlacer.getRows(); i++) {
+                        int bytesread = ReadRowRaw(i);
+                        int j = deinterlacer.getCurrRowReal();
+                        int mrow = imlines.ImageRowToMatrixRowStrict(j);
+                        if (mrow >= 0) {
+                            decodeLastReadRowToInt(buf, bytesread);
+                            deinterlacer.deinterlaceInt(buf, imlines.Scanlines[mrow], !unpackedMode);
+                        }
+                    }
+                }
+            }
+            End();
+            return imlines;
+        }
+
+        public ImageLines ReadRowsInt() {
+            return ReadRowsInt(0, ImgInfo.Rows, 1);
+        }
+
+        public ImageLines ReadRowsByte(int rowOffset, int nRows, int rowStep) {
+            if (nRows < 0)
+                nRows = (ImgInfo.Rows - rowOffset) / rowStep;
+            if (rowStep < 1 || rowOffset < 0 || nRows * rowStep + rowOffset > ImgInfo.Rows)
+                throw new PngjInputException("bad args");
+            ImageLines imlines = new ImageLines(ImgInfo, ImageLine.ESampleType.BYTE, unpackedMode, rowOffset, nRows, rowStep);
+            if (!interlaced) {
+                for (int j = 0; j < ImgInfo.Rows; j++) {
+                    int bytesread = ReadRowRaw(j); // read and perhaps discards
+                    int mrow = imlines.ImageRowToMatrixRowStrict(j);
+                    if (mrow >= 0)
+                        decodeLastReadRowToByte(imlines.ScanlinesB[mrow], bytesread);
+                }
+            } else { // and now, for something completely different (interlaced)
+                byte[] buf = new byte[unpackedMode ? ImgInfo.SamplesPerRow : ImgInfo.SamplesPerRowPacked];
+                for (int p = 1; p <= 7; p++) {
+                    deinterlacer.setPass(p);
+                    for (int i = 0; i < deinterlacer.getRows(); i++) {
+                        int bytesread = ReadRowRaw(i);
+                        int j = deinterlacer.getCurrRowReal();
+                        int mrow = imlines.ImageRowToMatrixRowStrict(j);
+                        if (mrow >= 0) {
+                            decodeLastReadRowToByte(buf, bytesread);
+                            deinterlacer.deinterlaceByte(buf, imlines.ScanlinesB[mrow], !unpackedMode);
+                        }
+                    }
+                }
+            }
+            End();
+            return imlines;
+        }
+
+        public ImageLines ReadRowsByte() {
+            return ReadRowsByte(0, ImgInfo.Rows, 1);
+        }
+
+        private int ReadRowRaw(int nrow) {
+            //
             if (nrow == 0 && FirstChunksNotYetRead())
                 ReadFirstChunks();
-            rowNum++;
-            if (buffer == null || buffer.Length < ImgInfo.SamplesPerRowP)
-                buffer = new int[ImgInfo.SamplesPerRowP];
+            if (nrow == 0 && interlaced)
+                Array.Clear(rowb, 0, rowb.Length); // new subimage: reset filters: this is enough, see the swap that happens lines
+            // below
+            int bytesRead = ImgInfo.BytesPerRow; // NOT including the filter byte
+            if (interlaced) {
+                if (nrow < 0 || nrow > deinterlacer.getRows() || (nrow != 0 && nrow != deinterlacer.getCurrRowSubimg() + 1))
+                    throw new PngjInputException("invalid row in interlaced mode: " + nrow);
+                deinterlacer.setRow(nrow);
+                bytesRead = (ImgInfo.BitspPixel * deinterlacer.getPixelsToRead() + 7) / 8;
+                if (bytesRead < 1)
+                    throw new PngjExceptionInternal("wtf??");
+            } else { // check for non interlaced
+                if (nrow < 0 || nrow >= ImgInfo.Rows || nrow != rowNum + 1)
+                    throw new PngjInputException("invalid row: " + nrow);
+            }
+            rowNum = nrow;
+            // swap buffers
             byte[] tmp = rowb;
             rowb = rowbprev;
             rowbprev = tmp;
             // loads in rowbfilter "raw" bytes, with filter
-            PngHelperInternal.ReadBytes(idatIstream, rowbfilter, 0, rowbfilter.Length);
-            // updates and checks offset
+            PngHelperInternal.ReadBytes(idatIstream, rowbfilter, 0, bytesRead + 1);
             offset = iIdatCstream.GetOffset();
-            if ((MaxTotalBytesRead >0 && offset >= MaxTotalBytesRead) || offset < 0)
+            if (offset < 0)
+                throw new PngjExceptionInternal("bad offset ??" + offset);
+            if (MaxTotalBytesRead > 0 && offset >= MaxTotalBytesRead)
                 throw new PngjInputException("Reading IDAT: Maximum total bytes to read exceeeded: " + MaxTotalBytesRead
                         + " offset:" + offset);
             rowb[0] = 0;
-            UnfilterRow();
+            UnfilterRow(bytesRead);
             rowb[0] = rowbfilter[0];
-            ConvertRowFromBytes(buffer);
-            // new: if last row, automatically call ReadLastAndClose()
-            if (nrow == ImgInfo.Rows - 1)
+            if ((rowNum == ImgInfo.Rows - 1 && !interlaced) || (interlaced && deinterlacer.isAtLastRow()))
                 ReadLastAndClose();
-            return buffer;
+            return bytesRead;
+        }
+
+        public void ReadSkippingAllRows() {
+            if (FirstChunksNotYetRead())
+                ReadFirstChunks();
+            // we read directly from the compressed stream, we dont decompress nor chec CRC
+            iIdatCstream.DisableCrcCheck();
+            try {
+                int r;
+                do {
+                    r = iIdatCstream.Read(rowbfilter, 0, rowbfilter.Length);
+                } while (r >= 0);
+            } catch (IOException e) {
+                throw new PngjInputException("error in raw read of IDAT", e);
+            }
+            offset = iIdatCstream.GetOffset();
+            if (offset < 0)
+                throw new PngjExceptionInternal("bad offset ??" + offset);
+            if (MaxTotalBytesRead > 0 && offset >= MaxTotalBytesRead)
+                throw new PngjInputException("Reading IDAT: Maximum total bytes to read exceeeded: " + MaxTotalBytesRead
+                        + " offset:" + offset);
+            ReadLastAndClose();
         }
 
 
@@ -559,15 +737,31 @@ namespace Hjg.Pngcs {
                 Close();
         }
 
-        /// <summary>
-        /// for debug 
-        /// </summary>
-        ///
-        public static void ShowLineInfo(ImageLine line) {
-            System.Console.Out.WriteLine(line);
-            Hjg.Pngcs.ImageLineHelper.ImageLineStats stats = new ImageLineHelper.ImageLineStats(line);
-            System.Console.Out.WriteLine(stats);
-            System.Console.Out.WriteLine(Hjg.Pngcs.ImageLineHelper.InfoFirstLastPixels(line));
+        public bool IsInterlaced() {
+            return interlaced;
+        }
+
+        public void SetUnpackedMode(bool unPackedMode) {
+            this.unpackedMode = unPackedMode;
+        }
+
+        /**
+         * @see PngReader#setUnpackedMode(boolean)
+         */
+        public bool IsUnpackedMode() {
+            return unpackedMode;
+        }
+
+        public void SetCrcCheckDisabled() {
+            crcEnabled = false;
+        }
+
+        internal long GetCrctestVal() {
+            return crctest.Value;
+        }
+
+        internal void InitCrctest() {
+            this.crctest = new Crc32();
         }
 
     }

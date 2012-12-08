@@ -23,8 +23,8 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override ChunkRaw CreateRawChunk() {
-            if (val.Length == 0 || key.Length == 0)
-                return null;
+            if (key.Length == 0)
+                throw new PngjException("Text chunk key must be non empty");
             MemoryStream ba = new MemoryStream();
             ChunkHelper.WriteBytesToStream(ba, ChunkHelper.ToBytes(key));
             ba.WriteByte(0); // separator

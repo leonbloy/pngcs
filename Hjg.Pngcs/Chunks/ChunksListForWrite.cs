@@ -89,7 +89,7 @@ namespace Hjg.Pngcs.Chunks {
         public bool RemoveChunk(PngChunk c) {
             return queuedChunks.Remove(c);
         }
-        
+
         /// <summary>
         /// Adds chunk to queue
         /// </summary>
@@ -108,7 +108,7 @@ namespace Hjg.Pngcs.Chunks {
             if (currentGroup == CHUNK_GROUP_2_PLTE)
                 return c.Id.Equals(ChunkHelper.PLTE);
             if (currentGroup % 2 == 0)
-                throw new PngjException("?");
+                throw new PngjOutputException("bad chunk group?");
             int minChunkGroup, maxChunkGroup;
             if (c.mustGoBeforePLTE())
                 minChunkGroup = maxChunkGroup = ChunksList.CHUNK_GROUP_1_AFTERIDHR;

@@ -13,14 +13,14 @@ namespace Hjg.Pngcs.Chunks {
     /// </summary>
     public class PngChunkZTXT : PngChunkTextVar {
         public const String ID = ChunkHelper.zTXt;
-        
+
         public PngChunkZTXT(ImageInfo info)
             : base(ID, info) {
         }
 
         public override ChunkRaw CreateRawChunk() {
-            if (val.Length == 0 || key.Length == 0)
-                return null;
+            if (key.Length == 0)
+                throw new PngjException("Text chunk key must be non empty");
             MemoryStream ba = new MemoryStream();
             ChunkHelper.WriteBytesToStream(ba, ChunkHelper.ToBytes(key));
             ba.WriteByte(0); // separator

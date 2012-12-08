@@ -20,7 +20,7 @@ namespace Hjg.Pngcs {
         private int discoverEachLines = -1;
         private double[] histogram1 = new double[256];
 
-        public FilterWriteStrategy(ImageInfo imgInfo, FilterType configuredType) {
+        internal FilterWriteStrategy(ImageInfo imgInfo, FilterType configuredType) {
             this.imgInfo = imgInfo;
             this.configuredType = configuredType;
             if (configuredType < 0) { // first guess
@@ -38,7 +38,7 @@ namespace Hjg.Pngcs {
                 discoverEachLines = 1;
         }
 
-        public bool shouldTestAll(int rown) {
+        internal bool shouldTestAll(int rown) {
             if (discoverEachLines > 0 && lastRowTested + discoverEachLines <= rown) {
                 currentType = FilterType.FILTER_UNKNOWN;
                 return true;
@@ -46,15 +46,15 @@ namespace Hjg.Pngcs {
                 return false;
         }
 
-        public void setPreference(double none, double sub, double up, double ave, double paeth) {
+        internal void setPreference(double none, double sub, double up, double ave, double paeth) {
             preference = new double[] { none, sub, up, ave, paeth };
         }
 
-        public bool computesStatistics() {
+        internal bool computesStatistics() {
             return (discoverEachLines > 0);
         }
 
-        public void fillResultsForFilter(int rown, FilterType type, double sum, int[] histo, bool tentative) {
+        internal void fillResultsForFilter(int rown, FilterType type, double sum, int[] histo, bool tentative) {
             lastRowTested = rown;
             lastSums[(int)type] = sum;
             if (histo != null) {
@@ -74,7 +74,7 @@ namespace Hjg.Pngcs {
             }
         }
 
-        public FilterType gimmeFilterType(int rown, bool useEntropy) {
+        internal FilterType gimmeFilterType(int rown, bool useEntropy) {
             if (currentType == FilterType.FILTER_UNKNOWN) { // get better
                 if (rown == 0)
                     currentType = FilterType.FILTER_SUB;

@@ -5,7 +5,7 @@ using System.IO;
 using Hjg.Pngcs;
 using Hjg.Pngcs.Chunks;
 
-namespace SampleCreateOrangeGradient {
+namespace SamplesTests {
     /// <summary>
     /// Example: Creates an orage/pink gradient image
     /// 
@@ -13,7 +13,7 @@ namespace SampleCreateOrangeGradient {
     /// 
     /// To examine them: http://entropymine.com/jason/tweakpng/
     /// </summary>
-    class CreateOrange {
+    class SampleCreateOrange {
 
         public static void Create(string filename, int cols, int rows) {
             ImageInfo imi = new ImageInfo(cols, rows, 8, false); // 8 bits per channel, no alpha 
@@ -30,7 +30,7 @@ namespace SampleCreateOrangeGradient {
                 int r = 255;
                 int g = 127;
                 int b = 255 * col / imi.Cols;
-                ImageLineHelper.SetPixel(iline, col, r, g, b); // orange-ish gradient
+                ImageLineHelper.SetPixel(iline , col, r, g, b); // orange-ish gradient
             }
             for (int row = 0; row < png.ImgInfo.Rows; row++) {
                 png.WriteRow(iline, row);

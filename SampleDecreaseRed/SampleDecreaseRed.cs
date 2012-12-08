@@ -5,7 +5,7 @@ using Hjg.Pngcs;
 using Hjg.Pngcs.Chunks;
 
 namespace SampleDecreaseRed {
-    class Program {
+    class SampleDecreaseRed {
         static void Main(string[] args) {
             DecreaseRed("C:/temp/test.png", "C:/temp/test2.png");
         }

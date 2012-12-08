@@ -16,6 +16,8 @@ namespace Hjg.Pngcs {
     /// http://www.w3.org/TR/PNG/#11IHDR
     /// </remarks>
     public class ImageInfo {
+        private const int MAX_COLS_ROWS_VAL = 400000; // very big value, but no so ridiculous as 2^32
+
         /// <summary>
         /// Image width, in pixels
         /// </summary>
@@ -78,7 +80,7 @@ namespace Hjg.Pngcs {
         /// Equals samplesPerRow if not packed. Elsewhere, it's lower
         /// For internal use, mostly.
         /// </remarks>
-        public readonly int SamplesPerRowP;
+        public readonly int SamplesPerRowPacked;
         /// <summary>
         /// flag: has alpha channel
         /// </summary>
@@ -96,7 +98,6 @@ namespace Hjg.Pngcs {
         /// </summary>
         public readonly bool Packed;
 
-        private const int MAX_COLS_ROWS_VAL = 400000; // very big value
 
         /// <summary>
         /// Simple constructor: only for RGB/RGBA
@@ -131,7 +132,7 @@ namespace Hjg.Pngcs {
             this.BytesPixel = (BitspPixel + 7) / 8;
             this.BytesPerRow = (BitspPixel * cols + 7) / 8;
             this.SamplesPerRow = Channels * this.Cols;
-            this.SamplesPerRowP = (Packed) ? BytesPerRow : SamplesPerRow;
+            this.SamplesPerRowPacked = (Packed) ? BytesPerRow : SamplesPerRow;
             // checks
             switch (this.BitDepth) {
                 case 1:
@@ -164,7 +165,7 @@ namespace Hjg.Pngcs {
             return "ImageInfo [cols=" + Cols + ", rows=" + Rows + ", bitDepth=" + BitDepth
                     + ", channels=" + Channels + ", bitspPixel=" + BitspPixel + ", bytesPixel="
                     + BytesPixel + ", bytesPerRow=" + BytesPerRow + ", samplesPerRow="
-                    + SamplesPerRow + ", samplesPerRowP=" + SamplesPerRowP + ", alpha=" + Alpha
+                    + SamplesPerRow + ", samplesPerRowP=" + SamplesPerRowPacked + ", alpha=" + Alpha
                     + ", greyscale=" + Greyscale + ", indexed=" + Indexed + ", packed=" + Packed
                     + "]";
         }
@@ -174,16 +175,11 @@ namespace Hjg.Pngcs {
             int result = 1;
             result = prime * result + ((Alpha) ? 1231 : 1237);
             result = prime * result + BitDepth;
-            result = prime * result + BitspPixel;
-            result = prime * result + BytesPerRow;
-            result = prime * result + BytesPixel;
             result = prime * result + Channels;
             result = prime * result + Cols;
             result = prime * result + ((Greyscale) ? 1231 : 1237);
             result = prime * result + ((Indexed) ? 1231 : 1237);
-            result = prime * result + ((Packed) ? 1231 : 1237);
             result = prime * result + Rows;
-            result = prime * result + SamplesPerRow;
             return result;
         }
 
@@ -199,12 +195,6 @@ namespace Hjg.Pngcs {
                 return false;
             if (BitDepth != other.BitDepth)
                 return false;
-            if (BitspPixel != other.BitspPixel)
-                return false;
-            if (BytesPerRow != other.BytesPerRow)
-                return false;
-            if (BytesPixel != other.BytesPixel)
-                return false;
             if (Channels != other.Channels)
                 return false;
             if (Cols != other.Cols)
@@ -213,11 +203,7 @@ namespace Hjg.Pngcs {
                 return false;
             if (Indexed != other.Indexed)
                 return false;
-            if (Packed != other.Packed)
-                return false;
             if (Rows != other.Rows)
-                return false;
-            if (SamplesPerRow != other.SamplesPerRow)
                 return false;
             return true;
         }

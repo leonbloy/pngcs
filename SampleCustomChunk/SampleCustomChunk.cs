@@ -9,8 +9,8 @@ using System.IO;
 /**
  * This example shows how to register a custom chunk.
  */
-namespace SampleCustomChunk {
-    class Program {
+namespace TestsSamples {
+    class SampleCustomChunk  {
 
         static void testWrite(string src, string target) {
             // for writing is not necesary to register

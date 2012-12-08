@@ -7,7 +7,6 @@ namespace Hjg.Pngcs {
     using System.IO;
     using System.Runtime.CompilerServices;
     using ICSharpCode.SharpZipLib.Checksums;
-
     /// <summary>
     /// Reads IDAT chunks
     /// </summary>
@@ -15,6 +14,7 @@ namespace Hjg.Pngcs {
     internal class PngIDatChunkInputStream : Stream {
         private readonly Stream inputStream;
         private readonly Crc32 crcEngine;
+        private bool checkCrc;
         private int lenLastChunk;
         private byte[] idLastChunk;
         private int toReadThisChunk;
@@ -25,7 +25,6 @@ namespace Hjg.Pngcs {
         public class IdatChunkInfo {
             public readonly int len;
             public readonly long offset;
-
             public IdatChunkInfo(int len_0, long offset_1) {
                 this.len = len_0;
                 this.offset = offset_1;
@@ -55,6 +54,7 @@ namespace Hjg.Pngcs {
             this.ended = false;
             this.foundChunksInfo = new List<IdatChunkInfo>();
             this.offset = offset_0;
+            checkCrc = true;
             inputStream = iStream;
             crcEngine = new Crc32();
             this.lenLastChunk = lenFirstChunk;
@@ -84,10 +84,12 @@ namespace Hjg.Pngcs {
             do {
                 int crc = Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream); //
                 offset += 4;
-                int crccalc = (int)crcEngine.Value;
-                if (lenLastChunk > 0 && crc != crccalc)
-                    throw new PngjBadCrcException("error reading idat; offset: " + offset);
-                crcEngine.Reset();
+                if (checkCrc) {
+                    int crccalc = (int)crcEngine.Value;
+                    if (lenLastChunk > 0 && crc != crccalc)
+                        throw new PngjBadCrcException("error reading idat; offset: " + offset);
+                    crcEngine.Reset();
+                }
                 lenLastChunk = Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream);
                 if (lenLastChunk < 0)
                     throw new PngjInputException("invalid len for chunk: " + lenLastChunk);
@@ -98,7 +100,8 @@ namespace Hjg.Pngcs {
                 ended = !PngCsUtils.arraysEqual4(idLastChunk, Hjg.Pngcs.Chunks.ChunkHelper.b_IDAT);
                 if (!ended) {
                     foundChunksInfo.Add(new PngIDatChunkInputStream.IdatChunkInfo(lenLastChunk, (offset - 8)));
-                    crcEngine.Update(idLastChunk, 0, 4);
+                    if (checkCrc)
+                        crcEngine.Update(idLastChunk, 0, 4);
                 }
                 // PngHelper.logdebug("IDAT ended. next len= " + lenLastChunk + " idat?" +
                 // (!ended));
@@ -115,7 +118,8 @@ namespace Hjg.Pngcs {
             if (!ended) {
                 byte[] dummy = new byte[toReadThisChunk];
                 Hjg.Pngcs.PngHelperInternal.ReadBytes(inputStream, dummy, 0, toReadThisChunk);
-                crcEngine.Update(dummy, 0, toReadThisChunk);
+                if (checkCrc)
+                    crcEngine.Update(dummy, 0, toReadThisChunk);
                 EndChunkGoForNext();
             }
         }
@@ -126,12 +130,14 @@ namespace Hjg.Pngcs {
         /// </summary>
         ///
         public override int Read(byte[] b, int off, int len_0) {
-            if (ended) return -1;
+            if (ended)
+                return -1; // can happen only when raw reading, see Pngreader.readAndSkipsAllRows()
             if (toReadThisChunk == 0) throw new Exception("this should not happen");
             int n = inputStream.Read(b, off, (len_0 >= toReadThisChunk) ? toReadThisChunk : len_0);
             if (n == -1) n = -2;
             if (n > 0) {
-                crcEngine.Update(b, off, n);
+                if (checkCrc)
+                    crcEngine.Update(b, off, n);
                 this.offset += n;
                 toReadThisChunk -= n;
             }
@@ -169,5 +175,11 @@ namespace Hjg.Pngcs {
             return ended;
         }
 
+        /// <summary>
+        /// Disables CRC checking. This can make reading faster
+        /// </summary>
+        internal void DisableCrcCheck() {
+            checkCrc = false;
+        }
     }
 }

@@ -10,8 +10,9 @@ namespace PngShowChunks
         {
 
             String file1 = args[0];
-            SampleShowChunks.showChunks(file1);
             Console.Out.WriteLine("processing " + file1);
+            SampleShowChunks.showChunks(file1);
+            Console.In.ReadLine();
 
         }
     }

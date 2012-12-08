@@ -183,7 +183,7 @@ namespace Hjg.Pngcs.Chunks {
             try {
                 MemoryStream inb = new MemoryStream(ori, offset, len);
                 Stream inx = inb;
-                if (compress) inx = new InflaterInputStream(inb);
+                if (! compress) inx = new InflaterInputStream(inb);
                 MemoryStream outb = new MemoryStream();
                 Stream outx = outb;
                 if (compress) outx = new DeflaterOutputStream(outb);
@@ -279,6 +279,9 @@ namespace Hjg.Pngcs.Chunks {
             return false;
         }
 
+	public static bool IsText(PngChunk c) {
+		return c is PngChunkTextVar;
+	}
 
     }
 }

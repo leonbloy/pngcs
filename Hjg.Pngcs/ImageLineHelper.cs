@@ -12,202 +12,206 @@ namespace Hjg.Pngcs {
     /// Bunch of utility static methods to process/analyze an image line. 
     /// 
     /// Not essential at all, some methods are probably to be removed if future releases.
+    /// 
+    /// TODO: document this better
+    /// 
     /// </summary>
     ///
     public class ImageLineHelper {
-        private const double BIG_VALUE = System.Double.MaxValue * 0.5d;
-        private const double BIG_VALUE_NEG = System.Double.MaxValue * (-0.5d);
 
         /// <summary>
         /// Given an indexed line with a palette, unpacks as a RGB array
         /// </summary>
         /// <param name="line">ImageLine as returned from PngReader</param>
         /// <param name="pal">Palette chunk</param>
+        /// <param name="trns">TRNS chunk (optional)</param>
         /// <param name="buf">Preallocated array, optional</param>
         /// <returns>R G B (one byte per sample)</returns>
-        public int[] PalIdx2RGB(ImageLine line, PngChunkPLTE pal, int[] buf) {
-            // TODO: test! Add alpha palette info?
-            int nbytes = line.ImgInfo.Cols * 3;
-            if (buf == null || buf.Length < nbytes) buf = new int[nbytes];
-            int[] src; // from where to read the indexes as bytes
-            if (line.ImgInfo.Packed) { // requires unpacking
-                line.Unpack(buf, false); // use buf temporarily (have space)
-                src = buf;
-            } else {
-                src = line.Scanline;
-            }
-            for (int c = line.ImgInfo.Cols - 1; c >= 0; c--) {
-                // scan from right to left to not overwrite myself  
-                pal.GetEntryRgb(src[c], buf, c * 3);
+        public static int[] Palette2rgb(ImageLine line, PngChunkPLTE pal, PngChunkTRNS trns, int[] buf) {
+            bool isalpha = trns != null;
+            int channels = isalpha ? 4 : 3;
+            int nsamples = line.ImgInfo.Cols * channels;
+            if (buf == null || buf.Length < nsamples)
+                buf = new int[nsamples];
+            if (!line.SamplesUnpacked)
+                line = line.unpackToNewImageLine();
+            bool isbyte = line.SampleType == Hjg.Pngcs.ImageLine.ESampleType.BYTE;
+            int nindexesWithAlpha = trns != null ? trns.GetPalletteAlpha().Length : 0;
+            for (int c = 0; c < line.ImgInfo.Cols; c++) {
+                int index = isbyte ? (line.ScanlineB[c] & 0xFF) : line.Scanline[c];
+                pal.GetEntryRgb(index, buf, c * channels);
+                if (isalpha) {
+                    int alpha = index < nindexesWithAlpha ? trns.GetPalletteAlpha()[index] : 255;
+                    buf[c * channels + 3] = alpha;
+                }
             }
             return buf;
         }
 
-        /** what follows is pretty uninteresting/untested/obsolete, subject to change */
-        /// <summary>
-        /// Just for basic info or debugging. Shows values for first and last pixel.
-        /// Does not include alpha
-        /// </summary>
-        ///
-        public static String InfoFirstLastPixels(ImageLine line) {
-            return "not implemented";
-            //return (line.imgInfo.channels == 1) ? ILOG.J2CsMapping.Util.StringUtil.Format("first=(%d) last=(%d)",line.scanline[0],line.scanline[line.scanline.Length - 1]) : ILOG.J2CsMapping.Util.StringUtil.Format("first=(%d %d %d) last=(%d %d %d)",line.scanline[0],line.scanline[1],line.scanline[2],line.scanline[line.scanline.Length - line.imgInfo.channels],line.scanline[line.scanline.Length - line.imgInfo.channels + 1],line.scanline[line.scanline.Length - line.imgInfo.channels + 2]);
+        public static int[] Palette2rgb(ImageLine line, PngChunkPLTE pal, int[] buf) {
+            return Palette2rgb(line, pal, null, buf);
         }
 
-        public static String InfoFull(ImageLine line) {
-            ImageLineHelper.ImageLineStats stats = new ImageLineHelper.ImageLineStats(line);
-            return "row=" + line.GetRown() + " " + stats.ToString() + "\n  "
-                    + InfoFirstLastPixels(line);
-        }
-
-        /// <summary>
-        /// Computes some statistics for the line. Not very efficient or elegant,
-        /// mainly for tests. Only for RGB/RGBA Outputs values as doubles (0.0 - 1.0)
-        /// </summary>
-        ///
-        public class ImageLineStats {
-            public double[] prom; // channel averages
-            public double[] maxv; // maximo
-            public double[] minv;
-            public double promlum; // maximum global (luminance)
-            public double maxlum; // max luminance
-            public double minlum;
-            public double[] maxdif; // maxima
-            public readonly int channels; // diferencia
-
-            public override String ToString() {
-                return "not implemented !!!asdasd456y";
-                /*return (channels == 3) ? ILOG.J2CsMapping.Util.StringUtil.Format("prom=%.1f (%.1f %.1f %.1f) max=%.1f (%.1f %.1f %.1f) min=%.1f (%.1f %.1f %.1f)",promlum,prom[0],prom[1],prom[2],maxlum,maxv[0],maxv[1],maxv[2],minlum,minv[0],minv[1],minv[2])
-                        + ILOG.J2CsMapping.Util.StringUtil.Format(" maxdif=(%.1f %.1f %.1f)",maxdif[0],maxdif[1],maxdif[2])
-                        : ILOG.J2CsMapping.Util.StringUtil.Format("prom=%.1f (%.1f %.1f %.1f %.1f) max=%.1f (%.1f %.1f %.1f %.1f) min=%.1f (%.1f %.1f %.1f %.1f)",promlum,prom[0],prom[1],prom[2],prom[3],maxlum,maxv[0],maxv[1],maxv[2],maxv[3],minlum,minv[0],minv[1],minv[2],minv[3])
-                                + ILOG.J2CsMapping.Util.StringUtil.Format(" maxdif=(%.1f %.1f %.1f %.1f)",maxdif[0],maxdif[1],maxdif[2],maxdif[3]);
-                 */
-            }
-
-            public ImageLineStats(ImageLine line) {
-                this.prom = new double[] { 0.0d, 0.0d, 0.0d, 0.0d };
-                this.maxv = new double[] { Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG };
-                this.minv = new double[] { Hjg.Pngcs.ImageLineHelper.BIG_VALUE, Hjg.Pngcs.ImageLineHelper.BIG_VALUE, Hjg.Pngcs.ImageLineHelper.BIG_VALUE, Hjg.Pngcs.ImageLineHelper.BIG_VALUE };
-                this.promlum = 0.0d;
-                this.maxlum = Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG;
-                this.minlum = Hjg.Pngcs.ImageLineHelper.BIG_VALUE;
-                this.maxdif = new double[] { Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE_NEG, Hjg.Pngcs.ImageLineHelper.BIG_VALUE };
-                this.channels = line.channels;
-                if (line.channels < 3)
-                    throw new PngjException("ImageLineStats only works for RGB - RGBA");
-                int ch = 0;
-                double lum, x, d;
-                for (int i = 0; i < line.ImgInfo.Cols; i++) {
-                    lum = 0;
-                    for (ch = channels - 1; ch >= 0; ch--) {
-                        x = Hjg.Pngcs.ImageLineHelper.Int2double(line, line.Scanline[i * channels]);
-                        if (ch < 3)
-                            lum += x;
-                        prom[ch] += x;
-                        if (x > maxv[ch])
-                            maxv[ch] = x;
-                        if (x < minv[ch])
-                            minv[ch] = x;
-                        if (i >= channels) {
-                            d = Math.Abs(x - Hjg.Pngcs.ImageLineHelper.Int2double(line, line.Scanline[i - channels]));
-                            if (d > maxdif[ch])
-                                maxdif[ch] = d;
-                        }
-                    }
-                    promlum += lum;
-                    if (lum > maxlum)
-                        maxlum = lum;
-                    if (lum < minlum)
-                        minlum = lum;
-                }
-                for (ch = 0; ch < channels; ch++) {
-                    prom[ch] /= line.ImgInfo.Cols;
-                }
-                promlum /= (line.ImgInfo.Cols * 3.0d);
-                maxlum /= 3.0d;
-                minlum /= 3.0d;
+        public static int ToARGB8(int r, int g, int b) {
+            unchecked {
+                return ((int)(0xFF000000)) | ((r ) << 16) | ((g ) << 8) | (b );
             }
         }
 
-        /// <summary>
-        /// integer packed R G B only for bitdepth=8! (does not check!)
-        /// </summary>
-        ///
-        public static int GetPixelRGB8(ImageLine line, int column) {
-            int offset = column * line.channels;
-            return (line.Scanline[offset] << 16) + (line.Scanline[offset + 1] << 8)
-                    + (line.Scanline[offset + 2]);
+        public static int ToARGB8(int r, int g, int b, int a) {
+            return ((a ) << 24) | ((r ) << 16) | ((g ) << 8) | (b );
         }
 
-        public static int GetPixelARGB8(ImageLine line, int column) {
-            int offset = column * line.channels;
-            return (line.Scanline[offset + 3] << 24) + (line.Scanline[offset] << 16)
-                    + (line.Scanline[offset + 1] << 8) + (line.Scanline[offset + 2]);
+        public static int ToARGB8(int[] buff, int offset, bool alpha) {
+            return alpha ? ToARGB8(buff[offset++], buff[offset++], buff[offset]) : ToARGB8(buff[offset++], buff[offset++],
+                    buff[offset++], buff[offset]);
         }
 
-        public static void SetPixelsRGB8(ImageLine line, int[] rgb) {
-            for (int i = 0,j=0; i < line.ImgInfo.Cols; i++) {
-                line.Scanline[j++] = ((rgb[i] >> 16) & 0xFF);
-                line.Scanline[j++] = ((rgb[i] >> 8) & 0xFF);
-                line.Scanline[j++] = ((rgb[i] & 0xFF));
+        public static int ToARGB8(byte[] buff, int offset, bool alpha) {
+            return alpha ? ToARGB8(buff[offset++], buff[offset++], buff[offset]) : ToARGB8(buff[offset++], buff[offset++],
+                    buff[offset++], buff[offset]);
+        }
+
+        public static void FromARGB8(int val, int[] buff, int offset, bool alpha) {
+            buff[offset++] = ((val >> 16) & 0xFF);
+            buff[offset++] = ((val >> 8) & 0xFF);
+            buff[offset] = (val & 0xFF);
+            if (alpha)
+                buff[offset + 1] = ((val >> 24) & 0xFF);
+        }
+
+        public static void FromARGB8(int val, byte[] buff, int offset, bool alpha) {
+            buff[offset++] = (byte)((val >> 16) & 0xFF);
+            buff[offset++] = (byte)((val >> 8) & 0xFF);
+            buff[offset] = (byte)(val & 0xFF);
+            if (alpha)
+                buff[offset + 1] = (byte)((val >> 24) & 0xFF);
+        }
+
+        public static int GetPixelToARGB8(ImageLine line, int column) {
+            if (line.IsInt())
+                return ToARGB8(line.Scanline, column * line.channels, line.ImgInfo.Alpha);
+            else
+                return ToARGB8(line.ScanlineB, column * line.channels, line.ImgInfo.Alpha);
+        }
+
+        public static void SetPixelFromARGB8(ImageLine line, int column, int argb) {
+            if (line.IsInt())
+                FromARGB8(argb, line.Scanline, column * line.channels, line.ImgInfo.Alpha);
+            else
+                FromARGB8(argb, line.ScanlineB, column * line.channels, line.ImgInfo.Alpha);
+        }
+
+        public static void SetPixel(ImageLine line, int col, int r, int g, int b, int a) {
+            int offset = col * line.channels;
+            if (line.IsInt()) {
+                line.Scanline[offset++] = r;
+                line.Scanline[offset++] = g;
+                line.Scanline[offset] = b;
+                if (line.ImgInfo.Alpha)
+                    line.Scanline[offset + 1] = a;
+            } else {
+                line.ScanlineB[offset++] = (byte)r;
+                line.ScanlineB[offset++] = (byte)g;
+                line.ScanlineB[offset] = (byte)b;
+                if (line.ImgInfo.Alpha)
+                    line.ScanlineB[offset + 1] = (byte)a;
             }
         }
 
-        public static void SetPixelRGB8(ImageLine line, int col, int rgb) {
-           SetPixelRGB8(line, col, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
-	    }
-
-        public static void SetPixelRGB8(ImageLine line, int col, int r, int g, int b) {
-            col *= line.channels;
-            line.Scanline[col++] = r;
-            line.Scanline[col++] = g;
-            line.Scanline[col++] = b;
+        public static void SetPixel(ImageLine line, int col, int r, int g, int b) {
+            SetPixel(line, col, r, g, b, line.maxSampleVal);
         }
 
-        public static void SetPixelsRGBA8(ImageLine line, int[] rgb) {
-            for (int i = 0, j = 0; i < line.ImgInfo.Cols; i++) {
-                line.Scanline[j++] = ((rgb[i] >> 16) & 0xFF);
-                line.Scanline[j++] = ((rgb[i] >> 8) & 0xFF);
-                line.Scanline[j++] = ((rgb[i] & 0xFF));
-                line.Scanline[j++] = ((rgb[i] >> 24) & 0xFF);
-            }
+        public static double ReadDouble(ImageLine line, int pos) {
+            if (line.IsInt())
+                return line.Scanline[pos] / (line.maxSampleVal + 0.9);
+            else
+                return (line.ScanlineB[pos]) / (line.maxSampleVal + 0.9);
         }
 
-        public static void SetPixelRGBA8(ImageLine line, int col, int rgb) {
-            SetPixelRGBA8(line, col, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, (rgb >> 24) & 0xFF);
+        public static void WriteDouble(ImageLine line, double d, int pos) {
+            if (line.IsInt())
+                line.Scanline[pos] = (int)(d * (line.maxSampleVal + 0.99));
+            else
+                line.ScanlineB[pos] = (byte)(d * (line.maxSampleVal + 0.99));
         }
 
-        public static void SetPixelRGBA8(ImageLine line, int col, int r, int g, int b,int a) {
-            col *= line.channels;
-            line.Scanline[col++] = r;
-            line.Scanline[col++] = g;
-            line.Scanline[col++] = b;
-            line.Scanline[col++] = a;
+      
+
+        public static int Interpol(int a, int b, int c, int d, double dx, double dy) {
+            // a b -> x (0-1)
+            // c d
+            double e = a * (1.0 - dx) + b * dx;
+            double f = c * (1.0 - dx) + d * dx;
+            return (int)(e * (1 - dy) + f * dy + 0.5);
         }
 
-        public static void SetValD(ImageLine line, int i, double d) {
-            line.Scanline[i] = Double2int(line, d);
+
+        public static int ClampTo_0_255(int i) {
+            return i > 255 ? 255 : (i < 0 ? 0 : i);
         }
 
-        public static double Int2double(ImageLine line, int p) {
-            return (line.bitDepth == 16) ? p / 65535.0d : p / 255.0d;
-            // TODO: replace my multiplication? check for other bitdepths
+        /**
+         * [0,1)
+         */
+        public static double ClampDouble(double i) {
+            return i < 0 ? 0 : (i >= 1 ? 0.999999 : i);
         }
 
-        public static double Int2doubleClamped(ImageLine line, int p) {
-            // TODO: replace my multiplication?
-            double d = (line.bitDepth == 16) ? p / 65535.0d : p / 255.0d;
-            return (d <= 0.0d) ? (double)(0) : (double)((d >= 1.0d ? 1.0d : d));
+        public static int ClampTo_0_65535(int i) {
+            return i > 65535 ? 65535 : (i < 0 ? 0 : i);
         }
 
-        public static int Double2int(ImageLine line, double d) {
-            d = (d <= 0.0d) ? (double)(0) : (double)((d >= 1.0d ? 1.0d : d));
-            return (line.bitDepth == 16) ? (int)(d * 65535.0d + 0.5d) : (int)(d * 255.0d + 0.5d); //
+        public static int ClampTo_128_127(int x) {
+            return x > 127 ? 127 : (x < -128 ? -128 : x);
         }
 
-        public static int Double2intClamped(ImageLine line, double d) {
-            d = (d <= 0.0d) ? (double)(0) : (double)((d >= 1.0d ? 1.0d : d));
-            return (line.bitDepth == 16) ? (int)(d * 65535.0d + 0.5d) : (int)(d * 255.0d + 0.5d); //
+        public static int[] Unpack(ImageInfo imgInfo, int[] src, int[] dst, bool scale) {
+            int len1 = imgInfo.SamplesPerRow;
+            int len0 = imgInfo.SamplesPerRowPacked;
+            if (dst == null || dst.Length < len1)
+                dst = new int[len1];
+            if (imgInfo.Packed)
+                ImageLine.unpackInplaceInt(imgInfo, src, dst, scale);
+            else
+                Array.Copy(src, 0, dst, 0, len0);
+            return dst;
         }
+
+        public static byte[] Unpack(ImageInfo imgInfo, byte[] src, byte[] dst, bool scale) {
+            int len1 = imgInfo.SamplesPerRow;
+            int len0 = imgInfo.SamplesPerRowPacked;
+            if (dst == null || dst.Length < len1)
+                dst = new byte[len1];
+            if (imgInfo.Packed)
+                ImageLine.unpackInplaceByte(imgInfo, src, dst, scale);
+            else
+                Array.Copy(src, 0, dst, 0, len0);
+            return dst;
+        }
+
+        public static int[] Pack(ImageInfo imgInfo, int[] src, int[] dst, bool scale) {
+            int len0 = imgInfo.SamplesPerRowPacked;
+            if (dst == null || dst.Length < len0)
+                dst = new int[len0];
+            if (imgInfo.Packed)
+                ImageLine.packInplaceInt(imgInfo, src, dst, scale);
+            else
+                Array.Copy(src, 0, dst, 0, len0);
+            return dst;
+        }
+
+        public static byte[] Pack(ImageInfo imgInfo, byte[] src, byte[] dst, bool scale) {
+            int len0 = imgInfo.SamplesPerRowPacked;
+            if (dst == null || dst.Length < len0)
+                dst = new byte[len0];
+            if (imgInfo.Packed)
+                ImageLine.packInplaceByte(imgInfo, src, dst, scale);
+            else
+                Array.Copy(src, 0, dst, 0, len0);
+            return dst;
+        }
+
     }
 }

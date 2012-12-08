@@ -20,8 +20,8 @@ namespace TestSpeed
 		ImageLine iline2 = new ImageLine(png.ImgInfo);
 		ImageLine iline = iline1;
 		for (int j = 0; j < cols; j++) {
-			ImageLineHelper.SetPixelRGB8(iline1, j, ((j & 0xFF) << 16) | (((j * 3) & 0xFF) << 8) | (j * 2) & 0xFF);
-			ImageLineHelper.SetPixelRGB8(iline2, j, (j * 13) & 0xFFFFFF);
+			//ImageLineHelper.SetPixel(iline1, j, (j & 0xFF) , ((j * 3) & 0xFF) ,  (j * 2) );
+			ImageLineHelper.setPixelFromARGB8(iline2, j, (j * 13) & 0xFFFFFF);
 		}
 		long t0 = Environment.TickCount;
 		for (int row = 0; row < rows; row++) {

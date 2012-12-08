@@ -212,5 +212,33 @@ namespace Hjg.Pngcs.Chunks {
                 t = t + c.GetVal() + "\n";
             return t.Trim();
         }
+
+        public PngChunkPLTE GetPLTE() {
+            return (PngChunkPLTE)chunkList.GetById1(PngChunkPLTE.ID);
+        }
+
+        public PngChunkPLTE CreatePLTEChunk() {
+            PngChunkPLTE plte = new PngChunkPLTE(chunkList.imageInfo);
+            QueueChunk(plte);
+            return plte;
+        }
+
+        /**
+         * Returns the TRNS chunk, if present
+         * 
+         * @return null if not present
+         */
+        public PngChunkTRNS GetTRNS() {
+            return (PngChunkTRNS)chunkList.GetById1(PngChunkTRNS.ID);
+        }
+
+        /**
+         * Creates a new empty TRNS chunk, queues it for write and return it to the caller, who should fill its entries
+         */
+        public PngChunkTRNS CreateTRNSChunk() {
+            PngChunkTRNS trns = new PngChunkTRNS(chunkList.imageInfo);
+            QueueChunk(trns);
+            return trns;
+        }
     }
 }
