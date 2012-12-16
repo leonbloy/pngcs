@@ -3,10 +3,9 @@ namespace Hjg.Pngcs.Chunks {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
-    using System.Runtime.CompilerServices;
-    using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+    using Hjg.Pngcs.Zlib;
+    
     /// <summary>
     /// Static utility methods for CHunks
     /// </summary>
@@ -183,10 +182,10 @@ namespace Hjg.Pngcs.Chunks {
             try {
                 MemoryStream inb = new MemoryStream(ori, offset, len);
                 Stream inx = inb;
-                if (! compress) inx = new InflaterInputStream(inb);
+                if (!compress) inx = ZlibStreamFactory.createZlibInputStream(inb);
                 MemoryStream outb = new MemoryStream();
                 Stream outx = outb;
-                if (compress) outx = new DeflaterOutputStream(outb);
+                if (compress) outx = ZlibStreamFactory.createZlibOutputStream(outb);
                 shovelInToOut(inx, outx);
                 inx.Close();
                 outx.Close();

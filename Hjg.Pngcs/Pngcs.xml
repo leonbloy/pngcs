@@ -877,26 +877,26 @@
             <param name="mrow">Row number inside the matrix</param>
             <returns></returns>
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.setRow(System.Int32)">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.setRow(System.Int32)">
             this refers to the row currRowSubimg 
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.isAtLastRow">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.isAtLastRow">
             Is current row the last row for the lass pass??
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.getCurrRowSubimg">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.getCurrRowSubimg">
             current row number inside the "sub image"
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.getCurrRowReal">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.getCurrRowReal">
             current row number inside the "real image"
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.getPass">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.getPass">
             current pass number (1-7)
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.getRows">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.getRows">
              How many rows has the current pass?
             
         </member>
-        <member name="M:Ar.Com.Hjg.Pngcs.PngDeinterlacer.getCols">
+        <member name="M:Hjg.Pngcs.PngDeinterlacer.getCols">
             How many columns (pixels) are there in the current row
         </member>
         <member name="T:Hjg.Pngcs.PngjExceptionInternal">
@@ -1484,10 +1484,9 @@
             
         </member>
         <member name="T:Hjg.Pngcs.PngIDatChunkInputStream">
-             <summary>
-             Reads IDAT chunks
-             </summary>
-            
+            <summary>
+            Reads IDAT chunks
+            </summary>
         </member>
         <member name="M:Hjg.Pngcs.PngIDatChunkInputStream.#ctor(System.IO.Stream,System.Int32,System.Int64)">
              <summary>
@@ -1845,15 +1844,6 @@
             init: is called automatically before writing the first row
             </summary>
         </member>
-        <member name="M:Hjg.Pngcs.PngWriter.CreateCompressedStream(System.IO.Stream,System.Int32,Hjg.Pngcs.PngWriter.ECompressionStrategy)">
-            <summary>
-            Creates the compressed stream with deflate (zlib) which decorates the IDAT stream.
-            </summary>
-            <param name="raw"></param>
-            <param name="compLevel"></param>
-            <param name="strat"></param>
-            <returns></returns>
-        </member>
         <member name="M:Hjg.Pngcs.PngWriter.WriteSignatureAndIHDR">
              <summary>
              Write id signature and also "IHDR" chunk
@@ -1959,13 +1949,27 @@
             </summary>
             <remarks>see ChunksList.CHUNK_GROUP_NNN</remarks>
         </member>
-        <member name="T:Hjg.Pngcs.PngWriter.ECompressionStrategy">
+        <member name="T:Hjg.Pngcs.Zlib.ZlibOutputStreamIs">
             <summary>
-            Strategy for deflater
+            Zlib output (deflater) based on ShaprZipLib
             </summary>
-            <remarks>
-            We define our own enums so as our public interface doesnt depend on implementation
-            </remarks>
+        </member>
+        <member name="M:Hjg.Pngcs.Zlib.AZlibOutputStream.getImplementationId">
+            <summary>
+            mainly for debugging
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Zlib.ZlibInputStreamIs">
+            <summary>
+            Zip input (inflater) based on ShaprZipLib
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Zlib.AZlibInputStream.getImplementationId">
+            <summary>
+            mainly for debugging
+            </summary>
+            <returns></returns>
         </member>
     </members>
 </doc>

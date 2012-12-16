@@ -19,9 +19,27 @@ See also the included sample projects,
 
 --------------------------------------------------------------
 
-NOTE: PngCs depends on SharpZipLib http://www.icsharpcode.net/opensource/sharpziplib/
+NOTE: Since version 1.1.4 two assemblies are provided for different environments:
+
+1 For .Net 4.5 :  dotnet45/png45.dll
+This uses an internal Zlib  implementation based on the new .Net 4.5 DeflateStream
+
+Advantages:
+     Single dll, does not requires SharpZipLib dll
+     Better speed
+
+2 .Net 2.0 compatible: dotnet20/png.dll 
+This requires an extra dll (included) ICSharpCode.SharpZipLib.dll
+
+Advantages:
+     Works with old .net versions (2.0 and above)
+     Slightly better compression
+
+
+------------------------------------------------------------------------
+
 The ICSharpCode.SharpZipLib.dll assembly, provided with this library,
-and must be referenced together with Pngcs.dll by client projects.
+must be referenced together with pngcs.dll by client projects.
 Because SharpZipLib is released  under the GPL license with an exception
 that allows to link it with independent modules, PNGCS relies on that
 exception and is released under the Apache license. See LICENSE.txt

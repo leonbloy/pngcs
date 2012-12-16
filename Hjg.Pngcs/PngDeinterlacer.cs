@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ar.Com.Hjg.Pngcs {
+namespace Hjg.Pngcs {
     class PngDeinterlacer {
         private readonly ImageInfo imi;
         private int pass; // 1-7

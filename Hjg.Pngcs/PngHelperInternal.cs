@@ -3,11 +3,9 @@ namespace Hjg.Pngcs {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
-    using System.Runtime.CompilerServices;
     using System.Text;
-    using ICSharpCode.SharpZipLib.Checksums;
+    using Hjg.Pngcs.Zlib;
 
     /// <summary>
     /// Some utility static methods for internal use.
@@ -15,14 +13,14 @@ namespace Hjg.Pngcs {
     public class PngHelperInternal {
 
         [ThreadStatic]
-        private static ICSharpCode.SharpZipLib.Checksums.Crc32 crc32Engine = null;
+        private static CRC32 crc32Engine = null;
 
         /// <summary>
         /// thread-singleton crc engine 
         /// </summary>
         ///
-        public static Crc32 GetCRC() {
-            if (crc32Engine == null) crc32Engine = new Crc32();
+        public static CRC32 GetCRC() {
+            if (crc32Engine == null) crc32Engine = new CRC32();
             return crc32Engine;
         }
 

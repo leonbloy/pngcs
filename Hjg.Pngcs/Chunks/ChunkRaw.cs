@@ -7,8 +7,8 @@ namespace Hjg.Pngcs.Chunks {
     using System.ComponentModel;
     using System.IO;
     using System.Runtime.CompilerServices;
-    using ICSharpCode.SharpZipLib.Checksums;
-
+    using Hjg.Pngcs.Zlib;
+    
     /// <summary>
     /// Wraps the raw chunk data
     /// </summary>
@@ -56,12 +56,12 @@ namespace Hjg.Pngcs.Chunks {
         /// Called after setting data, before writing to os
         /// </summary>
         private int ComputeCrc() {
-            Crc32 crcengine = Hjg.Pngcs.PngHelperInternal.GetCRC();
+            CRC32 crcengine = Hjg.Pngcs.PngHelperInternal.GetCRC();
             crcengine.Reset();
             crcengine.Update(IdBytes, 0, 4);
             if (Length > 0)
                 crcengine.Update(Data, 0, Length); //
-            return (int)crcengine.Value;
+            return (int)crcengine.GetValue();
         }
 
 

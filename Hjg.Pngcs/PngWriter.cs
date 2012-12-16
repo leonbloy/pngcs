@@ -8,8 +8,7 @@ namespace Hjg.Pngcs {
 
     using System.Runtime.CompilerServices;
     using Chunks;
-    using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-    using ICSharpCode.SharpZipLib.Zip.Compression;
+    using Hjg.Pngcs.Zlib;
 
     /// <summary>
     ///  Writes a PNG image, line by line.
@@ -27,21 +26,10 @@ namespace Hjg.Pngcs {
 
         private FilterWriteStrategy filterStrat;
 
-        /// <summary>
-        /// Strategy for deflater
-        /// </summary>
-        /// <remarks>
-        /// We define our own enums so as our public interface doesnt depend on implementation
-        /// </remarks>
-        public enum ECompressionStrategy {
-            Filtered,
-            HuffmanOnly,
-            Default
-        }
         /**
          * Deflate algortithm compression strategy
          */
-        public ECompressionStrategy CompressionStrategy { get; set; }
+        public EDeflateCompressStrategy CompressionStrategy { get; set; }
 
         /// <summary>
         /// zip compression level (0 - 9)
@@ -96,7 +84,7 @@ namespace Hjg.Pngcs {
         private readonly Stream outputStream;
 
         private PngIDatChunkOutputStream datStream;
-        private Stream datStreamDeflated;
+        private AZlibOutputStream datStreamDeflated;
 
         private int[] histox = new int[256]; // auxiliar buffer, histogram, only used by reportResultsForFilter
 
@@ -134,7 +122,7 @@ namespace Hjg.Pngcs {
             this.CompLevel = 6;
             this.ShouldCloseStream = true;
             this.IdatMaxSize = 0; // use default
-            this.CompressionStrategy = ECompressionStrategy.Default;
+            this.CompressionStrategy = EDeflateCompressStrategy.Filtered;
             // prealloc
             //scanline = new int[imgInfo.SamplesPerRowPacked];
             rowb = new byte[imgInfo.BytesPerRow + 1];
@@ -152,33 +140,9 @@ namespace Hjg.Pngcs {
         /// </summary>
         private void init() {
             datStream = new PngIDatChunkOutputStream(this.outputStream, this.IdatMaxSize);
-            datStreamDeflated = CreateCompressedStream(datStream, this.CompLevel, CompressionStrategy);
+            datStreamDeflated = ZlibStreamFactory.createZlibOutputStream(datStream, this.CompLevel, this.CompressionStrategy, true);
             WriteSignatureAndIHDR();
             WriteFirstChunks();
-        }
-
-        /// <summary>
-        /// Creates the compressed stream with deflate (zlib) which decorates the IDAT stream.
-        /// </summary>
-        /// <param name="raw"></param>
-        /// <param name="compLevel"></param>
-        /// <param name="strat"></param>
-        /// <returns></returns>
-        protected virtual Stream CreateCompressedStream(Stream raw, int compLevel, ECompressionStrategy strat) {
-            //return CreateCompressedStreamIonic(raw, compLevel, strat);
-            return CreateCompressedStreamCSsharpLib(raw, compLevel, strat);
-        }
-
-        private Stream CreateCompressedStreamCSsharpLib(Stream raw, int compLevel, ECompressionStrategy strat) {
-            Deflater defl = new Deflater(compLevel);
-            switch (strat) {
-                case ECompressionStrategy.Filtered: defl.SetStrategy(DeflateStrategy.Filtered); break;
-                case ECompressionStrategy.HuffmanOnly: defl.SetStrategy(DeflateStrategy.HuffmanOnly); break;
-                default: defl.SetStrategy(DeflateStrategy.Default); break;
-            }
-            DeflaterOutputStream datStream = new DeflaterOutputStream(raw, defl);
-            datStream.IsStreamOwner = false;
-            return datStream;
         }
 
         private void reportResultsForFilter(int rown, FilterType type, bool tentative) {

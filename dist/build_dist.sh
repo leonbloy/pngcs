@@ -27,9 +27,13 @@ cd "$DIRS"
 cp -r ../* $DIRNEW/src/
 cd $DIRNEW
 
-mv src/Hjg.Pngcs/bin/Release/Pngcs.dll .
+mkdir dotnet20
+mkdir dotnet45
+
+mv src/Hjg.Pngcs/bin/Release/Pngcs.dll dotnet20/
+mv src/Hjg.Pngcs/bin/Release45/Pngcs.dll dotnet45/Pngcs45.dll
 cp src/*.txt .
-mv src/*.dll .
+mv src/*.dll dotnet20
 mv src/docs .
 
 find . -name bin -type d -exec /bin/rm -rf '{}' \;

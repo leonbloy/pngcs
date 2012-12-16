@@ -1,15 +1,12 @@
-using Ar.Com.Hjg.Pngcs;
 namespace Hjg.Pngcs {
 
     using Hjg.Pngcs.Chunks;
+    using Hjg.Pngcs.Zlib;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
-    using System.Runtime.CompilerServices;
     using System;
-    using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-    using ICSharpCode.SharpZipLib.Checksums;
-    using Ar.Com.Hjg.Pngcs;
+    
+
 
     /// <summary>
     /// Reads a PNG image, line by line
@@ -140,10 +137,10 @@ namespace Hjg.Pngcs {
         private int bytesChunksLoaded = 0; // bytes loaded from anciallary chunks
 
         private readonly Stream inputStream;
-        internal InflaterInputStream idatIstream;
+        internal AZlibInputStream idatIstream;
         internal PngIDatChunkInputStream iIdatCstream;
 
-        protected Crc32 crctest; // If set to non null, it gets a CRC of the unfiltered bytes, to check for images equality
+        protected Adler32 crctest; // If set to non null, it gets a CRC of the unfiltered bytes, to check for images equality
 
         /// <summary>
         /// Constructs a PngReader from a Stream, with no filename information
@@ -356,7 +353,7 @@ namespace Hjg.Pngcs {
             if (idatLen < 0)
                 throw new PngjInputException("first idat chunk not found!");
             iIdatCstream = new PngIDatChunkInputStream(inputStream, idatLen, offset);
-            idatIstream = new InflaterInputStream(iIdatCstream);
+            idatIstream = ZlibStreamFactory.createZlibInputStream(iIdatCstream, true);
             if (!crcEnabled)
                 iIdatCstream.DisableCrcCheck();
         }
@@ -758,11 +755,11 @@ namespace Hjg.Pngcs {
         }
 
         internal long GetCrctestVal() {
-            return crctest.Value;
+            return crctest.GetValue();
         }
 
         internal void InitCrctest() {
-            this.crctest = new Crc32();
+            this.crctest = new Adler32();
         }
 
     }

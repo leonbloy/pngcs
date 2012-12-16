@@ -1,5 +1,12 @@
 ===========  HISTORY PngCs  http://code.google.com/p/pngcs/ ================
 
+15/Dec/2012:  1.1.4
+   - Two targers: .Net 4.5 with CLR DeflateStream (with our own Zlib wrapper), other with the old SharpZipLib (requires extra dll)
+     -- New namespace/folder Zlib 
+     -- Decoupled compression from implementation (SharpZipLib/.NetCLR)
+     -- Own implementations of CRC32 and Adler crcs.
+   - Small fixes:  bad namespace in internal PngInterlacer;  replaced crctest in pngreader by Adler32.
+
 8/Dec/2012:  1.1.3
    - Interlaced PNG: full support for reading.
    - Read/write can use INT or BYTE for sample storage now. The choice is explicit by the programmer

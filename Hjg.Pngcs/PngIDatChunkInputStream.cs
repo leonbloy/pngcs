@@ -3,17 +3,15 @@ namespace Hjg.Pngcs {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
-    using System.Runtime.CompilerServices;
-    using ICSharpCode.SharpZipLib.Checksums;
+    using Hjg.Pngcs.Zlib;
+
     /// <summary>
     /// Reads IDAT chunks
     /// </summary>
-    ///
     internal class PngIDatChunkInputStream : Stream {
         private readonly Stream inputStream;
-        private readonly Crc32 crcEngine;
+        private readonly Hjg.Pngcs.Zlib.CRC32 crcEngine;
         private bool checkCrc;
         private int lenLastChunk;
         private byte[] idLastChunk;
@@ -56,7 +54,7 @@ namespace Hjg.Pngcs {
             this.offset = offset_0;
             checkCrc = true;
             inputStream = iStream;
-            crcEngine = new Crc32();
+            crcEngine = new CRC32();
             this.lenLastChunk = lenFirstChunk;
             toReadThisChunk = lenFirstChunk;
             // we know it's a IDAT
@@ -85,7 +83,7 @@ namespace Hjg.Pngcs {
                 int crc = Hjg.Pngcs.PngHelperInternal.ReadInt4(inputStream); //
                 offset += 4;
                 if (checkCrc) {
-                    int crccalc = (int)crcEngine.Value;
+                    int crccalc = (int)crcEngine.GetValue();
                     if (lenLastChunk > 0 && crc != crccalc)
                         throw new PngjBadCrcException("error reading idat; offset: " + offset);
                     crcEngine.Reset();

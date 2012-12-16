@@ -5,11 +5,15 @@ using System.Text;
 
 namespace SamplesTests {
     
-    class Program {
+    class MainProgram {
+        
         static void Main(string[] args) {
+            long t0=Environment.TickCount;
+            myTestSuite();
+            //testTextChunks();
+            long t1 = Environment.TickCount;
 
-            sampleConvertTrueColor("C:/temp/grad.png");
-            Console.Out.WriteLine("Done. Press ENTER to close");
+            Console.Out.WriteLine("Done. (" + (t1-t0) + " msecs) " + "Net version: " +Environment.Version + " Press ENTER to close");
             Console.In.ReadLine();
         }
 
