@@ -65,8 +65,8 @@ namespace Hjg.Pngcs.Chunks {
             PngChunkTRNS otherx = (PngChunkTRNS)other;
             gray = otherx.gray;
             red = otherx.red;
-            green = otherx.red;
-            blue = otherx.red;
+            green = otherx.green;
+            blue = otherx.blue;
             if (otherx.paletteAlpha != null) {
                 paletteAlpha = new int[otherx.paletteAlpha.Length];
                 System.Array.Copy(otherx.paletteAlpha, 0, paletteAlpha, 0, paletteAlpha.Length);
