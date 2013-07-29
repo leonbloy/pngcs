@@ -6,7 +6,7 @@ using System.Text;
 namespace Hjg.Pngcs.Zlib {
 
 
-    internal class ZlibStreamFactory {        
+    public class ZlibStreamFactory {        
         public static AZlibInputStream createZlibInputStream(Stream st, bool leaveOpen) {
 #if NET45
                 return new ZlibInputStreamMs(st,leaveOpen);

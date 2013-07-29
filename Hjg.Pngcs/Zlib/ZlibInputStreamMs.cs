@@ -88,5 +88,5 @@ namespace Hjg.Pngcs.Zlib {
         }
 #endif
 
-    }
+    
 }
