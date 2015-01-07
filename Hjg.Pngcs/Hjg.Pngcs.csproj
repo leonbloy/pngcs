@@ -71,6 +71,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChunkReader.cs" />
+    <Compile Include="ChunkReaderMode.cs" />
     <Compile Include="Chunks\ChunkHelper.cs" />
     <Compile Include="Chunks\ChunksList.cs" />
     <Compile Include="Chunks\ChunkLoadBehaviour.cs" />
@@ -92,6 +94,8 @@
     <Compile Include="Chunks\PngChunkCHRM.cs" />
     <Compile Include="Chunks\PngChunkSBIT.cs" />
     <Compile Include="Chunks\PngChunkSRGB.cs" />
+    <Compile Include="BufferedStreamReader.cs" />
+    <Compile Include="IBytesConsumer.cs" />
     <Compile Include="ImageLines.cs" />
     <Compile Include="PngDeinterlacer.cs" />
     <Compile Include="PngjExceptionInternal.cs" />

@@ -345,7 +345,7 @@ namespace Hjg.Pngcs {
             int i, j, imax;
             imax = ImgInfo.BytesPerRow;
             for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= imax; i++, j++) {
-                rowbfilter[i] = (byte)(rowb[i] - ((rowbprev[i]) + (j > 0 ? rowb[j] : 0)) / 2);
+                rowbfilter[i] = (byte)(rowb[i] - ((rowbprev[i]) + (j > 0 ? rowb[j] : (byte)0)) / 2);
             }
         }
 
@@ -360,8 +360,8 @@ namespace Hjg.Pngcs {
             int i, j, imax;
             imax = ImgInfo.BytesPerRow;
             for (j = 1 - ImgInfo.BytesPixel, i = 1; i <= imax; i++, j++) {
-                rowbfilter[i] = (byte)(rowb[i] - PngHelperInternal.FilterPaethPredictor(j > 0 ? rowb[j] : 0,
-                        rowbprev[i], j > 0 ? rowbprev[j] : 0));
+                rowbfilter[i] = (byte)(rowb[i] - PngHelperInternal.FilterPaethPredictor(j > 0 ? rowb[j] : (byte)0,
+                        rowbprev[i], j > 0 ? rowbprev[j] : (byte)0));
             }
         }
 

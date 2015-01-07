@@ -35,7 +35,7 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw chunk) {
-            if (chunk.Length != 9)
+            if (chunk.Len != 9)
                 throw new PngjException("bad chunk length " + chunk);
             posX = PngHelperInternal.ReadInt4fromBytes(chunk.Data, 0);
             if (posX < 0)

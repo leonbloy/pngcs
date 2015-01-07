@@ -47,7 +47,7 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw chunk) {
-            SetNentries(chunk.Length / 3);
+            SetNentries(chunk.Len / 3);
             for (int n = 0, i = 0; n < nentries; n++) {
                 SetEntry(n, (int)(chunk.Data[i++] & 0xff), (int)(chunk.Data[i++] & 0xff),
                         (int)(chunk.Data[i++] & 0xff));

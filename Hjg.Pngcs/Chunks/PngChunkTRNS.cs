@@ -33,7 +33,7 @@ namespace Hjg.Pngcs.Chunks {
                 Hjg.Pngcs.PngHelperInternal.WriteInt2tobytes(gray, c.Data, 0);
             } else if (ImgInfo.Indexed) {
                 c = createEmptyChunk(paletteAlpha.Length, true);
-                for (int n = 0; n < c.Length; n++) {
+                for (int n = 0; n < c.Len; n++) {
                     c.Data[n] = (byte)paletteAlpha[n];
                 }
             } else {

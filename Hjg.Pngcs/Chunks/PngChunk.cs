@@ -150,7 +150,7 @@ namespace Hjg.Pngcs.Chunks {
 
         internal static PngChunk Factory(ChunkRaw chunk, ImageInfo info) {
             PngChunk c = FactoryFromId(Hjg.Pngcs.Chunks.ChunkHelper.ToString(chunk.IdBytes), info);
-            c.Length = chunk.Length;
+            c.Length = chunk.Len;
             c.ParseFromRaw(chunk);
             return c;
         }

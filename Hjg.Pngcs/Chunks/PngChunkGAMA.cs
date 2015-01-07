@@ -32,7 +32,7 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw chunk) {
-            if (chunk.Length != 4)
+            if (chunk.Len != 4)
                 throw new PngjException("bad chunk " + chunk);
             int g = Hjg.Pngcs.PngHelperInternal.ReadInt4fromBytes(chunk.Data, 0);
             gamma = ((double)g) / 100000.0d;

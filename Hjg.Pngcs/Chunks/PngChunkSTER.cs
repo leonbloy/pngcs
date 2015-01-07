@@ -34,7 +34,7 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw chunk) {
-            if (chunk.Length != 1)
+            if (chunk.Len != 1)
                 throw new PngjException("bad chunk length " + chunk);
             Mode = chunk.Data[0];
         }

@@ -45,8 +45,8 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw c) {
-            if (c.Length != 13)
-                throw new PngjException("Bad IDHR len " + c.Length);
+            if (c.Len != 13)
+                throw new PngjException("Bad IDHR len " + c.Len);
             MemoryStream st = c.GetAsByteStream();
             Cols = Hjg.Pngcs.PngHelperInternal.ReadInt4(st);
             Rows = Hjg.Pngcs.PngHelperInternal.ReadInt4(st);

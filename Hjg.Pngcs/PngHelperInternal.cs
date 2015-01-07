@@ -215,5 +215,10 @@ namespace Hjg.Pngcs {
 		return pngr.GetCrctestVal();
 	}
 
+
+    internal static void Log(string p, Exception e)
+    {
+        Console.Error.WriteLine(p);
+    }
     }
 }

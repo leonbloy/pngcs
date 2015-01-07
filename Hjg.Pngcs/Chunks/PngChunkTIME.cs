@@ -36,7 +36,7 @@ namespace Hjg.Pngcs.Chunks {
         }
 
         public override void ParseFromRaw(ChunkRaw chunk) {
-            if (chunk.Length != 7)
+            if (chunk.Len != 7)
                 throw new PngjException("bad chunk " + chunk);
             year = Hjg.Pngcs.PngHelperInternal.ReadInt2fromBytes(chunk.Data, 0);
             mon = Hjg.Pngcs.PngHelperInternal.ReadInt1fromByte(chunk.Data, 2);

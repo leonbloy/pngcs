@@ -34,7 +34,7 @@ namespace Hjg.Pngcs.Chunks {
 
 
         public override void ParseFromRaw(ChunkRaw c) {
-            if (c.Length != GetLen())
+            if (c.Len != GetLen())
                 throw new PngjException("bad chunk length " + c);
             if (ImgInfo.Greyscale) {
                 Graysb = PngHelperInternal.ReadInt1fromByte(c.Data, 0);
