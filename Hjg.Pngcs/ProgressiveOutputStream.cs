@@ -21,7 +21,11 @@ namespace Hjg.Pngcs {
             if (size < 8) throw new PngjException("bad size for ProgressiveOutputStream: " + size);
         }
 
+#if PORTABLE
+        public virtual void Close() {
+#else
         public override void Close() {
+#endif
             Flush();
             base.Close();
         }

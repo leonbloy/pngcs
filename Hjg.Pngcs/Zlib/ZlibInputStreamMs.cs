@@ -41,7 +41,11 @@ namespace Hjg.Pngcs.Zlib {
             return r;
         }
 
+#if PORTABLE
+        public virtual void Close() {
+#else
         public override void Close() {
+#endif
             if (!initdone) doInit(); // can happen if never called write
             if (closed) return;
             closed = true;

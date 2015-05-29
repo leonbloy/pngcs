@@ -33,7 +33,11 @@ namespace Hjg.Pngcs.Zlib {
             adler32.Update(array, offset, count);
         }
 
+#if PORTABLE
+        public virtual void Close() {
+#else
         public override void Close() {
+#endif
             if (!initdone) doInit(); // can happen if never called write
             if (closed) return;
             closed = true;
