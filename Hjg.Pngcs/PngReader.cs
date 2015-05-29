@@ -451,7 +451,7 @@ namespace Hjg.Pngcs {
         /// </remarks>
         /// <param name="warn"></param>
         internal void logWarn(String warn) {
-            Console.Error.WriteLine(warn);
+            System.Diagnostics.Debug.WriteLine(warn);
         }
 
         /// <summary>
