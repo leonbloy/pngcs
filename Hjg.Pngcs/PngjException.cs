@@ -10,7 +10,9 @@ namespace Hjg.Pngcs {
     /// <summary>
     /// Gral exception class for PNGCS library
     /// </summary>
+#if !PORTABLE
     [Serializable]
+#endif
     public class PngjException : Exception {
         private const long serialVersionUID = 1L;
 

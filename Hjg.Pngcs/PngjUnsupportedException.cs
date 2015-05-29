@@ -10,7 +10,9 @@ namespace Hjg.Pngcs {
     /// <summary>
     /// Exception for unsupported operation or feature
     /// </summary>
+#if !PORTABLE
     [Serializable]
+#endif
     public class PngjUnsupportedException : Exception {
         private const long serialVersionUID = 1L;
 
