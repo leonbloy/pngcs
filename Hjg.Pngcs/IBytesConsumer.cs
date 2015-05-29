@@ -6,5 +6,6 @@ namespace Ar.Com.Hjg.Pngcs
 {
     interface IBytesConsumer
     {
+        int consume(byte[] buf, int offset, int len);
     }
 }
