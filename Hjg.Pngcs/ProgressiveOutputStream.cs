@@ -53,7 +53,11 @@ namespace Hjg.Pngcs {
         ///
         private void CheckFlushBuffer(bool forced) {
             int count = (int)Position;
+#if PORTABLE
+            byte[] buf = ToArray();
+#else
             byte[] buf = GetBuffer();
+#endif
             while (forced || count >= size) {
                 int nb = size;
                 if (nb > count)
