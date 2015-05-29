@@ -6,6 +6,8 @@ namespace Hjg.Pngcs.Chunks {
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
 
 
@@ -166,7 +168,16 @@ namespace Hjg.Pngcs.Chunks {
             if (isKnown(cid)) {
                 Type t = factoryMap[cid];
                 if (t == null) System.Diagnostics.Debug.WriteLine("What?? " + cid);
+#if PORTABLE
+                System.Reflection.ConstructorInfo cons = t.GetTypeInfo().DeclaredConstructors.Single(
+                    c =>
+                        {
+                            var p = c.GetParameters();
+                            return p.Length == 1 && p[0].ParameterType == typeof(ImageInfo);
+                        });
+#else
                 System.Reflection.ConstructorInfo cons = t.GetConstructor(new Type[] { typeof(ImageInfo) });
+#endif
                 object o = cons.Invoke(new object[] { info });
                 chunk = (PngChunk)o;
             }
