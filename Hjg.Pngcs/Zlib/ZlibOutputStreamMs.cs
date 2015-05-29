@@ -44,7 +44,7 @@ namespace Hjg.Pngcs.Zlib {
             // sigh ... no only must I close the parent stream to force a flush, but I must save a reference
             // raw stream because (apparently) Close() sets it to null (shame on you, MS developers)
             if (deflateStream != null) {
-                deflateStream.Close();
+                deflateStream.Dispose();
             } else {         // second hack: empty input?
                 rawStream.WriteByte(3);
                 rawStream.WriteByte(0);
@@ -56,7 +56,7 @@ namespace Hjg.Pngcs.Zlib {
             rawStream.WriteByte((byte)((crcv >> 8) & 0xFF));
             rawStream.WriteByte((byte)((crcv) & 0xFF));
             if (!leaveOpen)
-                rawStream.Close();
+                rawStream.Dispose();
 
         }
 

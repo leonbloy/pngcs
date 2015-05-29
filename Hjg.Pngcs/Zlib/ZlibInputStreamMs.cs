@@ -50,14 +50,14 @@ namespace Hjg.Pngcs.Zlib {
             if (closed) return;
             closed = true;
             if (deflateStream != null) {
-                deflateStream.Close();
+                deflateStream.Dispose();
             }
             if (crcread == null) { // eat trailing 4 bytes
                 crcread = new byte[4];
                 for (int i = 0; i < 4; i++) crcread[i] = (byte)rawStream.ReadByte();
             }
             if (!leaveOpen)
-                rawStream.Close();
+                rawStream.Dispose();
         }
 
         private void initStream() {

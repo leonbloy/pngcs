@@ -75,7 +75,7 @@ namespace Hjg.Pngcs {
 #else
         public override void Close() {
 #endif
-            base.Close(); // nothing
+            base.Dispose(); // nothing
         }
 
         private void EndChunkGoForNext() {

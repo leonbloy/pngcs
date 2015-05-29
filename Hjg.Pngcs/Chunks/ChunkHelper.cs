@@ -187,8 +187,8 @@ namespace Hjg.Pngcs.Chunks {
                 Stream outx = outb;
                 if (compress) outx = ZlibStreamFactory.createZlibOutputStream(outb);
                 shovelInToOut(inx, outx);
-                inx.Close();
-                outx.Close();
+                inx.Dispose();
+                outx.Dispose();
                 byte[] res = outb.ToArray();
                 return res;
             } catch (Exception e) {

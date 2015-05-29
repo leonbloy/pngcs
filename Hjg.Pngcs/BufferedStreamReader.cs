@@ -126,7 +126,7 @@ namespace Ar.Com.Hjg.Pngcs
             try
             {
                 if (_stream != null && closeStream)
-                    _stream.Close();
+                    _stream.Dispose();
             }
             catch (Exception e)
             {

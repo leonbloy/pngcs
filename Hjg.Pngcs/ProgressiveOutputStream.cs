@@ -27,7 +27,7 @@ namespace Hjg.Pngcs {
         public override void Close() {
 #endif
             Flush();
-            base.Close();
+            base.Dispose();
         }
 
         public override void Flush() {
