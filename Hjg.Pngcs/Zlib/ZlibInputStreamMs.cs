@@ -86,6 +86,7 @@ namespace Hjg.Pngcs.Zlib {
         public override  String getImplementationId() {
             return "Zlib inflater: .Net CLR 4.5";
         }
+    }
 #endif
 
     
