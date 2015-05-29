@@ -101,7 +101,16 @@ namespace Hjg.Pngcs.Chunks {
             return new MemoryStream(Data);
         }
 
-        private void AllocData() {
+        /**
+         * offset in the full PNG stream, in bytes. only informational, for read chunks (0=NA)
+         */
+        public void setOffset(long offset)
+        {
+            this.offset = offset;
+        }
+
+        private void AllocData()
+        {
             if (Data == null || Data.Length < Len)
                 Data = new byte[Len];
         }
