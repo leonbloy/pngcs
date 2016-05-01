@@ -32,12 +32,9 @@ namespace Hjg.Pngcs.Zlib {
             deflateStream.Write(array, offset, count);
             adler32.Update(array, offset, count);
         }
-
-#if PORTABLE
+        
         public virtual void Close() {
-#else
-        public override void Close() {
-#endif
+
             if (!initdone) doInit(); // can happen if never called write
             if (closed) return;
             closed = true;
@@ -93,6 +90,22 @@ namespace Hjg.Pngcs.Zlib {
 
         public override String getImplementationId() {
             return "Zlib deflater: .Net CLR 4.5";
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.Close();
+                // Free any other managed objects here.
+                //
+            }
+
+            // Free any unmanaged objects here.
+            //
+            
+            // Call base class implementation.
+            base.Dispose(disposing);
         }
 
     }

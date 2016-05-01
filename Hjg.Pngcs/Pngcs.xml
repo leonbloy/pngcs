@@ -4,6 +4,20 @@
         <name>Pngcs</name>
     </assembly>
     <members>
+        <member name="M:Ar.Com.Hjg.Pngcs.BufferedStreamFeeder.getStream">
+            <summary>
+            Stream from which bytes are read
+            </summary>
+        </member>
+        <member name="M:Ar.Com.Hjg.Pngcs.BufferedStreamFeeder.feed(Ar.Com.Hjg.Pngcs.IBytesConsumer)">
+            <summary>
+            Feeds bytes to the consumer 
+             Returns bytes actually consumed
+             This should return 0 only if the stream is EOF or the consumer is done
+            </summary>
+            <param name="consumer"></param>
+            <returns></returns>
+        </member>
         <member name="T:Hjg.Pngcs.Chunks.ChunkHelper">
             <summary>
             Static utility methods for CHunks
@@ -277,7 +291,7 @@
              See http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
             </remarks>
         </member>
-        <member name="F:Hjg.Pngcs.Chunks.ChunkRaw.Length">
+        <member name="F:Hjg.Pngcs.Chunks.ChunkRaw.Len">
             <summary>
             The length counts only the data field, not itself, the chunk type code, or the CRC. Zero is a valid length.
             Although encoders and decoders should treat the length as unsigned, its value must not exceed 2^31-1 bytes.
@@ -293,13 +307,10 @@
             Raw data, crc not included
             </summary>
         </member>
-        <member name="M:Hjg.Pngcs.Chunks.ChunkRaw.#ctor(System.Int32,System.Byte[],System.Boolean)">
+        <member name="M:Hjg.Pngcs.Chunks.ChunkRaw.#ctor(System.Int32,System.String,System.Boolean)">
             <summary>
             Creates an empty raw chunk
             </summary>
-            <param name="length"></param>
-            <param name="idbytes"></param>
-            <param name="alloc">pre allocate the data buffer?</param>
         </member>
         <member name="M:Hjg.Pngcs.Chunks.ChunkRaw.ComputeCrc">
             <summary>
@@ -312,6 +323,9 @@
              be already allocated. Checks CRC Return number of byte read.
              </summary>
             
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.ChunkRaw.setOffset(System.Int64)">
+            offset in the full PNG stream, in bytes. only informational, for read chunks (0=NA)
         </member>
         <member name="M:Hjg.Pngcs.Chunks.ChunkRaw.ToString">
             <summary>
@@ -495,144 +509,6 @@
         <member name="T:Hjg.Pngcs.Chunks.PngChunkMultiple">
             <summary>
             A Chunk type that allows duplicate in an image
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunk">
-            <summary>
-            Represents a instance of a PNG chunk
-            </summary>
-            <remarks>
-            Concrete classes should extend <c>PngChunkSingle</c> or <c>PngChunkMultiple</c>
-            
-            Note that some methods/fields are type-specific (GetOrderingConstraint(), AllowsMultiple())
-            some are 'almost' type-specific (Id,Crit,Pub,Safe; the exception is <c>PngUKNOWN</c>), 
-            and some are instance-specific
-            
-            Ref: http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
-            </remarks>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Id">
-            <summary>
-            4 letters. The Id almost determines the concrete type (except for PngUKNOWN)
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Crit">
-            <summary>
-            Standard basic properties, implicit in the Id
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Pub">
-            <summary>
-            Standard basic properties, implicit in the Id
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Safe">
-            <summary>
-            Standard basic properties, implicit in the Id
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ImgInfo">
-            <summary>
-            Image basic info, mostly for some checks
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.#ctor(System.String,Hjg.Pngcs.ImageInfo)">
-            <summary>
-            Constructs an empty chunk
-            </summary>
-            <param name="id"></param>
-            <param name="imgInfo"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.FactoryRegister(System.String,System.Type)">
-            <summary>
-            Registers a Chunk ID in the factory, to instantiate a given type
-            </summary>
-            <remarks>
-            This can be called by client code to register additional chunk types
-            </remarks>
-            <param name="chunkId"></param>
-            <param name="type">should extend PngChunkSingle or PngChunkMultiple</param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.FactoryFromId(System.String,Hjg.Pngcs.ImageInfo)">
-            <summary>
-            Creates one new blank chunk of the corresponding type, according to factoryMap (PngChunkUNKNOWN if not known)
-            </summary>
-            <param name="cid">Chunk Id</param>
-            <param name="info"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.ToString">
-            <summary>
-            Basic info: Id, length, Type name
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.CreateRawChunk">
-            <summary>
-            Serialization. Creates a Raw chunk, ready for write, from this chunk content
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.ParseFromRaw(Hjg.Pngcs.Chunks.ChunkRaw)">
-            <summary>
-            Deserialization. Given a Raw chunk, just rad, fills this chunk content
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.CloneDataFromRead(Hjg.Pngcs.Chunks.PngChunk)">
-            <summary>
-            Override to make a copy (normally deep) from other chunk
-            </summary>
-            <param name="other"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.AllowsMultiple">
-            <summary>
-            This is implemented in PngChunkMultiple/PngChunSingle
-            </summary>
-            <returns>Allows more than one chunk of this type in a image</returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunk.GetOrderingConstraint">
-            <summary>
-            Get ordering constrain
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="P:Hjg.Pngcs.Chunks.PngChunk.Priority">
-            <summary>
-            For writing. Queued chunks with high priority will be written as soon as possible
-            </summary>
-        </member>
-        <member name="P:Hjg.Pngcs.Chunks.PngChunk.ChunkGroup">
-            <summary>
-            Chunk group where it was read or writen
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint">
-            <summary>
-            Restrictions for chunk ordering, for ancillary chunks
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.NONE">
-            <summary>
-            No constraint, the chunk can go anywhere
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT">
-            <summary>
-            Before PLTE (palette) - and hence, also before IDAT
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT">
-            <summary>
-            After PLTE (palette), but before IDAT
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.BEFORE_IDAT">
-            <summary>
-            Before IDAT (before or after PLTE)
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.NA">
-            <summary>
-            Does not apply
             </summary>
         </member>
         <member name="T:Hjg.Pngcs.Chunks.PngChunkSingle">
@@ -835,6 +711,372 @@
         <member name="T:Hjg.Pngcs.Chunks.PngChunkSRGB">
             <summary>
             sRGB chunk: http://www.w3.org/TR/PNG/#11sRGB
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunk">
+            <summary>
+            Represents a instance of a PNG chunk
+            </summary>
+            <remarks>
+            Concrete classes should extend <c>PngChunkSingle</c> or <c>PngChunkMultiple</c>
+            
+            Note that some methods/fields are type-specific (GetOrderingConstraint(), AllowsMultiple())
+            some are 'almost' type-specific (Id,Crit,Pub,Safe; the exception is <c>PngUKNOWN</c>), 
+            and some are instance-specific
+            
+            Ref: http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
+            </remarks>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Id">
+            <summary>
+            4 letters. The Id almost determines the concrete type (except for PngUKNOWN)
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Crit">
+            <summary>
+            Standard basic properties, implicit in the Id
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Pub">
+            <summary>
+            Standard basic properties, implicit in the Id
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.Safe">
+            <summary>
+            Standard basic properties, implicit in the Id
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ImgInfo">
+            <summary>
+            Image basic info, mostly for some checks
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.Chunks.PngChunk.Priority">
+            <summary>
+            For writing. Queued chunks with high priority will be written as soon as possible
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.Chunks.PngChunk.ChunkGroup">
+            <summary>
+            Chunk group where it was read or writen
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint">
+            <summary>
+            Restrictions for chunk ordering, for ancillary chunks
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.NONE">
+            <summary>
+            No constraint, the chunk can go anywhere
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.BEFORE_PLTE_AND_IDAT">
+            <summary>
+            Before PLTE (palette) - and hence, also before IDAT
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.AFTER_PLTE_BEFORE_IDAT">
+            <summary>
+            After PLTE (palette), but before IDAT
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.BEFORE_IDAT">
+            <summary>
+            Before IDAT (before or after PLTE)
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunk.ChunkOrderingConstraint.NA">
+            <summary>
+            Does not apply
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.#ctor(System.String,Hjg.Pngcs.ImageInfo)">
+            <summary>
+            Constructs an empty chunk
+            </summary>
+            <param name="id"></param>
+            <param name="imgInfo"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.FactoryRegister(System.String,System.Type)">
+            <summary>
+            Registers a Chunk ID in the factory, to instantiate a given type
+            </summary>
+            <remarks>
+            This can be called by client code to register additional chunk types
+            </remarks>
+            <param name="chunkId"></param>
+            <param name="type">should extend PngChunkSingle or PngChunkMultiple</param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.FactoryFromId(System.String,Hjg.Pngcs.ImageInfo)">
+            <summary>
+            Creates one new blank chunk of the corresponding type, according to factoryMap (PngChunkUNKNOWN if not known)
+            </summary>
+            <param name="cid">Chunk Id</param>
+            <param name="info"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.ToString">
+            <summary>
+            Basic info: Id, length, Type name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.CreateRawChunk">
+            <summary>
+            Serialization. Creates a Raw chunk, ready for write, from this chunk content
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.ParseFromRaw(Hjg.Pngcs.Chunks.ChunkRaw)">
+            <summary>
+            Deserialization. Given a Raw chunk, just rad, fills this chunk content
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.CloneDataFromRead(Hjg.Pngcs.Chunks.PngChunk)">
+            <summary>
+            Override to make a copy (normally deep) from other chunk
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.AllowsMultiple">
+            <summary>
+            This is implemented in PngChunkMultiple/PngChunSingle
+            </summary>
+            <returns>Allows more than one chunk of this type in a image</returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunk.GetOrderingConstraint">
+            <summary>
+            Get ordering constrain
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkBKGD">
+            <summary>
+            bKGD chunk, see http://www.w3.org/TR/PNG/#11bKGD
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetGray(System.Int32)">
+            <summary>
+            Set gray value (0-255 if bitdept=8)
+            </summary>
+            <param name="gray"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetGray">
+            <summary>
+            Gets gray value 
+            </summary>
+            <returns>gray value  (0-255 if bitdept=8)</returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetPaletteIndex(System.Int32)">
+            <summary>
+            Set pallette index - only for indexed
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetPaletteIndex">
+            <summary>
+            Get pallette index - only for indexed
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetRGB(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Sets rgb value, only for rgb images
+            </summary>
+            <param name="r"></param>
+            <param name="g"></param>
+            <param name="b"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetRGB">
+            <summary>
+            Gets rgb value, only for rgb images
+            </summary>
+            <returns>[r , g, b] array</returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkGAMA">
+            <summary>
+            gAMA chunk, see http://www.w3.org/TR/PNG/#11gAMA
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkICCP">
+            <summary>
+            iCCP Chunk: see http://www.w3.org/TR/PNG/#11iCCP
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.SetProfileNameAndContent(System.String,System.String)">
+            <summary>
+            Sets profile name and profile
+            </summary>
+            <param name="name">profile name </param>
+            <param name="profile">profile (latin1 string)</param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.SetProfileNameAndContent(System.String,System.Byte[])">
+            <summary>
+            Sets profile name and profile
+            </summary>
+            <param name="name">profile name </param>
+            <param name="profile">profile (uncompressed)</param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.GetProfile">
+            <summary>
+            This uncompresses the string!
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkIDAT">
+            <summary>
+            IDAT chunk http://www.w3.org/TR/PNG/#11IDAT
+            
+            This object is dummy placeholder - We treat this chunk in a very different way than ancillary chnks
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkIEND">
+            <summary>
+            IEND chunk  http://www.w3.org/TR/PNG/#11IEND
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkIHDR">
+            <summary>
+            IHDR chunk: http://www.w3.org/TR/PNG/#11IHDR
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkITXT">
+            <summary>
+            iTXt chunk:  http://www.w3.org/TR/PNG/#11iTXt
+            One of the three text chunks
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkUNKNOWN">
+            <summary>
+            Unknown (for our chunk factory) chunk type.
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkPHYS">
+            <summary>
+            pHYs chunk: http://www.w3.org/TR/PNG/#11pHYs
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.Chunks.PngChunkPHYS.Units">
+            <summary>
+            0: unknown 1:metre
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.GetAsDpi">
+            <summary>
+            returns -1 if not in meters, or not equal
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.GetAsDpi2">
+            <summary>
+            returns -1 if the physicial unit is unknown
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.SetAsDpi(System.Double)">
+            <summary>
+            same in both directions
+            </summary>
+            <param name="dpi"></param>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkPLTE">
+            <summary>
+            PLTE Palette chunk: this is the only optional critical chunk
+            
+            http://www.w3.org/TR/PNG/#11PLTE
+            </summary>
+        </member>
+        <member name="F:Hjg.Pngcs.Chunks.PngChunkPLTE.entries">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.SetNentries(System.Int32)">
+            <summary>
+            Also allocates array
+            </summary>
+            <param name="nentries">1-256</param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntry(System.Int32)">
+            <summary>
+            as packed RGB8
+            </summary>
+            <param name="n"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntryRgb(System.Int32,System.Int32[],System.Int32)">
+            <summary>
+            Gets n'th entry, filling 3 positions of given array, at given offset
+            </summary>
+            <param name="index"></param>
+            <param name="rgb"></param>
+            <param name="offset"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntryRgb(System.Int32,System.Int32[])">
+            <summary>
+            shortcut: GetEntryRgb(index, int[] rgb, 0)
+            </summary>
+            <param name="n"></param>
+            <param name="rgb"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.MinBitDepth">
+            <summary>
+            minimum allowed bit depth, given palette size
+            </summary>
+            <returns>1-2-4-8</returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkTEXT">
+            <summary>
+            tEXt chunk: latin1 uncompressed text
+            </summary>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkTextVar">
+            <summary>
+            general class for textual chunks
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTextVar.GetKey">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkTIME">
+            <summary>
+            tIME chunk: http://www.w3.org/TR/PNG/#11tIME
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTIME.GetAsString">
+            format YYYY/MM/DD HH:mm:SS 
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkTRNS">
+            <summary>
+            tRNS chunk: http://www.w3.org/TR/PNG/#11tRNS
+            </summary>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.SetPalletteAlpha(System.Int32[])">
+            <summary>
+            WARNING: non deep copy
+            </summary>
+            <param name="palAlpha"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.setIndexEntryAsTransparent(System.Int32)">
+            <summary>
+            utiliy method : to use when only one pallete index is set as totally transparent
+            </summary>
+            <param name="palAlphaIndex"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.GetPalletteAlpha">
+            <summary>
+            WARNING: non deep copy
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Hjg.Pngcs.Chunks.PngChunkZTXT">
+            <summary>
+            zTXt chunk: http://www.w3.org/TR/PNG/#11zTXt
+            
             </summary>
         </member>
         <member name="T:Hjg.Pngcs.ImageLines">
@@ -1060,31 +1302,6 @@
              See <c>scanline</c> field doc, to understand the format.
             </remarks>
         </member>
-        <member name="M:Hjg.Pngcs.ImageLine.#ctor(Hjg.Pngcs.ImageInfo,Hjg.Pngcs.ImageLine.ESampleType,System.Boolean)">
-            <summary>
-            Constructs an ImageLine
-            </summary>
-            <param name="imgInfo">Inmutable copy of PNG ImageInfo</param>
-            <param name="stype">Storage for samples:INT (default) or BYTE</param>
-            <param name="unpackedMode">If true and bitdepth less than 8, samples are unpacked. This has no effect if biddepth 8 or 16</param>
-        </member>
-        <member name="M:Hjg.Pngcs.ImageLine.packInplaceByte(Hjg.Pngcs.ImageInfo,System.Byte[],System.Byte[],System.Boolean)">
-            size original: samplesPerRow sizeFinal: samplesPerRowPacked (trailing elements are trash!) *
-        </member>
-        <member name="M:Hjg.Pngcs.ImageLine.SetScanLine(System.Int32[])">
-            <summary>
-            Makes a deep copy
-            </summary>
-            <remarks>You should rarely use this</remarks>
-            <param name="b"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.ImageLine.GetScanLineCopy(System.Int32[])">
-            <summary>
-            Makes a deep copy
-            </summary>
-            <remarks>You should rarely use this</remarks>
-            <param name="b"></param>
-        </member>
         <member name="P:Hjg.Pngcs.ImageLine.ImgInfo">
             <summary>
             ImageInfo (readonly inmutable)
@@ -1147,6 +1364,31 @@
             informational only ; filled by the reader
             </summary>
         </member>
+        <member name="M:Hjg.Pngcs.ImageLine.#ctor(Hjg.Pngcs.ImageInfo,Hjg.Pngcs.ImageLine.ESampleType,System.Boolean)">
+            <summary>
+            Constructs an ImageLine
+            </summary>
+            <param name="imgInfo">Inmutable copy of PNG ImageInfo</param>
+            <param name="stype">Storage for samples:INT (default) or BYTE</param>
+            <param name="unpackedMode">If true and bitdepth less than 8, samples are unpacked. This has no effect if biddepth 8 or 16</param>
+        </member>
+        <member name="M:Hjg.Pngcs.ImageLine.packInplaceByte(Hjg.Pngcs.ImageInfo,System.Byte[],System.Byte[],System.Boolean)">
+            size original: samplesPerRow sizeFinal: samplesPerRowPacked (trailing elements are trash!) *
+        </member>
+        <member name="M:Hjg.Pngcs.ImageLine.SetScanLine(System.Int32[])">
+            <summary>
+            Makes a deep copy
+            </summary>
+            <remarks>You should rarely use this</remarks>
+            <param name="b"></param>
+        </member>
+        <member name="M:Hjg.Pngcs.ImageLine.GetScanLineCopy(System.Int32[])">
+            <summary>
+            Makes a deep copy
+            </summary>
+            <remarks>You should rarely use this</remarks>
+            <param name="b"></param>
+        </member>
         <member name="T:Hjg.Pngcs.ImageLineHelper">
              <summary>
              Bunch of utility static methods to process/analyze an image line. 
@@ -1170,234 +1412,6 @@
         </member>
         <member name="M:Hjg.Pngcs.ImageLineHelper.ClampDouble(System.Double)">
             [0,1)
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkBKGD">
-            <summary>
-            bKGD chunk, see http://www.w3.org/TR/PNG/#11bKGD
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetGray(System.Int32)">
-            <summary>
-            Set gray value (0-255 if bitdept=8)
-            </summary>
-            <param name="gray"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetGray">
-            <summary>
-            Gets gray value 
-            </summary>
-            <returns>gray value  (0-255 if bitdept=8)</returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetPaletteIndex(System.Int32)">
-            <summary>
-            Set pallette index - only for indexed
-            </summary>
-            <param name="index"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetPaletteIndex">
-            <summary>
-            Get pallette index - only for indexed
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.SetRGB(System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Sets rgb value, only for rgb images
-            </summary>
-            <param name="r"></param>
-            <param name="g"></param>
-            <param name="b"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkBKGD.GetRGB">
-            <summary>
-            Gets rgb value, only for rgb images
-            </summary>
-            <returns>[r , g, b] array</returns>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkGAMA">
-            <summary>
-            gAMA chunk, see http://www.w3.org/TR/PNG/#11gAMA
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkICCP">
-            <summary>
-            iCCP Chunk: see http://www.w3.org/TR/PNG/#11iCCP
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.SetProfileNameAndContent(System.String,System.String)">
-            <summary>
-            Sets profile name and profile
-            </summary>
-            <param name="name">profile name </param>
-            <param name="profile">profile (latin1 string)</param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.SetProfileNameAndContent(System.String,System.Byte[])">
-            <summary>
-            Sets profile name and profile
-            </summary>
-            <param name="name">profile name </param>
-            <param name="profile">profile (uncompressed)</param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkICCP.GetProfile">
-            <summary>
-            This uncompresses the string!
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkIDAT">
-            <summary>
-            IDAT chunk http://www.w3.org/TR/PNG/#11IDAT
-            
-            This object is dummy placeholder - We treat this chunk in a very different way than ancillary chnks
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkIEND">
-            <summary>
-            IEND chunk  http://www.w3.org/TR/PNG/#11IEND
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkIHDR">
-            <summary>
-            IHDR chunk: http://www.w3.org/TR/PNG/#11IHDR
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkITXT">
-            <summary>
-            iTXt chunk:  http://www.w3.org/TR/PNG/#11iTXt
-            One of the three text chunks
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkTextVar">
-            <summary>
-            general class for textual chunks
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkTextVar.GetKey">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkUNKNOWN">
-            <summary>
-            Unknown (for our chunk factory) chunk type.
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkPHYS">
-            <summary>
-            pHYs chunk: http://www.w3.org/TR/PNG/#11pHYs
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.GetAsDpi">
-            <summary>
-            returns -1 if not in meters, or not equal
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.GetAsDpi2">
-            <summary>
-            returns -1 if the physicial unit is unknown
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPHYS.SetAsDpi(System.Double)">
-            <summary>
-            same in both directions
-            </summary>
-            <param name="dpi"></param>
-        </member>
-        <member name="P:Hjg.Pngcs.Chunks.PngChunkPHYS.Units">
-            <summary>
-            0: unknown 1:metre
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkPLTE">
-            <summary>
-            PLTE Palette chunk: this is the only optional critical chunk
-            
-            http://www.w3.org/TR/PNG/#11PLTE
-            </summary>
-        </member>
-        <member name="F:Hjg.Pngcs.Chunks.PngChunkPLTE.entries">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.SetNentries(System.Int32)">
-            <summary>
-            Also allocates array
-            </summary>
-            <param name="nentries">1-256</param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntry(System.Int32)">
-            <summary>
-            as packed RGB8
-            </summary>
-            <param name="n"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntryRgb(System.Int32,System.Int32[],System.Int32)">
-            <summary>
-            Gets n'th entry, filling 3 positions of given array, at given offset
-            </summary>
-            <param name="index"></param>
-            <param name="rgb"></param>
-            <param name="offset"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.GetEntryRgb(System.Int32,System.Int32[])">
-            <summary>
-            shortcut: GetEntryRgb(index, int[] rgb, 0)
-            </summary>
-            <param name="n"></param>
-            <param name="rgb"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkPLTE.MinBitDepth">
-            <summary>
-            minimum allowed bit depth, given palette size
-            </summary>
-            <returns>1-2-4-8</returns>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkTEXT">
-            <summary>
-            tEXt chunk: latin1 uncompressed text
-            </summary>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkTIME">
-            <summary>
-            tIME chunk: http://www.w3.org/TR/PNG/#11tIME
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkTIME.GetAsString">
-            format YYYY/MM/DD HH:mm:SS 
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkTRNS">
-            <summary>
-            tRNS chunk: http://www.w3.org/TR/PNG/#11tRNS
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.SetPalletteAlpha(System.Int32[])">
-            <summary>
-            WARNING: non deep copy
-            </summary>
-            <param name="palAlpha"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.setIndexEntryAsTransparent(System.Int32)">
-            <summary>
-            utiliy method : to use when only one pallete index is set as totally transparent
-            </summary>
-            <param name="palAlphaIndex"></param>
-        </member>
-        <member name="M:Hjg.Pngcs.Chunks.PngChunkTRNS.GetPalletteAlpha">
-            <summary>
-            WARNING: non deep copy
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Hjg.Pngcs.Chunks.PngChunkZTXT">
-            <summary>
-            zTXt chunk: http://www.w3.org/TR/PNG/#11zTXt
-            
-            </summary>
         </member>
         <member name="T:Hjg.Pngcs.FilterType">
             <summary>
@@ -1526,20 +1540,6 @@
              </summary>
             
         </member>
-        <member name="T:Hjg.Pngcs.ProgressiveOutputStream">
-             <summary>
-             stream that outputs to memory and allows to flush fragments every 'size'
-             bytes to some other destination
-             </summary>
-            
-        </member>
-        <member name="M:Hjg.Pngcs.ProgressiveOutputStream.CheckFlushBuffer(System.Boolean)">
-             <summary>
-             if it's time to flush data (or if forced==true) calls abstract method
-             flushBuffer() and cleans those bytes from own buffer
-             </summary>
-            
-        </member>
         <member name="T:Hjg.Pngcs.PngjBadCrcException">
             <summary>
             Exception for CRC check
@@ -1590,10 +1590,57 @@
             
              </remarks>
         </member>
+        <member name="P:Hjg.Pngcs.PngReader.ImgInfo">
+            <summary>
+            Basic image info, inmutable
+            </summary>
+        </member>
         <member name="F:Hjg.Pngcs.PngReader.filename">
             <summary>
             filename, or description - merely informative, can be empty
             </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.ChunkLoadBehaviour">
+            <summary>
+            Strategy for chunk loading. Default: LOAD_CHUNK_ALWAYS
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.ShouldCloseStream">
+            <summary>
+            Should close the underlying Input Stream when ends?
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.MaxBytesMetadata">
+            <summary>
+            Maximum amount of bytes from ancillary chunks to load in memory 
+            </summary>
+            <remarks>
+             Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.MaxTotalBytesRead">
+            <summary>
+            Maximum total bytes to read from stream 
+            </summary>
+            <remarks>
+             Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.SkipChunkMaxSize">
+            <summary>
+            Maximum ancillary chunk size
+            </summary>
+            <remarks>
+             Default: 2MB, 0: unlimited. Chunks exceeding this size will be skipped (nor even CRC checked)
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.SkipChunkIds">
+            <summary>
+            Ancillary chunks to skip
+            </summary>
+            <remarks>
+             Default: { "fdAT" }. chunks with these ids will be skipped (nor even CRC checked)
+            </remarks>
         </member>
         <member name="F:Hjg.Pngcs.PngReader.metadata">
             <summary>
@@ -1624,6 +1671,12 @@
             <summary>
             raw current row, after unfiltered
             </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngReader.CurrentChunkGroup">
+            <summary>
+            number of chunk group (0-6) last read, or currently reading
+            </summary>
+            <remarks>see ChunksList.CHUNK_GROUP_NNN</remarks>
         </member>
         <member name="F:Hjg.Pngcs.PngReader.rowNum">
             <summary>
@@ -1725,59 +1778,6 @@
         <member name="M:Hjg.Pngcs.PngReader.IsUnpackedMode">
             @see PngReader#setUnpackedMode(boolean)
         </member>
-        <member name="P:Hjg.Pngcs.PngReader.ImgInfo">
-            <summary>
-            Basic image info, inmutable
-            </summary>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.ChunkLoadBehaviour">
-            <summary>
-            Strategy for chunk loading. Default: LOAD_CHUNK_ALWAYS
-            </summary>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.ShouldCloseStream">
-            <summary>
-            Should close the underlying Input Stream when ends?
-            </summary>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.MaxBytesMetadata">
-            <summary>
-            Maximum amount of bytes from ancillary chunks to load in memory 
-            </summary>
-            <remarks>
-             Default: 5MB. 0: unlimited. If exceeded, chunks will be skipped
-            </remarks>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.MaxTotalBytesRead">
-            <summary>
-            Maximum total bytes to read from stream 
-            </summary>
-            <remarks>
-             Default: 200MB. 0: Unlimited. If exceeded, an exception will be thrown
-            </remarks>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.SkipChunkMaxSize">
-            <summary>
-            Maximum ancillary chunk size
-            </summary>
-            <remarks>
-             Default: 2MB, 0: unlimited. Chunks exceeding this size will be skipped (nor even CRC checked)
-            </remarks>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.SkipChunkIds">
-            <summary>
-            Ancillary chunks to skip
-            </summary>
-            <remarks>
-             Default: { "fdAT" }. chunks with these ids will be skipped (nor even CRC checked)
-            </remarks>
-        </member>
-        <member name="P:Hjg.Pngcs.PngReader.CurrentChunkGroup">
-            <summary>
-            number of chunk group (0-6) last read, or currently reading
-            </summary>
-            <remarks>see ChunksList.CHUNK_GROUP_NNN</remarks>
-        </member>
         <member name="T:Hjg.Pngcs.PngWriter">
             <summary>
              Writes a PNG image, line by line.
@@ -1792,6 +1792,32 @@
             <summary>
             filename, or description - merely informative, can be empty
             </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngWriter.CompressionStrategy">
+            Deflate algortithm compression strategy
+        </member>
+        <member name="P:Hjg.Pngcs.PngWriter.CompLevel">
+            <summary>
+            zip compression level (0 - 9)
+            </summary>
+            <remarks>
+            default:6
+            
+            9 is the maximum compression
+            </remarks>
+        </member>
+        <member name="P:Hjg.Pngcs.PngWriter.ShouldCloseStream">
+            <summary>
+            true: closes stream after ending write
+            </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngWriter.IdatMaxSize">
+            <summary>
+            Maximum size of IDAT chunks
+            </summary>
+            <remarks>
+            0=use default (PngIDatChunkOutputStream 32768)
+            </remarks>
         </member>
         <member name="F:Hjg.Pngcs.PngWriter.metadata">
             <summary>
@@ -1817,6 +1843,12 @@
             <summary>
             raw current row, after filtered
             </summary>
+        </member>
+        <member name="P:Hjg.Pngcs.PngWriter.CurrentChunkGroup">
+            <summary>
+            number of chunk group (0-6) last writen, or currently writing
+            </summary>
+            <remarks>see ChunksList.CHUNK_GROUP_NNN</remarks>
         </member>
         <member name="M:Hjg.Pngcs.PngWriter.#ctor(System.IO.Stream,Hjg.Pngcs.ImageInfo)">
             <summary>
@@ -1917,55 +1949,32 @@
             </remarks>
             <param name="filterType">One of the five prediction types or strategy to choose it</param>
         </member>
-        <member name="P:Hjg.Pngcs.PngWriter.CompressionStrategy">
-            Deflate algortithm compression strategy
-        </member>
-        <member name="P:Hjg.Pngcs.PngWriter.CompLevel">
-            <summary>
-            zip compression level (0 - 9)
-            </summary>
-            <remarks>
-            default:6
+        <member name="T:Hjg.Pngcs.ProgressiveOutputStream">
+             <summary>
+             stream that outputs to memory and allows to flush fragments every 'size'
+             bytes to some other destination
+             </summary>
             
-            9 is the maximum compression
-            </remarks>
         </member>
-        <member name="P:Hjg.Pngcs.PngWriter.ShouldCloseStream">
+        <member name="M:Hjg.Pngcs.ProgressiveOutputStream.CheckFlushBuffer(System.Boolean)">
+             <summary>
+             if it's time to flush data (or if forced==true) calls abstract method
+             flushBuffer() and cleans those bytes from own buffer
+             </summary>
+            
+        </member>
+        <member name="T:Hjg.Pngcs.Zlib.ZlibInputStreamMs">
             <summary>
-            true: closes stream after ending write
+            Zip input (deflater) based on Ms DeflateStream (.net 4.5)
             </summary>
         </member>
-        <member name="P:Hjg.Pngcs.PngWriter.IdatMaxSize">
-            <summary>
-            Maximum size of IDAT chunks
-            </summary>
-            <remarks>
-            0=use default (PngIDatChunkOutputStream 32768)
-            </remarks>
-        </member>
-        <member name="P:Hjg.Pngcs.PngWriter.CurrentChunkGroup">
-            <summary>
-            number of chunk group (0-6) last writen, or currently writing
-            </summary>
-            <remarks>see ChunksList.CHUNK_GROUP_NNN</remarks>
-        </member>
-        <member name="T:Hjg.Pngcs.Zlib.ZlibOutputStreamIs">
-            <summary>
-            Zlib output (deflater) based on ShaprZipLib
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Zlib.AZlibOutputStream.getImplementationId">
+        <member name="M:Hjg.Pngcs.Zlib.AZlibInputStream.getImplementationId">
             <summary>
             mainly for debugging
             </summary>
             <returns></returns>
         </member>
-        <member name="T:Hjg.Pngcs.Zlib.ZlibInputStreamIs">
-            <summary>
-            Zip input (inflater) based on ShaprZipLib
-            </summary>
-        </member>
-        <member name="M:Hjg.Pngcs.Zlib.AZlibInputStream.getImplementationId">
+        <member name="M:Hjg.Pngcs.Zlib.AZlibOutputStream.getImplementationId">
             <summary>
             mainly for debugging
             </summary>

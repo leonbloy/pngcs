@@ -40,9 +40,6 @@
     <Compile Include="..\Hjg.Pngcs\BufferedStreamReader.cs">
       <Link>BufferedStreamReader.cs</Link>
     </Compile>
-    <Compile Include="..\Hjg.Pngcs\ChunkReader.cs">
-      <Link>ChunkReader.cs</Link>
-    </Compile>
     <Compile Include="..\Hjg.Pngcs\ChunkReaderMode.cs">
       <Link>ChunkReaderMode.cs</Link>
     </Compile>
