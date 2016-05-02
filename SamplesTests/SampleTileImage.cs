@@ -17,7 +17,6 @@ namespace SampleTests {
             if (factor<2 || factor>100) throw new PngjException("bad factor ");
             PngReader pngr = FileHelper.CreatePngReader(orig);
             var x = pngr.ImgInfo;
-            x.
             PngWriter pngw = FileHelper.CreatePngWriter(dest, pngr.ImgInfo, true);
             pngr.SetUnpackedMode(true); // we dont want to do the unpacking ourselves, we want a sample per array element
             pngw.SetUseUnPackedMode(true); // not really necesary here, as we pass the ImageLine, but anyway...

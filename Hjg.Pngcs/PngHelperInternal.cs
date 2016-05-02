@@ -203,7 +203,7 @@ namespace Hjg.Pngcs {
 
         public static void Logdebug(String msg) {
             if (DEBUG)
-                System.Console.Out.WriteLine(msg);
+                System.Diagnostics.Debug.WriteLine(msg);
         }
 
 
@@ -218,7 +218,7 @@ namespace Hjg.Pngcs {
 
     internal static void Log(string p, Exception e)
     {
-        Console.Error.WriteLine(p);
+        System.Diagnostics.Debug.WriteLine(p);
     }
     }
 }

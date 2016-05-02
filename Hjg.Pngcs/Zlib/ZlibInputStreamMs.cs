@@ -40,20 +40,21 @@ namespace Hjg.Pngcs.Zlib {
             }
             return r;
         }
+        
+        public virtual void Close() {
 
-        public override void Close() {
             if (!initdone) doInit(); // can happen if never called write
             if (closed) return;
             closed = true;
             if (deflateStream != null) {
-                deflateStream.Close();
+                deflateStream.Dispose();
             }
             if (crcread == null) { // eat trailing 4 bytes
                 crcread = new byte[4];
                 for (int i = 0; i < 4; i++) crcread[i] = (byte)rawStream.ReadByte();
             }
             if (!leaveOpen)
-                rawStream.Close();
+                rawStream.Dispose();
         }
 
         private void initStream() {
@@ -86,6 +87,23 @@ namespace Hjg.Pngcs.Zlib {
         public override  String getImplementationId() {
             return "Zlib inflater: .Net CLR 4.5";
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.Close();
+                // Free any other managed objects here.
+                //
+            }
+
+            // Free any unmanaged objects here.
+            //
+
+            // Call base class implementation.
+            base.Dispose(disposing);
+        }
+    }
 #endif
 
     

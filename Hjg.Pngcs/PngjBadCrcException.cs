@@ -10,7 +10,9 @@ namespace Hjg.Pngcs {
     /// <summary>
     /// Exception for CRC check
     /// </summary>
+#if !PORTABLE
     [Serializable]
+#endif
     public class PngjBadCrcException : PngjException {
         private const long serialVersionUID = 1L;
 

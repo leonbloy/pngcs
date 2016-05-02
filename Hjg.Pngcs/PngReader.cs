@@ -225,7 +225,7 @@ namespace Hjg.Pngcs {
         private void ReadLastAndClose() {
             if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_5_AFTERIDAT) {
                 try {
-                    idatIstream.Close();
+                    idatIstream.Dispose();
                 } catch (Exception ) { }
                 ReadLastChunks();
             }
@@ -235,13 +235,13 @@ namespace Hjg.Pngcs {
         private void Close() {
             if (CurrentChunkGroup < ChunksList.CHUNK_GROUP_6_END) { // this could only happen if forced close
                 try {
-                    idatIstream.Close();
+                    idatIstream.Dispose();
                 } catch (Exception ) {
                 }
                 CurrentChunkGroup = ChunksList.CHUNK_GROUP_6_END;
             }
             if (ShouldCloseStream)
-                inputStream.Close();
+                inputStream.Dispose();
         }
 
 
@@ -451,7 +451,7 @@ namespace Hjg.Pngcs {
         /// </remarks>
         /// <param name="warn"></param>
         internal void logWarn(String warn) {
-            Console.Error.WriteLine(warn);
+            System.Diagnostics.Debug.WriteLine(warn);
         }
 
         /// <summary>

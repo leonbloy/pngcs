@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FC944235-D299-4EEF-BE46-D5A83C591048}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SamplesTests</RootNamespace>
+    <AssemblyName>SamplesTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hjg.Pngcs.Portable\Hjg.Pngcs.Portable.csproj">
+      <Project>{ccf5e155-ecf0-4dbc-bc7c-69fe1aaaf235}</Project>
+      <Name>Hjg.Pngcs.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Hjg.Pngcs\FileHelper.cs">
+      <Link>FileHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\MainProgram.cs">
+      <Link>MainProgram.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\NullOutputStream.cs">
+      <Link>NullOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleConvertToTrueCol.cs">
+      <Link>SampleConvertToTrueCol.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleCreateOrange.cs">
+      <Link>SampleCreateOrange.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleCustomChunk.cs">
+      <Link>SampleCustomChunk.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleDecreaseRed.cs">
+      <Link>SampleDecreaseRed.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleMirrorImage.cs">
+      <Link>SampleMirrorImage.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleShowChunks.cs">
+      <Link>SampleShowChunks.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\SampleTileImage.cs">
+      <Link>SampleTileImage.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\TestPngSuite.cs">
+      <Link>TestPngSuite.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\TestsHelper.cs">
+      <Link>TestsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\TestTextChunks.cs">
+      <Link>TestTextChunks.cs</Link>
+    </Compile>
+    <Compile Include="..\SamplesTests\TestZlib.cs">
+      <Link>TestZlib.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -15,7 +15,7 @@ namespace Ar.Com.Hjg.Pngcs
         private bool eof = false;
         private bool closeStream = true;
         private bool failIfNoFeed = false;
-        private static const int DEFAULTSIZE = 8192;
+        private const int DEFAULTSIZE = 8192;
 
        	public BufferedStreamFeeder(Stream ist) : this(ist,DEFAULTSIZE) {
 	    }
@@ -126,7 +126,7 @@ namespace Ar.Com.Hjg.Pngcs
             try
             {
                 if (_stream != null && closeStream)
-                    _stream.Close();
+                    _stream.Dispose();
             }
             catch (Exception e)
             {

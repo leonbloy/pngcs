@@ -53,7 +53,7 @@ namespace Hjg.Pngcs.Chunks {
         /// <param name="x"></param>
         /// <returns></returns>
         public static String ToString(byte[] x) {
-            return Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(x);
+            return Hjg.Pngcs.PngHelperInternal.charsetLatin1.GetString(x, 0, x.Length);
         }
         /// <summary>
         ///  Converts to String using Latin1 (ISO-8859-1)
@@ -81,7 +81,7 @@ namespace Hjg.Pngcs.Chunks {
         /// <param name="x"></param>
         /// <returns></returns>
         public static String ToStringUTF8(byte[] x) {
-            return Hjg.Pngcs.PngHelperInternal.charsetUtf8.GetString(x);
+            return Hjg.Pngcs.PngHelperInternal.charsetUtf8.GetString(x, 0, x.Length);
         }
         /// <summary>
         /// Converts to string using UTF-8
@@ -187,8 +187,8 @@ namespace Hjg.Pngcs.Chunks {
                 Stream outx = outb;
                 if (compress) outx = ZlibStreamFactory.createZlibOutputStream(outb);
                 shovelInToOut(inx, outx);
-                inx.Close();
-                outx.Close();
+                inx.Dispose();
+                outx.Dispose();
                 byte[] res = outb.ToArray();
                 return res;
             } catch (Exception e) {

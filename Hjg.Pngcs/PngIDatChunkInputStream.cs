@@ -70,8 +70,12 @@ namespace Hjg.Pngcs {
         /// does NOT close the associated stream!
         /// </summary>
         ///
+#if PORTABLE
+        public virtual void Close() {
+#else
         public override void Close() {
-            base.Close(); // nothing
+#endif
+            base.Dispose(); // nothing
         }
 
         private void EndChunkGoForNext() {

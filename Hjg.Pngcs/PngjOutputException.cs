@@ -10,7 +10,9 @@ namespace Hjg.Pngcs {
     /// <summary>
     /// Exception associated with input (reading) operations
     /// </summary>
+#if !PORTABLE
     [Serializable]
+#endif
     public class PngjOutputException : PngjException {
         private const long serialVersionUID = 1L;
 
