@@ -16,7 +16,7 @@ namespace Hjg.Pngcs {
     /// http://www.w3.org/TR/PNG/#11IHDR
     /// </remarks>
     public class ImageInfo {
-        private const int MAX_COLS_ROWS_VAL = 400000; // very big value, but no so ridiculous as 2^32
+        private const int MAX_COLS_ROWS_VAL = 0X7FEFFFFF; // very big value, but no so ridiculous as 2^32
 
         /// <summary>
         /// Image width, in pixels

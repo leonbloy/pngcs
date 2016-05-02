@@ -1,15 +1,14 @@
-namespace Hjg.Pngcs.Chunks {
+namespace Hjg.Pngcs.Chunks
+{
 
     using Hjg.Pngcs;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
+#if PORTABLE
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
-
+#endif
 
     /// <summary>
     /// Represents a instance of a PNG chunk
